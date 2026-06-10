@@ -1,6 +1,6 @@
 # Obsidian ASAP Recon Notes — Index
 
-> **Revival note (2026-06-10):** Original file (created 2026-06-07 10:41) was accidentally deleted. Reconstructed from ScreenPipe screenshots in `archive/screenshots/`. Rows the screenshots cut off are marked `[unverified]`.
+> **Revival note (2026-06-10):** Original file (created 2026-06-07 10:41) was accidentally deleted. Reconstructed from ScreenPipe screenshots (deleted after revival). Rows the screenshots cut off are marked `[unverified]`.
 
 **Vault path:** `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Action/MRI/ASAP Recon/`
 

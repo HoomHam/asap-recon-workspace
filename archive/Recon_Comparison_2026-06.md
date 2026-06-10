@@ -1,6 +1,6 @@
 # Steve vs Faraz — Reconstruction Comparison
 
-> **Revival note (2026-06-10):** Original file (created 2026-06-07 10:40) was accidentally deleted. Reconstructed from ScreenPipe screenshots in `archive/screenshots/`. Sections the screenshots cut off are marked. **Superseded** by `reference/Recon_Comparison_StaticGas.md` (2026-06-10), which also corrects errors in this doc (MATLAB combine is real-part, not magnitude; Steve does combine coils via b-map; Faraz does not de-apodize).
+> **Revival note (2026-06-10):** Original file (created 2026-06-07 10:40) was accidentally deleted. Reconstructed from ScreenPipe screenshots (deleted after revival). Sections the screenshots cut off are marked. **Superseded** by `reference/Recon_Comparison_StaticGas.md` (2026-06-10), which also corrects errors in this doc (MATLAB combine is real-part, not magnitude; Steve does combine coils via b-map; Faraz does not de-apodize).
 
 **Full deep-dive:** `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Action/MRI/ASAP Recon/ASAP Faraz vs Steve.md`
 

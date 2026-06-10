@@ -1,6 +1,6 @@
 # Steve's ASAP Recon — Code Map
 
-**Date:** 2026-06-10 (rewritten fresh from code read; original 2026-06-07 version deleted, partial copy in `archive/screenshots/`)
+**Date:** 2026-06-10 (rewritten fresh from code read; original 2026-06-07 version deleted)
 **Repo:** `/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/`
 **Full pipeline notes:** Obsidian `Action/MRI/ASAP Recon/ASAP Recon Pipeline.md`
 **Faraz function map:** Obsidian `Action/MRI/ASAP Recon/ASAP Recon Faraz Approach.md`
