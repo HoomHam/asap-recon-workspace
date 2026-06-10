@@ -17,7 +17,9 @@ cd workspace/helpers
 |------|------|
 | `asap_recon.py` | Module: `recon(traj, data, sample_weights=None, method=...)`; adjoint / Pipe–Menon DCF / CG via FINUFFT type1+type2; Steve-grid-units → radians conversion |
 | `selftest.py` | Synthetic validation: adjointness dot-product test (machine precision), quality ordering adjoint < +DCF < CG. No scanner data needed |
-| `compare_baseline.py` | The arbiter experiment: recon Steve's npy dumps, compare vs `savedbin0.npy` over all axis-flips, write side-by-side slices |
+| `dump_inputs.py` | **No-GPU input production**: runs Steve's own `raw.py`/`traj` loaders on a `.dat` + trajectory `.npy`, writes his exact `trajx/y/z.npy`, `acq.npy`, `bins.npy` + `meta.json`. Needs `pymapvbvd` (installed) |
+| `steve_kernel_numpy.py` | Faithful CPU reimplementation of `cudarecon`/`cudarenorm` (single bin/channel): same filter, box, Gaussian, knorm kluge, F-order reshape, FFT, crop. ~1.6 s / 120k samples on 153³. Validated corr 0.95 vs synthetic truth |
+| `compare_baseline.py` | The arbiter experiment: our recons vs Steve — uses GPU `savedbin0.npy` if present, else computes Steve-equivalent via the numpy kernel. Flip-search alignment, slice figure |
 
 ## Conventions (read before touching)
 
@@ -30,9 +32,13 @@ cd workspace/helpers
 ## Status / next
 
 - [x] Operator pair validated (selftest PASS, 2026-06-10)
-- [ ] Arbiter run on real phantom data — needs Steve's npy dumps
-      (`trajx/y/z.npy`, `acq.npy` from one `dyn_recon` run, results.py:258-262)
-      and his `savedbin0.npy` output in the same folder
-- [ ] Confounder-neutralized comparison (gplb=0, killpts) per
-      `reference/Recon_Comparison_StaticGas.md` protocol
+- [x] No-GPU path complete: `dump_inputs.py` (inputs via Steve's own loaders)
+      + `steve_kernel_numpy.py` (Steve-equivalent output). Cloud CUDA now
+      optional — only for one-time bit-faithfulness certification
+- [ ] **Arbiter run on real phantom data** — blocked only on a `.dat` file +
+      its gas trajectory `.npy`:
+      `dump_inputs.py meas.dat gp_traj.npy out/ && compare_baseline.py out/`
+- [ ] Confounder-neutralized comparison (gplb=0 via meta.json edit, killpts)
+      per `reference/Recon_Comparison_StaticGas.md` protocol
+- [ ] One-time Colab run to certify numpy kernel vs GPU savedbin0.npy
 - [ ] CS layer (sigpy L1-wavelet/TV) on top of the same operator

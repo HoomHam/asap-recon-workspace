@@ -57,20 +57,33 @@ def main():
 
     recons = [("adjoint", img_adj), ("adjoint+DCF", img_dcf), ("CG", img_cg)]
 
-    # Steve's output, if available
+    # Steve's output: GPU savedbin0.npy if present, else our numpy
+    # reimplementation of his kernel (steve_kernel_numpy, axes-matched)
     steve_path = sys.argv[2] if len(sys.argv) > 2 else os.path.join(folder, "savedbin0.npy")
-    steve = np.load(steve_path) if os.path.exists(steve_path) else None
+    meta_path = os.path.join(folder, "meta.json")
+    steve = None
+    steve_label = "steve"
+    if os.path.exists(steve_path):
+        steve = np.transpose(np.load(steve_path), (2, 1, 0))  # his (z,y,x) -> xyz
+        print(f"\nSteve GPU output {steve.shape} from {steve_path}")
+    elif os.path.exists(meta_path):
+        import json
+        from steve_kernel_numpy import steve_recon
+        meta = json.load(open(meta_path))
+        print(f"\nno savedbin0.npy — computing Steve-equivalent (numpy kernel, "
+              f"gplb={meta['gplb']}) ...")
+        steve = steve_recon(d["traj"], acq, npts=meta["npts"], MS=meta["MS"],
+                            IS=meta["IS"], smoothing=meta["gplb"], axes="xyz")
+        steve_label = "steve-equiv (numpy)"
     if steve is not None:
-        print(f"\nSteve output {steve.shape} from {steve_path}")
         for name, img in recons:
             c, flips, _ = best_aligned_corr(img, steve)
-            print(f"  corr(|{name}|, |steve|) = {c:.4f}   (flips {flips})")
+            print(f"  corr(|{name}|, |{steve_label}|) = {c:.4f}   (flips {flips})")
     else:
-        print("\nno savedbin0.npy found — showing our recons only "
-              "(run Steve's dyn_recon once to produce it)")
+        print("\nno savedbin0.npy and no meta.json — showing our recons only")
 
     # figure: center slices, 3 orientations x recons (+ steve)
-    panels = recons + ([("steve", steve)] if steve is not None else [])
+    panels = recons + ([(steve_label, steve)] if steve is not None else [])
     fig, axes = plt.subplots(3, len(panels), figsize=(4 * len(panels), 11))
     for j, (name, img) in enumerate(panels):
         a = norm(img)
