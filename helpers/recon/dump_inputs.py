@@ -8,7 +8,10 @@ plus meta.json (npts, nuniquesmp, ntotalilvs, nch, MS, IS, TR) needed by
 steve_kernel_numpy.py.
 
 Usage:
-    .venv/bin/python dump_inputs.py <meas.dat> <gp_traj.npy> [dp_traj.npy] [outdir]
+    .venv/bin/python dump_inputs.py <meas.dat> <gp_traj.npy> [dp_traj.npy] [outdir] [--fov MM]
+
+--fov overrides Steve's hardcoded traj.FOV = 350 mm (raw.py:26) for data
+acquired at a different field of view (e.g. the v3_fov250 phantom).
 
 Runs Steve's raw.load() (noise normalization, rephasing, spike filter,
 exclusion ranges) so the dumped acq is bit-faithful to what his recon grids.
@@ -30,17 +33,26 @@ import raw as steve_raw                              # noqa: E402
 
 
 def main():
-    if len(sys.argv) < 3:
+    args = sys.argv[1:]
+    fov = None
+    if "--fov" in args:
+        i = args.index("--fov")
+        fov = float(args[i + 1])
+        del args[i:i + 2]
+    if len(args) < 2:
         sys.exit(__doc__)
-    datfile = sys.argv[1]
-    gptraj = sys.argv[2]
-    dptraj = sys.argv[3] if len(sys.argv) > 3 and sys.argv[3].endswith(".npy") else "/nonexistent"
-    outdir = sys.argv[-1] if not sys.argv[-1].endswith((".npy", ".dat")) else "."
+    datfile = args[0]
+    gptraj = args[1]
+    dptraj = args[2] if len(args) > 2 and args[2].endswith(".npy") else "/nonexistent"
+    outdir = args[-1] if not args[-1].endswith((".npy", ".dat")) else "."
     os.makedirs(outdir, exist_ok=True)
 
     g = gvar()
 
     trajec = steve_raw.traj()
+    if fov is not None:
+        trajec.FOV = fov
+        print(f"traj.FOV overridden: {fov} mm")
     trajec.load(gptraj, dptraj, nusimg=1)
     if trajec.npts == 0:
         sys.exit(f"trajectory load failed for {gptraj}")
