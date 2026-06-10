@@ -27,13 +27,24 @@ Personal working space alongside Steve/Kento's ASAP recon code.
 | `helpers/` | Hooman's scripts — loaders, plotters, CS tools | subfolder by type |
 
 ## Active Reference Docs
-*(populate as created)*
 
-| Doc | Contents |
-|-----|---------|
-| `reference/Recon_Overview.md` | High-level algorithm map — Steve's pipeline |
-| `reference/Recon_Comparison.md` | Steve vs Faraz implementation diff |
-| `reference/Physics_Notes.md` | k-space, gridding, Xe-129 gas exchange concepts |
+| Doc | Contents | Status |
+|-----|---------|--------|
+| `reference/Recon_Comparison_StaticGas.md` | Steve vs Faraz full diff — static phantom, single bin, gas only. Scoring, theory notes, compute cost. **Single source of truth for this comparison.** | ✅ 2026-06-10 |
+| `reference/Recon_Overview_Steve.md` | Code map — Steve's pipeline: file roles, data flow, entry points, GPU dispatch, magic numbers | ✅ 2026-06-10 |
+| `reference/Recon_Overview_Faraz.md` | Code map — Faraz's MATLAB pipeline: file roles, data flow, entry points, compute model, magic numbers | ✅ 2026-06-10 |
+| `reference/Physics_Notes.md` | Educational: non-Cartesian recon from FID + 2D DFT up — signal eq, DCF, gridding, kernels, coil combine, trajectory calibration, CS outlook; every concept mapped to Steve/Faraz code | ✅ 2026-06-10 |
+
+## Archive
+
+Original reference docs (created 2026-06-07) were accidentally deleted before the 2026-06-10 session; revived from ScreenPipe screenshots and archived:
+
+| Doc | What it was | Notes |
+|-----|------------|-------|
+| `archive/Obsidian_index_2026-06.md` | Index of Obsidian ASAP Recon vault notes | Revived from screenshots; a few rows marked `[unverified]` |
+| `archive/Recon_Comparison_2026-06.md` | Old Steve-vs-Faraz summary (LLM-generated) | Revived; superseded by `reference/Recon_Comparison_StaticGas.md`, which corrects its errors (magnitude-vs-real combine, coil-combine claims, de-apodization) |
+
+Obsidian deep-dive comparison (`Action/MRI/ASAP Recon/ASAP Faraz vs Steve.md`) also superseded by `Recon_Comparison_StaticGas.md` for static-gas scope.
 
 ## People Quick Ref
 - **Steve** — original author, check his code for ground truth
