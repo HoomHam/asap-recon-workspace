@@ -37,10 +37,17 @@ FOV_MM = 250.0
 
 
 def phase_corrected_real(c, sigma=4):
-    """Steve/Faraz-style output stage: divide by a smooth phase estimate and
-    take the real part (what calcb's b-map and combinecoils_fa both do).
-    Comparing our raw magnitudes against their phased real parts overstates
-    our low-frequency shading by ~20% (measured 2026-06-11)."""
+    """Real part after dividing by a locally-smoothed phase estimate.
+
+    NOT USED for display — kept as a cautionary reference. A sigma=4-voxel
+    local phase reference fails where phase varies fast or smoothed magnitude
+    is ~0 (dark inserts, edges, end slices): cos(dphi) suppression -> hollow
+    blotches (seen 2026-06-11, reverted). It also *improved* interior-CV while
+    visibly degrading the image — metric blind spot. A proper version needs
+    Steve's approach: phase from a full-data recon with polynomial fill in
+    low-signal regions (results.calcb), not a local filter. Note also: for
+    single-channel single-rep data Faraz's combine reduces to magnitude, so
+    |.| is already the matched comparison."""
     from scipy.ndimage import gaussian_filter
     sm = gaussian_filter(c.real, sigma) + 1j * gaussian_filter(c.imag, sigma)
     ph = sm / (np.abs(sm) + 1e-12)
@@ -102,16 +109,16 @@ def main():
     print(f"alpha (his resizing formula on this trajectory) = {alpha:.4f}  "
           f"-> magnification x{1/alpha:.3f}")
 
-    # --- recons (output stage matched to theirs: phased real part, not |.|) ---
+    # --- recons. MAGNITUDE display: for single-channel single-rep data
+    # Faraz's combinecoils_fa reduces to b = img/|img|, so his output IS the
+    # magnitude — |.| is the matched treatment here. (The phased-real-part
+    # detour of 2026-06-11 produced suppression artifacts from a local phase
+    # reference and was reverted; see phase_corrected_real docstring.) ---
     print("our CG recon ...")
-    vol_cg = phase_corrected_real(ar.recon(d["traj"], d["acq"], method="cg",
-                                           cg_iters=15))
-    vol_cg = np.maximum(vol_cg, 0)
+    vol_cg = np.abs(ar.recon(d["traj"], d["acq"], method="cg", cg_iters=15))
     print("steve-equiv recon ...")
-    vol_st = phase_corrected_real(steve_recon(d["traj"], d["acq"],
-                                              npts=meta["npts"], MS=MS, IS=IS,
-                                              smoothing=meta["gplb"], axes="xyz"))
-    vol_st = np.maximum(vol_st, 0)
+    vol_st = np.abs(steve_recon(d["traj"], d["acq"], npts=meta["npts"], MS=MS,
+                                IS=IS, smoothing=meta["gplb"], axes="xyz"))
 
     # --- 2. proof: alpha-emulated CG must match his volume at s = 1.00 ---
     traj_a = kdk * alpha + MS / 2
