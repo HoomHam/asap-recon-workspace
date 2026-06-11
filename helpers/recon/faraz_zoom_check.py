@@ -36,6 +36,17 @@ ACR_TRUE_MM = (190.0, 190.0, 148.0)
 FOV_MM = 250.0
 
 
+def phase_corrected_real(c, sigma=4):
+    """Steve/Faraz-style output stage: divide by a smooth phase estimate and
+    take the real part (what calcb's b-map and combinecoils_fa both do).
+    Comparing our raw magnitudes against their phased real parts overstates
+    our low-frequency shading by ~20% (measured 2026-06-11)."""
+    from scipy.ndimage import gaussian_filter
+    sm = gaussian_filter(c.real, sigma) + 1j * gaussian_filter(c.imag, sigma)
+    ph = sm / (np.abs(sm) + 1e-12)
+    return (c * np.conj(ph)).real
+
+
 def center_zoom(vol, factor, out_shape=None):
     """Zoom about the volume center, crop/pad back to out_shape."""
     if out_shape is None:
@@ -91,12 +102,16 @@ def main():
     print(f"alpha (his resizing formula on this trajectory) = {alpha:.4f}  "
           f"-> magnification x{1/alpha:.3f}")
 
-    # --- recons ---
+    # --- recons (output stage matched to theirs: phased real part, not |.|) ---
     print("our CG recon ...")
-    vol_cg = np.abs(ar.recon(d["traj"], d["acq"], method="cg", cg_iters=15))
+    vol_cg = phase_corrected_real(ar.recon(d["traj"], d["acq"], method="cg",
+                                           cg_iters=15))
+    vol_cg = np.maximum(vol_cg, 0)
     print("steve-equiv recon ...")
-    vol_st = np.abs(steve_recon(d["traj"], d["acq"], npts=meta["npts"], MS=MS,
-                                IS=IS, smoothing=meta["gplb"], axes="xyz"))
+    vol_st = phase_corrected_real(steve_recon(d["traj"], d["acq"],
+                                              npts=meta["npts"], MS=MS, IS=IS,
+                                              smoothing=meta["gplb"], axes="xyz"))
+    vol_st = np.maximum(vol_st, 0)
 
     # --- 2. proof: alpha-emulated CG must match his volume at s = 1.00 ---
     traj_a = kdk * alpha + MS / 2
