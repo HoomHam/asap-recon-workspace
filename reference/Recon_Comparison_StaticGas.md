@@ -304,3 +304,74 @@ Neither divides the image by the kernel's Fourier transform. Steve gets away wit
 **Comparison protocol implications:** neutralize 3 (set gplb = 0 or filter both) and 4 (test killpts both ways) before attributing image differences to 1 and 2, which are the genuine algorithmic comparison. Items 5–9 are implementation style, not algorithm. Item 10 only matters when judging against known phantom geometry.
 
 **CS pipeline implications:** take Faraz's KB geometry but with full k³ kernel support; drop DCF (the iterative solver's forward model handles density); make any readout filtering an explicit, reported parameter; settle killpts empirically on phantom data.
+
+---
+
+## Why each beats the textbook — estimator objectives
+
+*(Added 2026-06-11 after the ACR phantom measurements: Steve's recon measured
+SNR 28.7 vs the unbiased CG inverse's 19.6; Faraz's measured the flattest
+interiors, lowfreq-CV 0.093 vs CG's 0.110. Both "beat" the textbook-optimal
+least-squares reconstruction. Neither result is paradoxical.)*
+
+The resolution of the paradox is that "textbook optimal" means optimal **for
+the criterion the textbook chose** — minimum variance *among unbiased
+estimators*. Total error is MSE = bias² + variance, and a biased estimator
+beats the unbiased one whenever its bias is cheap for the object at hand. Both
+implementations quietly optimize different criteria, and each wins exactly the
+metric its design implicitly targets.
+
+### Steve's SNR: minimum variance, bias accepted
+
+1. **The object's k-space is mostly empty.** Phantom and lung spectra
+   concentrate at low |k|; the outer half of k-space is essentially pure
+   noise. Steve's cell-averaging and gplb filter suppress fluctuations there
+   at near-zero signal cost. The unbiased inverse must faithfully reconstruct
+   that noise — unbiasedness *requires* it.
+2. **Kernel regression averages within cells**: variance ÷ effective samples
+   per cell, with bias (k-space assumed constant over 0.4 Δk) negligible for
+   any object smaller than the FOV.
+3. **The SNR metric rewards low-pass** (object mean / background std improves
+   under smoothing until visible blur). Steve sits just below that threshold.
+
+Measured decomposition: his gplb filter applied to our CG data buys +2 SNR
+(19.5 → 21.5); the remaining ~7 points are the cell-averaging bias–variance
+trade. Confirmed negatively by the λ sweep (`cg_tune.py`): Tikhonov over four
+decades moves CG's SNR only 19.6 → 20.9 — λI penalizes amplitude, not
+roughness, so it cannot buy what Steve's smoothing buys.
+
+### Faraz's homogeneity: flatness is literally his objective function
+
+The Pipe–Menon fixed point is `w ⊛ C = 1` across sampled k-space — iterate
+until the **net spectral weighting of the whole acquisition+recon chain is
+flat**. A flat transfer function is precisely what the eye reads as a uniform
+image; he runs five iterations of an algorithm whose convergence criterion
+*is* flatness. Secondary contributors: smooth KB interpolation (no
+cell-quantization ripple — Steve's nearest-cell binning staircases sample
+positions, producing the faint low-frequency swirl), and 3.125 mm voxels
+averaging more per voxel.
+
+The unbiased LS solution optimizes per-sample data fidelity instead; its
+spectral response is not constrained flat, and finite-iteration CG makes it
+worse — CG converges eigencomponents unevenly (extremes first), leaving
+clustered low-frequency modes partially equalized → the measured lowfreq-CV
+~0.12 that persists even at 30 iterations.
+
+### The unified picture
+
+| Recon | Implicit objective | Wins | Pays |
+|---|---|---|---|
+| Steve | minimum variance (smoothing bias accepted) | SNR | resolution tax, k-edge fidelity |
+| Faraz | flat spectral transfer (DCF fixed point) | homogeneity | DCF heuristics; grid-overflow fragility (the `resizing` zoom bug) |
+| Textbook CG | unbiased data fidelity | resolution, faithfulness, geometry | keeps all the noise; finite-iteration low-freq shading |
+
+Nobody beat the textbook — each beat it on the axis the textbook never
+optimized, by paying on an axis it did. Both veterans encoded application
+knowledge as estimator bias without writing the objective down.
+
+**Consequence for the CS step:** compressed sensing is the framework where the
+objective *is* written down — `min ‖Aρ − s‖² + λ·R(ρ)` — so the bias is chosen
+deliberately (sparsity/smoothness matched to lungs) rather than inherited from
+the gridder's plumbing. Steve's SNR advantage and Faraz's flatness both become
+tunable terms of one explicit functional; the expectation is to match or beat
+both on their home metrics simultaneously, at equal or better resolution.
