@@ -85,10 +85,10 @@ print(f"adjointness <Ax,y> vs <x,A^Hy>: rel err {adj_err:.2e}  "
       f"{'PASS' if adj_err < 1e-6 else 'FAIL'}")
 
 results = {}
-for method, kw in [("adjoint", {}), ("adjoint_dcf", {}), ("cg", {"cg_iters": 30})]:
+for method, kw in [("adjoint", {}), ("cg", {"cg_iters": 30})]:
     img = ar.recon(traj, samples, method=method, MS=MS, IS=IS, **kw)
     results[method] = nrmse(img, truth)
     print(f"{method:12s} NRMSE vs truth: {results[method]:.4f}")
 
-ok = results["adjoint_dcf"] < results["adjoint"] and results["cg"] <= results["adjoint_dcf"] * 1.05
-print("ordering adjoint > adjoint_dcf >= cg :", "PASS" if ok else "FAIL")
+ok = results["cg"] < results["adjoint"]
+print("ordering adjoint > cg :", "PASS" if ok else "FAIL")

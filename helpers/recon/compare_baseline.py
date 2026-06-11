@@ -48,14 +48,12 @@ def main():
           f"({len(acq)/traj.shape[0]:.1f}x trajectory repeats)")
     print(f"traj grid range [{traj.min():.1f}, {traj.max():.1f}] (MS={ar.MS_DEFAULT})")
 
-    print("\n[1/3] plain adjoint (no DCF — expect center-heavy blur) ...")
+    print("\n[1/2] plain adjoint (density-biased — expect center-heavy blur) ...")
     img_adj = ar.recon(traj, acq, method="adjoint")
-    print("[2/3] DCF adjoint (Pipe-Menon 10 iters) ...")
-    img_dcf = ar.recon(traj, acq, method="adjoint_dcf")
-    print("[3/3] CG inverse (20 iters, no regularization) ...")
+    print("[2/2] CG inverse (20 iters) ...")
     img_cg = ar.recon(traj, acq, method="cg", cg_iters=20)
 
-    recons = [("adjoint", img_adj), ("adjoint+DCF", img_dcf), ("CG", img_cg)]
+    recons = [("adjoint", img_adj), ("CG", img_cg)]
 
     # Steve's output: GPU savedbin0.npy if present, else our numpy
     # reimplementation of his kernel (steve_kernel_numpy, axes-matched)

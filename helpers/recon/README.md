@@ -1,7 +1,10 @@
 # FINUFFT Recon Baseline
 
 Own thin pipeline + library NUFFT operator (handoff D1/D3). Native arm64 —
-**do not run with the conda base python** (it is x86_64 under Rosetta).
+run with this project's `.venv`. (Historical note: the old Intel anaconda base
+was x86_64 under Rosetta, which is why this venv exists; since 2026-06-11 the
+system conda base is native arm64 Miniforge, but keep using the venv — it pins
+the working finufft/sigpy stack.)
 
 ## Setup (done 2026-06-10)
 
@@ -15,7 +18,8 @@ cd workspace/helpers
 
 | File | Role |
 |------|------|
-| `asap_recon.py` | Module: `recon(traj, data, sample_weights=None, method=...)`; adjoint / Pipe–Menon DCF / CG via FINUFFT type1+type2; Steve-grid-units → radians conversion |
+| `asap_recon.py` | Module: `recon(traj, data, sample_weights=None, method='cg'\|'adjoint')`; FINUFFT type1+type2; Steve-grid-units → radians conversion. CG = method of record (iters=20, lam=0 per sweep); DCF variant deleted 2026-06-11 |
+| `cg_tune.py` | λ×iters sweep (2026-06-11). Verdict: Tikhonov λ is a no-op on fully-sampled data; gplb filter accounts for ~2 SNR pts of Steve's lead; the rest is bias–variance (his gridder smooths) → smoothing regularizer (CS layer) is the real knob |
 | `selftest.py` | Synthetic validation: adjointness dot-product test (machine precision), quality ordering adjoint < +DCF < CG. No scanner data needed |
 | `dump_inputs.py` | **No-GPU input production**: runs Steve's own `raw.py`/`traj` loaders on a `.dat` + trajectory `.npy`, writes his exact `trajx/y/z.npy`, `acq.npy`, `bins.npy` + `meta.json`. Needs `pymapvbvd` (installed) |
 | `steve_kernel_numpy.py` | Faithful CPU reimplementation of `cudarecon`/`cudarenorm` (single bin/channel): same filter, box, Gaussian, knorm kluge, F-order reshape, FFT, crop. ~1.6 s / 120k samples on 153³. Validated corr 0.95 vs synthetic truth |

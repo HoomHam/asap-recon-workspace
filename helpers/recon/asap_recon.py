@@ -82,19 +82,11 @@ def forward(traj_rad, img, isign=None, eps=1e-9):
 
 
 # ---------------------------------------------------------------- DCF
-
-def pipe_menon_dcf(traj_rad, n, n_iter=10, eps=1e-6):
-    """Pipe & Menon 1999 via the NUFFT pair: w <- w / |A(A^H w)|.
-    Tiled duplicate points (trajectory repeats) are handled naturally:
-    R copies of a sample each end up with ~1/R of the single-copy weight."""
-    m = traj_rad.shape[0]
-    w = np.ones(m, dtype=np.complex128)
-    for _ in range(n_iter):
-        dens = forward(traj_rad, adjoint(traj_rad, w, n, eps=eps), eps=eps)
-        d = np.abs(dens)
-        d[d == 0] = 1.0
-        w = w / d
-    return np.real(w)
+# Deleted 2026-06-11: the PSF-as-kernel Pipe-Menon variant underperformed
+# badly on real data (corr 0.38 vs Steve, worse than the plain adjoint) and
+# CG makes one-shot DCF redundant. If a fast preview-with-DCF is ever needed,
+# implement proper compact-kernel Pipe-Menon (grid/degrid with a KB kernel,
+# not the full PSF) — see Faraz's iterative_dcf_fa_20190910.m for reference.
 
 
 # ---------------------------------------------------------------- CG inverse
@@ -132,8 +124,8 @@ def cg_recon(traj_rad, data, n, sample_weights=None, n_iter=20, lam=0.0,
 
 # ---------------------------------------------------------------- handoff API
 
-def recon(traj, data, sample_weights=None, method="adjoint_dcf",
-          MS=MS_DEFAULT, IS=IS_DEFAULT, dcf_iters=10, cg_iters=20, lam=0.0):
+def recon(traj, data, sample_weights=None, method="cg",
+          MS=MS_DEFAULT, IS=IS_DEFAULT, cg_iters=20, lam=0.0):
     """The API of handoff decision D3.
 
     traj : (Nuniq,3) grid-index units (Steve convention) — auto-tiled to data
@@ -141,17 +133,18 @@ def recon(traj, data, sample_weights=None, method="adjoint_dcf",
     sample_weights : (M,) or None. Static = None. Binned recon = call once
         per bin with that bin's weight vector. Soft bins, spike masks,
         reliability — all just weights.
-    method : 'adjoint' | 'adjoint_dcf' | 'cg'
+    method : 'cg' (default, the method of record) | 'adjoint' (fast preview;
+        density-biased — expect center-heavy blur)
+
+    Defaults settled by the 2026-06-11 sweep (cg_tune.py): cg_iters=20,
+    lam=0. Tikhonov lam is a no-op on fully-sampled data (A^H A is
+    well-conditioned); noise parity with Steve's filtered gridder comes from
+    a smoothing regularizer (the CS layer), not from lam.
     Returns IS^3 complex image.
     """
     traj_rad = grid_to_radians(tile_traj(np.asarray(traj, float), len(data)), MS)
     if method == "adjoint":
         return adjoint(traj_rad, data, IS, weights=sample_weights)
-    if method == "adjoint_dcf":
-        w = pipe_menon_dcf(traj_rad, IS, n_iter=dcf_iters)
-        if sample_weights is not None:
-            w = w * sample_weights
-        return adjoint(traj_rad, data, IS, weights=w)
     if method == "cg":
         return cg_recon(traj_rad, data, IS, sample_weights=sample_weights,
                         n_iter=cg_iters, lam=lam)
