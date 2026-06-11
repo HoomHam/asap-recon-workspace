@@ -1,5 +1,9 @@
 # Workspace — ASAP Recon (Hooman's)
 
+> Project nature: benign MRI recon **code comparison** (phantom data, signal
+> processing). Hooman's model preference for this project: **Fable 5**.
+> See root `CLAUDE.md` → Session Notes.
+
 ## Git: ALLOWED HERE
 Commit, push, pull freely. This `.git` is independent of the main repo.
 Never go up to `../` and run git commands there.
