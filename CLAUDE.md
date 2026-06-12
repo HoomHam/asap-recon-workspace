@@ -38,6 +38,7 @@ Personal working space alongside Steve/Kento's ASAP recon code.
 | `reference/Recon_Overview_Steve.md` | Code map — Steve's pipeline: file roles, data flow, entry points, GPU dispatch, magic numbers | ✅ 2026-06-10 |
 | `reference/Recon_Overview_Faraz.md` | Code map — Faraz's MATLAB pipeline: file roles, data flow, entry points, compute model, magic numbers | ✅ 2026-06-10 |
 | `reference/Physics_Notes.md` | Educational: non-Cartesian recon from FID + 2D DFT up — signal eq, DCF, gridding, kernels, coil combine, trajectory calibration, CS outlook; every concept mapped to Steve/Faraz code | ✅ 2026-06-10 |
+| `reference/CS_Implementation.md` | Educational: CS layer on the finufft operator — objective, λ-as-threshold parameterization (two measured failures), DCF-as-preconditioner (CG vs gradient solvers), wavelet/TV priors, metric blind spots, first sweep results | ✅ 2026-06-12 |
 
 ## Archive
 
