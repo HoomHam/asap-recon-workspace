@@ -70,6 +70,12 @@ def main():
     cs_d = orient_to_match(vol_cs, vol_f_fix)
     st_d = orient_to_match(vol_st, vol_f_fix)
 
+    # volumes are in unrelated absolute units (mat / kernel / CS): normalize
+    # each by its p99.5 and display on a shared [0, 1] color axis
+    def nrm(v):
+        return np.clip(v / np.percentile(v, 99.5), 0, 1)
+    vol_f_fix, st_d, cs_d = nrm(vol_f_fix), nrm(st_d), nrm(cs_d)
+
     idx_f = [j - 1 for j in SLICES_1B]
     idx_o = fraction_matched_slices(N, 80)
     panels = [
@@ -79,7 +85,7 @@ def main():
     ]
     fig, axes = plt.subplots(3, 1, figsize=(16, 34))
     for ax, (img, t) in zip(axes, panels):
-        ax.imshow(img, cmap="gray")
+        ax.imshow(img, cmap="gray", vmin=0, vmax=1)
         ax.set_title(t, fontsize=14)
         ax.axis("off")
     fig.tight_layout()
