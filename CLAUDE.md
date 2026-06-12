@@ -30,6 +30,9 @@ Personal working space alongside Steve/Kento's ASAP recon code.
 | `archive/` | Old notes, superseded analysis | `Domain_Description_YYYY-MM.md` |
 | `helpers/` | Hooman's scripts — loaders, plotters, CS tools | subfolder by type |
 
+`helpers/recon/` has its own node: `helpers/recon/AGENTS.md` (entry points,
+contracts, pitfalls for the FINUFFT/CS pipeline).
+
 ## Active Reference Docs
 
 | Doc | Contents | Status |
