@@ -54,6 +54,9 @@ def metrics(vol):
     thr = 0.4 * np.percentile(v, 99.5)
     obj = binary_erosion(v > thr, iterations=3)
     bg = ~binary_dilation(v > thr, iterations=5)
+    if not obj.any() or not bg.any():  # over-regularized: object mask empty
+        return {"snr": 0.0, "cv": float("nan"), "lowfreq_cv": float("nan"),
+                "extent_mm": [0, 0, 0]}
     mu = v[obj].mean()
     lo = gaussian_filter(v, 2.5)
     ext = []
@@ -61,7 +64,8 @@ def metrics(vol):
     for ax in range(3):
         proj = mask.any(axis=tuple(i for i in range(3) if i != ax))
         idx = np.where(proj)[0]
-        ext.append(float((idx[-1] - idx[0] + 1) / v.shape[0] * 250))
+        ext.append(float((idx[-1] - idx[0] + 1) / v.shape[0] * 250)
+                   if idx.size else 0.0)
     return {"snr": float(mu / v[bg].std()),
             "cv": float(v[obj].std() / mu),
             "lowfreq_cv": float(lo[obj].std() / mu),

@@ -45,4 +45,11 @@ cd workspace/helpers
 - [ ] Confounder-neutralized comparison (gplb=0 via meta.json edit, killpts)
       per `reference/Recon_Comparison_StaticGas.md` protocol
 - [ ] One-time Colab run to certify numpy kernel vs GPU savedbin0.npy
-- [ ] CS layer (sigpy L1-wavelet/TV) on top of the same operator
+- [x] CS layer built: `cs_recon.py` (sigpy L1-wavelet FISTA / TV PDHG on the
+      same finufft operator, DCF-preconditioned — unweighted A^H A stalls
+      gradient solvers, density spread 1.8e6). First sweep 2026-06-12:
+      wavelet t0.003-0.01 beats both bars (SNR 32.8-47.2 > 28.7,
+      lowfreqCV 0.084-0.085 < 0.093). λ choice pending Hooman's visual
+      verdict on `cs_sweep_sheet.png`
+- [ ] CS undersampling experiment (1/2, 1/4, 1/8 interleaves; CS vs CG vs
+      Steve-equiv) — handoff CS step 4, after λ verdict
