@@ -51,5 +51,6 @@ cd workspace/helpers
       wavelet t0.003-0.01 beats both bars (SNR 32.8-47.2 > 28.7,
       lowfreqCV 0.084-0.085 < 0.093). λ choice pending Hooman's visual
       verdict on `cs_sweep_sheet.png`
-- [ ] CS undersampling experiment (1/2, 1/4, 1/8 interleaves; CS vs CG vs
-      Steve-equiv) — handoff CS step 4, after λ verdict
+- [ ] CS vs independent Lustig-lineage CS (BART `pics`) — after λ verdict.
+      Undersampling test shelved 2026-06-12; returns with 4D diaphragm
+      binning (temporal phase)

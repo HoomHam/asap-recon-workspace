@@ -63,8 +63,12 @@ carry the CS phase (handoff 2026-06-11 spec). Does not own: Steve's code
 ## Status (2026-06-12)
 
 CS layer built and swept; wavelet t0.003–0.01 beats both handoff bars
-(SNR > 28.7, lowfreq-CV < 0.093). λ verdict pending Hooman's eye. Next:
-undersampling experiment (1/2, 1/4, 1/8 interleaves).
+(SNR > 28.7, lowfreq-CV < 0.093). λ verdict pending Hooman's eye.
+Plan (2026-06-12): (1) fix metrics + freeze λ, (2) compare our CS against an
+independent Lustig-lineage implementation (BART `pics` preferred; note sigpy
+itself is Lustig-lab, so sigpy-vs-sigpy would be circular), (3) temporal 4D
+with diaphragm binning — undersampling returns there, not as a standalone
+test.
 
 ## Navigation
 
