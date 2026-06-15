@@ -2,3 +2,4 @@
 **/.DS_Store
 *.mat
 data/
+helpers/lustig_oneshot/.venv_lustig/
