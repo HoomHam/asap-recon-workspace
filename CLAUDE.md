@@ -31,7 +31,8 @@ Personal working space alongside Steve/Kento's ASAP recon code.
 | `helpers/` | Hooman's scripts — loaders, plotters, CS tools | subfolder by type |
 
 `helpers/recon/` has its own node: `helpers/recon/AGENTS.md` (entry points,
-contracts, pitfalls for the FINUFFT/CS pipeline).
+contracts, pitfalls for the FINUFFT/CS pipeline). `helpers/lustig_oneshot/` has
+its own node too: one-command Lustig MATLAB CS on recon_io data (`run_lustig.py`).
 
 ## Active Reference Docs
 
@@ -42,7 +43,8 @@ contracts, pitfalls for the FINUFFT/CS pipeline).
 | `reference/Recon_Overview_Faraz.md` | Code map — Faraz's MATLAB pipeline: file roles, data flow, entry points, compute model, magic numbers | ✅ 2026-06-10 |
 | `reference/Physics_Notes.md` | Educational: non-Cartesian recon from FID + 2D DFT up — signal eq, DCF, gridding, kernels, coil combine, trajectory calibration, CS outlook; every concept mapped to Steve/Faraz code | ✅ 2026-06-10 |
 | `reference/CS_Implementation.md` | Educational: CS layer on the finufft operator — objective, λ-as-threshold parameterization (two measured failures), DCF-as-preconditioner (CG vs gradient solvers), wavelet/TV priors, metric blind spots, first sweep results | ✅ 2026-06-12 |
-| `reference/Lustig_CS_Baseline.md` | Hooman's pre-project MATLAB Lustig CS pipeline (IRT + sparseMRI + torchkbnufft DCF) — density framework mismatch, why Steve's densities fail, diff vs our CS, prep list for step-2 comparison | ✅ 2026-06-12 |
+| `reference/Lustig_CS_Baseline.md` | Hooman's pre-project MATLAB Lustig CS pipeline — density framework mismatch, why Steve's densities fail, diff vs our CS, **one-shot tool + same-data v3 verdict (ours wins)** | ✅ 2026-06-15 |
+| `reference/Lustig_CS_Tuning.md` | Lustig CS parameter/conditioning reference — the 3 run scripts decoded, every NUFFT3D/TV/wavelet/fnlCg knob, init, conditioning caveats (DCF-in-init-only, 2D-wavelet-on-3D bug), priority-ranked sweep list | ✅ 2026-06-15 |
 
 ## Archive
 

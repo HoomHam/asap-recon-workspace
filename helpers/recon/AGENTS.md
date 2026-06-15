@@ -60,15 +60,19 @@ carry the CS phase (handoff 2026-06-11 spec). Does not own: Steve's code
 - `phase_corrected_real` in `faraz_zoom_check.py` is a documented tombstone —
   do not revive (local-phase reference creates hollow blotches and fools CV).
 
-## Status (2026-06-12)
+## Status (2026-06-15)
 
 CS layer built and swept; wavelet t0.003–0.01 beats both handoff bars
-(SNR > 28.7, lowfreq-CV < 0.093). λ verdict pending Hooman's eye.
-Plan (2026-06-12): (1) fix metrics + freeze λ, (2) compare our CS against an
-independent Lustig-lineage implementation (BART `pics` preferred; note sigpy
-itself is Lustig-lab, so sigpy-vs-sigpy would be circular), (3) temporal 4D
-with diaphragm binning — undersampling returns there, not as a standalone
-test.
+(SNR > 28.7, lowfreq-CV < 0.093). λ verdict **still pending** Hooman's eye.
+Plan: (1) fix metrics + freeze λ — still open; (2) compare our CS vs
+independent Lustig-lineage implementations — **MATLAB Lustig DONE** (same-data
+v3 verdict: ours wins, lfCV 0.084 vs 0.115; tool in `../lustig_oneshot/`,
+montage via `lustig_compare.py`), **BART `pics` still open** (the real
+independence test; sigpy is Lustig-lab so sigpy-vs-sigpy would be circular);
+(3) temporal 4D with diaphragm binning — undersampling returns there.
+
+Sibling tools added this phase: `lustig_compare.py` (our CS vs a Lustig
+`gas` .mat, shared p99.5 axis, undoes the MATLAB per-slice rot90).
 
 ## Navigation
 
