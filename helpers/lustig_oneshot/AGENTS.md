@@ -20,6 +20,7 @@ toolboxes (`../../codes/2025_CS/`, read-only), scanner data (`../../data/`).
 | Rebuild ACR_test only (DCF step) | `.venv_lustig/bin/python build_acrtest.py <recon_io> <out.mat>` |
 | Reuse existing ACR_test, skip torch | `run_lustig.py <recon_io> --skip-dcf` |
 | Montage result vs our CS | `../recon/lustig_compare.py <recon_io> <recon_io>/lustig/lustig_cs.mat` |
+| **Pure-TV λ sweep (matched to BART, metrics_v2)** | `.venv_lustig/bin/python run_lustig_sweep.py <recon_io> --tvweights 1e-3 3e-3 1e-2 3e-2 1e-1` → `run_cs_sweep.m` → `<recon_io>/lustig/lustig_tv_sweep.mat` + metrics json |
 
 ## Contracts
 

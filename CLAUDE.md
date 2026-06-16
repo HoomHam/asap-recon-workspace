@@ -45,6 +45,8 @@ its own node too: one-command Lustig MATLAB CS on recon_io data (`run_lustig.py`
 | `reference/CS_Implementation.md` | Educational: CS layer on the finufft operator — objective, λ-as-threshold parameterization (two measured failures), DCF-as-preconditioner (CG vs gradient solvers), wavelet/TV priors, metric blind spots, first sweep results | ✅ 2026-06-12 |
 | `reference/Lustig_CS_Baseline.md` | Hooman's pre-project MATLAB Lustig CS pipeline — density framework mismatch, why Steve's densities fail, diff vs our CS, **one-shot tool + same-data v3 verdict (ours wins)** | ✅ 2026-06-15 |
 | `reference/Lustig_CS_Tuning.md` | Lustig CS parameter/conditioning reference — the 3 run scripts decoded, every NUFFT3D/TV/wavelet/fnlCg knob, init, conditioning caveats (DCF-in-init-only, 2D-wavelet-on-3D bug), priority-ranked sweep list | ✅ 2026-06-15 |
+| `reference/Final_Report_CS_Comparison.md` | **Presentation-ready final report** — ours vs BART vs Lustig vs Steve vs Faraz. Narrative arc, code catalog (I/O per script), figure catalog (FINAL vs superseded), findings, reproduce-from-scratch, open threads. **Read this first for the comparison phase.** | ✅ 2026-06-15 |
+| `reference/BART_Comparison.md` | Detailed chronology of the BART comparison + the texture/slice-matching saga with all dead-ends ruled out | ✅ 2026-06-15 |
 
 ## Archive
 

@@ -1,0 +1,1618 @@
+ ▐▛███▜▌   Claude Code v2.1.175
+▝▜█████▛▘  Fable 5 · Claude Pro
+  ▘▘ ▝▝    ~/Hooman/Work/Codes/2026_ASAP_Recon
+
+ ▎ Fable 5 is here! Our newest model for complex, long-running work.
+ ▎ Included in your plan limits until Jun 22, then switch to usage credits to continue.
+
+❯ /model                                                                        
+  ⎿  Set model to Fable 5 and saved as your default for new sessions
+
+❯ read handoff and tell me what we do next                                      
+
+  Read 1 file, listed 1 directory (ctrl+o to expand)
+
+⏺ Handoff read. Comparison phase closed — next phase: compressed sensing 
+  implementation. Spec in handoff.
+
+  Build order:
+  1. cs_recon.py — static single-bin CS on ACR phantom (data ready:
+  workspace/data/v3_fov250/recon_io/). Wrap our validated finufft operators as
+  sigpy Linop (preferred over sigpy NUFFT — keeps Steve-units convention).
+  L1-wavelet + TV regularizers.
+  2. λ sweep → contact-sheet figure → your visual verdict gates choice (standing
+  rule).
+  3. Score vs bar: SNR ≥ 28.7 (Steve), lowfreq-CV ≤ 0.093 (Faraz), extents
+  190/190/148 mm, edge sharpness intact. CS must beat both simultaneously —
+  that's the thesis.
+  4. Undersampling experiment: decimate interleaves 1/2, 1/4, 1/8; CS vs CG vs
+  Steve-equiv. Prediction: Steve's gridder degrades first. Publishable if
+  confirmed.
+  5. Binned/dynamic CS later — bins = weights (D3), no API change.
+
+  Constraints: .venv python only, no git in root, selftest.py must pass after
+  operator changes.
+
+  Open loops (parked, not blocking): tell Faraz about ×1.205 zoom bug; Steve
+  rebuttal pending; b-map calcb port before multi-coil; optional Colab float
+  check.
+
+  Immediate next step: run sanity check, then start cs_recon.py:
+  cd workspace/helpers/recon
+  ../.venv/bin/python selftest.py
+
+  Say go — I run selftest + baseline, then build CS step 1.
+
+✻ Brewed for 20s
+
+❯ go                                                                            
+
+⏺ Running selftest + reading recon code structure.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python selftest.py 2>&1 | tail -20)
+  ⎿  Running in the background (↓ to manage)
+
+  Read 1 file, listed 1 directory (ctrl+o to expand)
+
+⏺ Background command "Run recon selftest sanity check" completed (exit code 0)
+  ⎿  Loaded workspace/CLAUDE.md
+
+⏺ Selftest PASS (adjointness machine-precision, ordering correct). Reading
+  operator module + baseline script to wire CS.
+
+  Read 2 files (ctrl+o to expand)
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers &&
+      .venv/bin/python -c "
+      import sigpy, finufft, numpy…)
+  ⎿  sigpy 0.1.27 | finufft 2.5.1 | numpy 2.4.6
+     apps OK; Linop base: <class 'sigpy.linop.Linop'>
+     pywt 1.8.0
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ sigpy 0.1.27 + pywt present. Creating tasks, checking data size, then writing
+  cs_recon.py.
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/data/v3_fov
+      250/recon_io && cat meta.json && ../../../helpers/.venv/bin/python -c "
+      import numpy as…)
+  ⎿  {
+       "npts": 510,
+       "nuniquesmp": 424320,
+     … +9 lines (ctrl+o to expand)
+
+⏺ M = 424,320 samples, single repeat — fast iterations. Writing cs_recon.py.
+⏺ Write(workspace/helpers/recon/cs_recon.py)
+  ⎿  Wrote 165 lines to workspace/helpers/recon/cs_recon.py
+         andoff CS step 1-2).g recon on the validated FINUFFT operator (h
+       2 
+       4 min_x ||A x - y||^2 + lam R(x)
+       5 A      : asap_recon.forward/adjoint wrapped as sigpy Linops (kee
+       6          Steve-units, isign=-1 convention in one place — handoff
+          preference
+       8 R      : 'wavelet' — L1 of db4 coefficients, synthesis form, FIS
+         TA
+      10 lam    : swept relative to max|A^H y| (lam_rel grid below); the 
+         choice is
+     … +180 lines (ctrl+o to expand)
+
+⏺ Smoke test sigpy wiring first (Wavelet on complex, PDHG shapes) — 2 iters, one
+  λ.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python -c "
+      import numpy as np, time…)
+  ⎿  lam_ref 3.789e+05
+     wavelet 2it OK (100, 100, 100) complex128 6.1s
+     tv 2it OK (100, 100, 100) complex128 5.8s
+
+⏺ Wiring works. Full sweep (8 recons × 80 iters + CG baseline, ~5–8 min) in
+  background.
+
+⏺ Bash(../.venv/bin/python cs_recon.py ../../data/v3_fov250/recon_io --max-iter
+      80 2>&1)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Sweep running in background (task blu4t1sxu). Will report metrics + contact
+  sheet when done. Bar: SNR > 28.7, lowfreq-CV < 0.093, extents 190/190/148 mm,
+  edges judged by your eye.
+
+✻ Brewed for 3m 30s
+
+⏺ Background command "Run full CS λ sweep on phantom data" completed (exit code
+0)
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Bash(../.venv/bin/python -c "
+      import numpy as np, sigpy as sp…)
+  ⎿  maxeig(A^H A) = 6.6107e+09   alpha = 1.5127e-10
+     max|W x_cg| = 1.7275e-01  p99 = 2.9344e-03
+     max|G x_cg| = 4.6992e-03  p99 = 2.7081e-03
+     … +2 lines (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 7 lines, removed 3 lines
+       7           over sigpy's own NUFFT).
+       8  R      : 'wavelet' — L1 of db4 coefficients, synthesis form, FI
+          STA
+       9           'tv'      — L1 of finite differences, PDHG
+      10 -lam    : swept relative to max|A^H y| (lam_rel grid below); the
+         - choice is                                                     
+      11 -         gated by Hooman's visual verdict on the contact sheet,
+         - not by the                                                    
+      12 -         scalar metrics (standing rule).                       
+      10 +lam    : parameterized by the FISTA soft-threshold t = alpha*la
+         +m (alpha =                                                     
+      11 +         1/maxeig(A^H A)), with t swept relative to the p99 coe
+         +fficient                                                       
+      12 +         magnitude of the CG-20 solution per regularizer. Scali
+         +ng to                                                          
+      13 +         max|A^H y| (first attempt 2026-06-12) put the threshol
+         +d 4-5 orders                                                   
+      14 +         below the coefficients — a measured no-op. Choice gate
+         +d by Hooman's                                                  
+      15 +         visual verdict on the contact sheet, not the scalar me
+         +trics                                                          
+      16 +         (standing rule).                                      
+      17  
+      18  Static single bin: sample_weights = ones (omitted). Binned reco
+          n later =
+      19  same call with W_b folded into A and y (architecture D3 unchang
+          ed).
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 1 line, removed 1 line
+      37  from cg_tune import metrics
+      38  
+      39  N = 100
+      40 -LAM_RELS = [3e-4, 1e-3, 3e-3, 1e-2]                            
+      40 +T_RELS = [0.1, 0.3, 1.0, 3.0]  # threshold / p99(|coeffs of x_c
+         +g|)                                                            
+      41  EPS = 1e-7  # finufft tolerance, same as cg_recon
+      42  
+      43  
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 7 lines, removed 4 lines
+      75  
+      76  # -------------------------------------------------------------
+          ----- CS recons
+      77  
+      78 -def wavelet_recon(A, y, lam, max_iter):                        
+      79 -    """Synthesis-form L1-wavelet: min_a ||A W^H a - y||^2 + lam
+         - ||a||_1."""                                                   
+      78 +def wavelet_recon(A, y, lam, max_iter, alpha=None):            
+      79 +    """Synthesis-form L1-wavelet: min_a ||A W^H a - y||^2 + lam
+         + ||a||_1.                                                      
+      80 +    W is orthogonal (db4) so maxeig(W A^H A W^H) = maxeig(A^H A
+         +) and the                                                      
+      81 +    precomputed alpha carries over."""                         
+      82      W = sp.linop.Wavelet(A.ishape, wave_name="db4")
+      83      a = sp.app.LinearLeastSquares(A * W.H, y,
+      84                                    proxg=sp.prox.L1Reg(W.oshape,
+           lam),
+      85 +                                  alpha=alpha,                 
+      86                                    max_iter=max_iter, show_pbar=
+          False).run()
+      87      return W.H(a)
+      88  
+      89  
+      87 -def tv_recon(A, y, lam, max_iter):                             
+      88 -    """min_x ||A x - y||^2 + lam ||grad x||_1 via PDHG."""     
+      90 +def tv_recon(A, y, lam, max_iter, alpha=None):                 
+      91 +    """min_x ||A x - y||^2 + lam ||grad x||_1 via PDHG (alpha u
+         +nused)."""                                                     
+      92      G = sp.linop.FiniteDifference(A.ishape)
+      93      return sp.app.LinearLeastSquares(A, y,
+      94                                       proxg=sp.prox.L1Reg(G.osha
+          pe, lam), G=G,
+
+⏺ Now rewrite main loop with new parameterization:
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 15 lines, removed 6 lines
+      109      y = np.ascontiguousarray(d["acq"], dtype=np.complex128)
+      110  
+      111      A = FinufftForward(traj_rad, N)
+      112 -    lam_ref = float(np.abs(A.H(y)).max())                     
+      113 -    print(f"M = {len(y)}   lam_ref = max|A^H y| = {lam_ref:.4e
+          -}")                                                           
+      112 +    L = sp.app.MaxEig(A.H * A, dtype=np.complex128, show_pbar=
+          +False).run()                                                  
+      113 +    print(f"M = {len(y)}   maxeig(A^H A) = {L:.4e}")          
+      114  
+      115      print("baseline CG-20 (method of record) ...")
+      116      img_cg = ar.recon(d["traj"], y, method="cg", cg_iters=20)
+     ...
+      119      slices = {"cg20": np.abs(img_cg)[:, :, N // 2]}
+      120      print(f"  cg20: {results['cg20']}")
+      121  
+      122 +    # per-regularizer threshold reference: p99 coefficient mag
+          +nitude of x_cg                                                
+      123 +    W = sp.linop.Wavelet(A.ishape, wave_name="db4")           
+      124 +    G = sp.linop.FiniteDifference(A.ishape)                   
+      125 +    t_ref = {"wavelet": float(np.percentile(np.abs(W(img_cg)),
+          + 99)),                                                        
+      126 +             "tv": float(np.percentile(np.abs(G(img_cg)), 99))
+          +}                                                             
+      127 +    print(f"threshold refs: {t_ref}")                         
+      128 +                                                              
+      129      for reg, fn in [("wavelet", wavelet_recon), ("tv", tv_reco
+           n)]:
+      123 -        for lr in LAM_RELS:                                   
+      124 -            key = f"{reg}_lam{lr:g}"                          
+      130 +        for tr in T_RELS:                                     
+      131 +            key = f"{reg}_t{tr:g}"                            
+      132 +            lam = tr * t_ref[reg] * L  # FISTA threshold alpha
+          +*lam = tr * t_ref                                             
+      133              t0 = time.time()
+      126 -            img = fn(A, y, lr * lam_ref, args.max_iter)       
+      134 +            img = fn(A, y, lam, args.max_iter, alpha=1.0 / L) 
+      135              m = metrics(img)
+      128 -            results[key] = {"lam_rel": lr, "seconds": round(ti
+          -me.time() - t0, 1), **m}                                      
+      136 +            results[key] = {"t_rel": tr, "lam": lam,          
+      137 +                            "seconds": round(time.time() - t0,
+          + 1), **m}                                                     
+      138              slices[key] = np.abs(img)[:, :, N // 2]
+      139              print(f"  {key}: SNR {m['snr']:5.1f}  CV {m['cv']:
+           .3f}  "
+      140                    f"lowfreqCV {m['lowfreq_cv']:.3f}  extent {m
+           ['extent_mm']}  "
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 1 line, removed 1 line
+      141                    f"({results[key]['seconds']}s)")
+      142  
+      143      # contact sheet: row 0 = CG baseline + reference bar, rows
+            1-2 = wavelet/TV
+      144 -    ncols = len(LAM_RELS)                                     
+      144 +    ncols = len(T_RELS)                                       
+      145      fig, axes = plt.subplots(3, ncols, figsize=(4 * ncols, 12)
+           )
+      146      for ax in axes.ravel():
+      147          ax.axis("off")
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 3 lines, removed 3 lines
+      157                      "edges: judge visually",
+      158                      fontsize=11, family="monospace", va="cente
+           r")
+      159      for i, reg in enumerate(["wavelet", "tv"], start=1):
+      160 -        for j, lr in enumerate(LAM_RELS):                     
+      161 -            key = f"{reg}_lam{lr:g}"                          
+      160 +        for j, tr in enumerate(T_RELS):                       
+      161 +            key = f"{reg}_t{tr:g}"                            
+      162              m = results[key]
+      163              axes[i, j].imshow(slices[key], cmap="gray")
+      164 -            axes[i, j].set_title(f"{reg} λrel={lr:g}\nSNR {m['
+          -snr']:.1f} "                                                  
+      164 +            axes[i, j].set_title(f"{reg} t={tr:g}·p99\nSNR {m[
+          +'snr']:.1f} "                                                 
+      165                                   f"lfCV {m['lowfreq_cv']:.3f}"
+           , fontsize=9)
+      166      fig.tight_layout()
+      167      out = os.path.join(args.folder, "cs_sweep_sheet.png")
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 1 line, removed 1 line
+      169      print(f"wrote {out}")
+      170  
+      171      with open(os.path.join(args.folder, "cs_sweep_metrics.json
+           "), "w") as f:
+      172 -        json.dump({"lam_ref": lam_ref, "max_iter": args.max_it
+          -er,                                                           
+      172 +        json.dump({"maxeig": L, "t_ref": t_ref, "max_iter": ar
+          +gs.max_iter,                                                  
+      173                     "results": results}, f, indent=2)
+      174      print(f"wrote {os.path.join(args.folder, 'cs_sweep_metrics
+           .json')}")
+      175  
+
+⏺ Rerun sweep with corrected λ scaling.
+⏺ Bash(../.venv/bin/python cs_recon.py ../../data/v3_fov250/recon_io --max-iter
+      80 2>&1)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Sweep rerunning (~5 min). First run was λ no-op — threshold landed 4–5 orders
+  below coefficient scale. Fixed: λ now set so FISTA soft-threshold = {0.1, 0.3,
+  1, 3}× p99 coefficient magnitude of CG-20 solution, per regularizer. Will
+  report when done.
+
+✻ Brewed for 2m 26s
+
+⏺ Background command "Rerun CS sweep with corrected threshold scaling" failed
+with exit code 1
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/cg_tune.py)
+  ⎿  Added 5 lines, removed 1 line
+      54      thr = 0.4 * np.percentile(v, 99.5)
+      55      obj = binary_erosion(v > thr, iterations=3)
+      56      bg = ~binary_dilation(v > thr, iterations=5)
+      57 +    if not obj.any() or not bg.any():  # over-regularized: obje
+         +ct mask empty                                                  
+      58 +        return {"snr": 0.0, "cv": float("nan"), "lowfreq_cv": f
+         +loat("nan"),                                                   
+      59 +                "extent_mm": [0, 0, 0]}                        
+      60      mu = v[obj].mean()
+      61      lo = gaussian_filter(v, 2.5)
+      62      ext = []
+     ...
+      64      for ax in range(3):
+      65          proj = mask.any(axis=tuple(i for i in range(3) if i != 
+          ax))
+      66          idx = np.where(proj)[0]
+      64 -        ext.append(float((idx[-1] - idx[0] + 1) / v.shape[0] * 
+         -250))                                                          
+      67 +        ext.append(float((idx[-1] - idx[0] + 1) / v.shape[0] * 
+         +250)                                                           
+      68 +                   if idx.size else 0.0)                       
+      69      return {"snr": float(mu / v[bg].std()),
+      70              "cv": float(v[obj].std() / mu),
+      71              "lowfreq_cv": float(lo[obj].std() / mu),
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 3 lines, removed 1 line
+      37  from cg_tune import metrics
+      38  
+      39  N = 100
+      40 -T_RELS = [0.1, 0.3, 1.0, 3.0]  # threshold / p99(|coeffs of x_c
+         -g|)                                                            
+      40 +T_RELS = [0.003, 0.01, 0.03, 0.1]  # threshold / p99(|coeffs of
+         + x_cg|)                                                        
+      41 +# (first grid [0.1..3] over-regularized: t=0.1 already shrank t
+         +he object,                                                     
+      42 +#  t=1 emptied it. t=0.1 kept as the known-too-strong anchor.) 
+      43  EPS = 1e-7  # finufft tolerance, same as cg_recon
+      44  
+      45  
+
+⏺ Bash(../.venv/bin/python cs_recon.py ../../data/v3_fov250/recon_io --max-iter
+      80 2>&1)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Sweep rerunning with grid [0.003, 0.01, 0.03, 0.1]·p99 — brackets the sweet
+  spot between measured no-op (~1e-5) and measured over-kill (0.1). Report when
+  done.
+
+✻ Sautéed for 45s
+
+⏺ Background command "Rerun CS sweep with shifted threshold grid" completed
+(exit code 0)
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 21 lines, removed 8 lines
+      46  # ------------------------------------------------------- finuf
+          ft as sigpy Linop
+      47  
+      48  class FinufftForward(sp.linop.Linop):
+      49 -    """A: (N,N,N) image -> (M,) nonuniform samples."""         
+      49 +    """A: (N,N,N) image -> (M,) nonuniform samples, times `scal
+         +e`.                                                            
+      50  
+      51 -    def __init__(self, traj_rad, n, eps=EPS):                  
+      51 +    scale = 1/sqrt(maxeig(A^H A)) normalizes the operator so   
+      52 +    maxeig(A_n^H A_n) = 1: FISTA's soft-threshold equals lam di
+         +rectly, and                                                    
+      53 +    PDHG's primal/dual steps are sane (raw ||A|| ~ 8e4 left tau
+         + ~ 1e-10 —                                                     
+      54 +    measured: TV output was byte-identical across 4 decades of 
+         +lam).                                                          
+      55 +    Normalizing y by the same factor keeps the least-squares mi
+         +nimizer                                                        
+      56 +    unchanged.                                                 
+      57 +    """                                                        
+      58 +                                                               
+      59 +    def __init__(self, traj_rad, n, eps=EPS, scale=1.0):       
+      60          self.traj_rad = traj_rad
+      61          self.eps = eps
+      62 +        self.scale = scale                                     
+      63          super().__init__((traj_rad.shape[0],), (n, n, n))
+      64  
+      65      def _apply(self, input):
+      57 -        return ar.forward(self.traj_rad, input, eps=self.eps)  
+      66 +        return self.scale * ar.forward(self.traj_rad, input, ep
+         +s=self.eps)                                                    
+      67  
+      68      def _adjoint_linop(self):
+      60 -        return FinufftAdjoint(self.traj_rad, self.ishape[0], ep
+         -s=self.eps)                                                    
+      69 +        return FinufftAdjoint(self.traj_rad, self.ishape[0], ep
+         +s=self.eps,                                                    
+      70 +                              scale=self.scale)                
+      71  
+      72  
+      73  class FinufftAdjoint(sp.linop.Linop):
+      64 -    """A^H: (M,) nonuniform samples -> (N,N,N) image."""       
+      74 +    """A^H: (M,) nonuniform samples -> (N,N,N) image, times `sc
+         +ale`."""                                                       
+      75  
+      66 -    def __init__(self, traj_rad, n, eps=EPS):                  
+      76 +    def __init__(self, traj_rad, n, eps=EPS, scale=1.0):       
+      77          self.traj_rad = traj_rad
+      78          self.eps = eps
+      79 +        self.scale = scale                                     
+      80          super().__init__((n, n, n), (traj_rad.shape[0],))
+      81  
+      82      def _apply(self, input):
+      72 -        return ar.adjoint(self.traj_rad, input, self.oshape[0],
+         - eps=self.eps)                                                 
+      83 +        return self.scale * ar.adjoint(self.traj_rad, input, se
+         +lf.oshape[0],                                                  
+      84 +                                       eps=self.eps)           
+      85  
+      86      def _adjoint_linop(self):
+      75 -        return FinufftForward(self.traj_rad, self.oshape[0], ep
+         -s=self.eps)                                                    
+      87 +        return FinufftForward(self.traj_rad, self.oshape[0], ep
+         +s=self.eps,                                                    
+      88 +                              scale=self.scale)                
+      89  
+      90  
+      91  # -------------------------------------------------------------
+          ----- CS recons
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 6 lines, removed 6 lines
+       90  
+       91  # ------------------------------------------------------------
+           ------ CS recons
+       92  
+       93 -def wavelet_recon(A, y, lam, max_iter, alpha=None):           
+       93 +def wavelet_recon(A, y, lam, max_iter):                       
+       94      """Synthesis-form L1-wavelet: min_a ||A W^H a - y||^2 + la
+           m ||a||_1.
+       95 -    W is orthogonal (db4) so maxeig(W A^H A W^H) = maxeig(A^H 
+          -A) and the                                                    
+       96 -    precomputed alpha carries over."""                        
+       95 +    Expects normalized A (maxeig = 1, so alpha = 1 and thresho
+          +ld = lam).                                                    
+       96 +    W is orthogonal (db4): maxeig(W A^H A W^H) = maxeig(A^H A)
+          + = 1."""                                                      
+       97      W = sp.linop.Wavelet(A.ishape, wave_name="db4")
+       98      a = sp.app.LinearLeastSquares(A * W.H, y,
+       99                                    proxg=sp.prox.L1Reg(W.oshape
+           , lam),
+      100 -                                  alpha=alpha,                
+      100 +                                  alpha=1.0,                  
+      101                                    max_iter=max_iter, show_pbar
+           =False).run()
+      102      return W.H(a)
+      103  
+      104  
+      105 -def tv_recon(A, y, lam, max_iter, alpha=None):                
+      106 -    """min_x ||A x - y||^2 + lam ||grad x||_1 via PDHG (alpha 
+          -unused)."""                                                   
+      105 +def tv_recon(A, y, lam, max_iter):                            
+      106 +    """min_x ||A x - y||^2 + lam ||grad x||_1 via PDHG. Expect
+          +s normalized A."""                                            
+      107      G = sp.linop.FiniteDifference(A.ishape)
+      108      return sp.app.LinearLeastSquares(A, y,
+      109                                       proxg=sp.prox.L1Reg(G.osh
+           ape, lam), G=G,
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 6 lines, removed 2 lines
+      123          ar.tile_traj(d["traj"].astype(float), len(d["acq"])))
+      124      y = np.ascontiguousarray(d["acq"], dtype=np.complex128)
+      125  
+      126 -    A = FinufftForward(traj_rad, N)                           
+      127 -    L = sp.app.MaxEig(A.H * A, dtype=np.complex128, show_pbar=
+          -False).run()                                                  
+      126 +    A_raw = FinufftForward(traj_rad, N)                       
+      127 +    L = sp.app.MaxEig(A_raw.H * A_raw, dtype=np.complex128,   
+      128 +                      show_pbar=False).run()                  
+      129      print(f"M = {len(y)}   maxeig(A^H A) = {L:.4e}")
+      130 +    c = 1.0 / np.sqrt(L)                                      
+      131 +    A = FinufftForward(traj_rad, N, scale=c)  # normalized: ma
+          +xeig = 1                                                      
+      132 +    y_n = c * y                                               
+      133  
+      134      print("baseline CG-20 (method of record) ...")
+      135      img_cg = ar.recon(d["traj"], y, method="cg", cg_iters=20)
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 2 lines, removed 2 lines
+      148      for reg, fn in [("wavelet", wavelet_recon), ("tv", tv_reco
+           n)]:
+      149          for tr in T_RELS:
+      150              key = f"{reg}_t{tr:g}"
+      151 -            lam = tr * t_ref[reg] * L  # FISTA threshold alpha
+          -*lam = tr * t_ref                                             
+      151 +            lam = tr * t_ref[reg]  # normalized A: FISTA thres
+          +hold = lam                                                    
+      152              t0 = time.time()
+      153 -            img = fn(A, y, lam, args.max_iter, alpha=1.0 / L) 
+      153 +            img = fn(A, y_n, lam, args.max_iter)              
+      154              m = metrics(img)
+      155              results[key] = {"t_rel": tr, "lam": lam,
+      156                              "seconds": round(time.time() - t0,
+            1), **m}
+
+⏺ Quick TV smoke — verify λ now changes output before full rerun.
+
+⏺ Bash(../.venv/bin/python -c "
+      import numpy as np, sigpy as sp…)
+  ⎿  rel diff between lams: 0.21107037704437964
+     x1 max 0.00010552126171059704  x2 max 8.627139913165964e-05
+
+⏺ Bash(../.venv/bin/python -c "
+      import inspect, sigpy as sp…)
+  ⎿      def __init__(
+             self,
+             A,
+     … +56 lines (ctrl+o to expand)
+
+⏺ Bash(../.venv/bin/python -c "
+      import inspect, sigpy as sp…)
+  ⎿      def _get_alg(self):
+             if self.solver is None:
+                 if self.proxg is None:
+     … +26 lines (ctrl+o to expand)
+⏺ ADMM available. Testing PDHG long-run vs ADMM convergence on one λ:
+
+⏺ Bash(../.venv/bin/python -c "
+      import numpy as np, sigpy as sp, time…)
+  ⎿  PDHG  100 it: |x|max 2.4193e-04  (25s)
+     PDHG  300 it: |x|max 6.0714e-04  (66s)
+     ADMM  20 it rho=1.0: |x|max 2.2858e-03  (39s)
+
+⏺ Bash(../.venv/bin/python -c "
+      import numpy as np, sigpy as sp, time…)
+  ⎿  density range 4173.595302836035 7587343120.9878 ratio 1817939.34736126
+     9
+     maxeig weighted: 1.191e+07
+     … +3 lines (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 9 lines, removed 1 line
+       1  """Compressed-sensing recon on the validated FINUFFT operator (
+          handoff CS step 1-2).
+       2  
+       3 -min_x ||A x - y||^2 + lam R(x)                                 
+       3 +min_x ||W^(1/2) (A x - y)||^2 + lam R(x)                       
+       4  
+       5  A      : asap_recon.forward/adjoint wrapped as sigpy Linops (ke
+          eps the
+       6           Steve-units, isign=-1 convention in one place — handof
+          f preference
+       7           over sigpy's own NUFFT).
+       8 +W      : DCF preconditioning weights, w = 1/density (density vi
+         +a |A A^H 1|).                                                  
+       9 +         Required for gradient-type solvers: unweighted A^H A h
+         +as maxeig                                                      
+      10 +         dominated by the oversampled spiral center (measured d
+         +ensity spread                                                  
+      11 +         1.8e6) so FISTA/PDHG amplitudes stall ~1000x low while
+         + CG cuts                                                       
+      12 +         through. Weighted FISTA reaches the CG solution scale 
+         +in ~20 iters                                                   
+      13 +         (corr 0.945 vs unweighted CG-20). Standard CS-MRI prac
+         +tice (sigpy                                                    
+      14 +         mri apps use dcf the same way). Bin weights later mult
+         +iply into the                                                  
+      15 +         same W (architecture D3).                             
+      16  R      : 'wavelet' — L1 of db4 coefficients, synthesis form, FI
+          STA
+      17           'tv'      — L1 of finite differences, PDHG
+      18  lam    : parameterized by the FISTA soft-threshold t = alpha*la
+          m (alpha =
+
+⏺ Update(workspace/helpers/recon/cs_recon.py)
+  ⎿  Added 12 lines, removed 4 lines
+      132      y = np.ascontiguousarray(d["acq"], dtype=np.complex128)
+      133  
+      134      A_raw = FinufftForward(traj_rad, N)
+      135 -    L = sp.app.MaxEig(A_raw.H * A_raw, dtype=np.complex128,   
+      135 +    M = len(y)                                                
+      136 +                                                              
+      137 +    # DCF preconditioning weights (see module docstring)      
+      138 +    dens = np.abs(A_raw(A_raw.H(np.ones(M, dtype=complex))))  
+      139 +    w = 1.0 / np.clip(dens, dens.max() * 1e-4, None)          
+      140 +    w /= w.mean()                                             
+      141 +    Aw_raw = sp.linop.Multiply((M,), np.sqrt(w)) * A_raw      
+      142 +    L = sp.app.MaxEig(Aw_raw.H * Aw_raw, dtype=np.complex128, 
+      143                        show_pbar=False).run()
+      137 -    print(f"M = {len(y)}   maxeig(A^H A) = {L:.4e}")          
+      144 +    print(f"M = {M}   density spread {dens.max()/dens.min():.2
+          +e}   "                                                        
+      145 +          f"maxeig(A_w^H A_w) = {L:.4e}")                     
+      146      c = 1.0 / np.sqrt(L)
+      139 -    A = FinufftForward(traj_rad, N, scale=c)  # normalized: ma
+          -xeig = 1                                                      
+      140 -    y_n = c * y                                               
+      147 +    A = sp.linop.Multiply((M,), c * np.sqrt(w)) * A_raw  # nor
+          +malized: maxeig=1                                             
+      148 +    y_n = c * np.sqrt(w) * y                                  
+      149  
+      150      print("baseline CG-20 (method of record) ...")
+      151      img_cg = ar.recon(d["traj"], y, method="cg", cg_iters=20)
+
+⏺ Bash(../.venv/bin/python cs_recon.py ../../data/v3_fov250/recon_io --max-iter
+      100 2>&1)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Sweep running with DCF-preconditioned operators, 100 iters. Will check images
+  myself before sending sheet for your verdict.
+
+✻ Cooked for 7m 20s
+
+⏺ Background command "Run CS sweep with DCF-preconditioned operators" completed
+(exit code 0)
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/README.md)
+  ⎿  Added 8 lines, removed 1 line
+      45  - [ ] Confounder-neutralized comparison (gplb=0 via meta.json e
+          dit, killpts)
+      46        per `reference/Recon_Comparison_StaticGas.md` protocol
+      47  - [ ] One-time Colab run to certify numpy kernel vs GPU savedbi
+          n0.npy
+      48 -- [ ] CS layer (sigpy L1-wavelet/TV) on top of the same operato
+         -r                                                              
+      48 +- [x] CS layer built: `cs_recon.py` (sigpy L1-wavelet FISTA / T
+         +V PDHG on the                                                  
+      49 +      same finufft operator, DCF-preconditioned — unweighted A^
+         +H A stalls                                                     
+      50 +      gradient solvers, density spread 1.8e6). First sweep 2026
+         +-06-12:                                                        
+      51 +      wavelet t0.003-0.01 beats both bars (SNR 32.8-47.2 > 28.7
+         +,                                                              
+      52 +      lowfreqCV 0.084-0.085 < 0.093). λ choice pending Hooman's
+         + visual                                                        
+      53 +      verdict on `cs_sweep_sheet.png`                          
+      54 +- [ ] CS undersampling experiment (1/2, 1/4, 1/8 interleaves; C
+         +S vs CG vs                                                     
+      55 +      Steve-equiv) — handoff CS step 4, after λ verdict        
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace && git add
+      helpers/recon/cs_recon.py helpers/recon/cg_tune.py helpers/recon/README.md
+      && git commi…)
+  ⎿  [main ab11a27] Add CS layer: cs_recon.py (L1-wavelet/TV on finufft ope
+     rator)
+      3 files changed, 229 insertions(+), 2 deletions(-)
+     … +2 lines (ctrl+o to expand)
+
+⏺ Bash(open /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/data/v3_f
+      ov250/recon_io/cs_sweep_sheet.png)
+  ⎿  (No output)
+
+⏺ CS layer built, swept, committed (ab11a27). Contact sheet open on your screen
+  — your visual verdict gates λ.
+
+  Two bugs found + fixed on the way:
+  1. λ scaled to max|Aᴴy| → effective FISTA threshold 4–5 orders below
+  coefficient scale → measured no-op. Now parameterized by threshold directly,
+  relative to p99 coefficient magnitude of CG-20 solution.
+  2. Deeper: unweighted AᴴA spectrum dominated by oversampled spiral center
+  (density spread 1.8×10⁶) — FISTA/PDHG stalled ~1000× below solution amplitude;
+  CG cut through via Krylov. Fix: DCF weights w = 1/|AAᴴ1| in data term — same
+  per-sample-weight slot the D3 architecture reserves for bins.
+
+  Results vs bar (CG-20 baseline: SNR 19.5, lfCV 0.123):
+
+  ┌───────────────┬────────────┬───────────────────┬───────────────────────┐
+  │     recon     │    SNR     │    lowfreq-CV     │      extent mm        │
+  │               │  (>28.7)   │     (<0.093)      │     (190/190/148)     │
+  ├───────────────┼────────────┼───────────────────┼───────────────────────┤
+  │ wavelet       │ 32.8 ✓     │ 0.084 ✓           │ 212/175/250           │
+  │ t0.003        │            │                   │                       │
+  ├───────────────┼────────────┼───────────────────┼───────────────────────┤
+  │ wavelet t0.01 │ 47.2 ✓     │ 0.085 ✓           │ 180/172/185           │
+  ├───────────────┼────────────┼───────────────────┼───────────────────────┤
+  │ wavelet t0.03 │ 67.9 ✓     │ 0.087 ✓           │ 175/175/140           │
+  ├───────────────┼────────────┼───────────────────┼───────────────────────┤
+  │ tv t0.01      │ 22.6 ✗     │ 0.126 ✗           │ 212/225/250           │
+  ├───────────────┼────────────┼───────────────────┼───────────────────────┤
+  │ tv t0.1       │ 84.2 ✓     │ 0.143 ✗           │ 172/168/128           │
+  └───────────────┴────────────┴───────────────────┴───────────────────────┘
+
+  Wavelet t0.003–0.01 beats Steve's SNR and Faraz's flatness simultaneously —
+  the handoff thesis, first confirmation. My eye: t0.003 most natural; t0.01
+  cleaner but faint block texture starting; t0.03+ clearly blocky db4 artifacts;
+  TV smears edges before it wins SNR. Don't trust my read — check edge
+  sharpness and the defect notch yourself.
+
+  After your verdict: undersampling experiment (1/2, 1/4, 1/8 interleaves — the
+  actual point of CS, and the publishable prediction that Steve's gridder
+  degrades first).
+
+✻ Cooked for 1m 23s
+※ recap: Building compressed sensing recon for the ASAP project; the λ sweep on the ACR phantom is done and wavelet CS beats both Steve's SNR and Faraz's flatness bars. Next: your visual verdict on cs_sweep_sheet.png (open on screen) to pick λ. (disable recaps in /config)
+
+❯ can you generate the same montage slice [Image #1] for t0.003 alongside steve 
+  and faraz (a new fig, dont touch the old ones)                                
+  ⎿  [Image #1]
+
+⏺ Reading montage script to reuse layout + Faraz/Steve volume loading.
+
+  Listed 1 directory (ctrl+o to expand)
+
+⏺ Bash(pwd; ls /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/data/v
+      3_fov250/recon_io/faraz/ 2>/dev/null; ls
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Rec…)
+  ⎿  /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace
+     faraz_recon.mat
+     farazrecon.png
+     … +11 lines (ctrl+o to expand)
+
+  Searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+⏺ Write(workspace/helpers/recon/cs_montage.py)
+  ⎿  Wrote 92 lines to workspace/helpers/recon/cs_montage.py
+        rrected) andce montage: CS wavelet recon alongside Faraz (zoom-co
+      2 Steve-equiv — same slice layout as montage_zoomfix.png, separate 
+        output file.
+      4 Reuses maxeig and t_ref from cs_sweep_metrics.json (written by cs
+        _recon.py)
+      5 so only the DCF weights and the one CS recon are recomputed.
+      7 Usage: .venv/bin/python cs_montage.py <recon_io folder> [--t-rel 
+        0.003]
+      8 Output: <folder>/montage_cs_t<t_rel>.png
+      9 """
+     … +98 lines (ctrl+o to expand)
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python cs_montage.py ../../data/v3_fov250/recon_io --t-rel
+      0.003 2>&…)
+  ⎿  alpha = 0.8298 (x1.205 magnification corrected)
+     steve-equiv recon (numpy kernel) ...
+     CS wavelet recon (t_rel=0.003, lam=8.803e-06, 100 iters) ...
+     … +6 lines (ctrl+o to expand)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Bash(open /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/data/v3_f
+      ov250/recon_io/montage_cs_t0.003.png && cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_R…)
+  ⎿  4ab7cf2 Add cs_montage.py: CS wavelet vs Faraz-corrected vs Steve-equi
+     v multi-slice montage
+
+⏺ Done — montage_cs_t0.003.png open on screen, old montages untouched. Three
+  rows, same 48-slice layout as montage_zoomfix.png: Faraz corrected /
+  Steve-equiv / CS wavelet t0.003. Orientation auto-matched (corr 0.98 both
+  volumes). Script committed as cs_montage.py (4ab7cf2) — rerun with --t-rel 
+  0.01 etc. for other λ after your verdict.
+
+  Quick self-check from the montage: CS row has visibly darker background and
+  flatter interior than both; resolution-insert slices (grid pattern, rows 3–4)
+  still resolved. Check those insert slices and the end slices (z-extent erosion
+  risk from L1 shrinkage) — that's where wavelet would cheat.
+
+✻ Cogitated for 2m 9s
+
+❯ do the same (new fig) for t0.01                                               
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python cs_montage.py ../../data/v3_fov250/recon_io --t-rel
+      0.01 2>&1…)
+  ⎿  orienting CS volume to Faraz layout:
+       orientation: perm (0, 2, 1) flips (False, True, False)  (vol corr 0.
+     9777)
+     … +3 lines (ctrl+o to expand)
+
+⏺ montage_cs_t0.01.png written and open on screen — same layout, CS row at t0.01
+  (SNR 47.2, lfCV 0.085). Compare side by side with t0.003: watch the
+  resolution-insert grid slices for block texture onset and the end slices for
+  shrinkage. Your verdict picks λ, then I move to the undersampling experiment.
+
+✻ Baked for 46s
+
+❯ it seems the color axis are not the same for all the three? if true replot    
+  the last two fig (overwrite)                                                  
+
+⏺ True — each row autoscaled independently, and the three volumes are in
+  unrelated absolute units (mat / kernel / CS). Fix: normalize each volume by
+  its p99.5, display all with fixed vmin=0, vmax=1.
+
+⏺ Update(workspace/helpers/recon/cs_montage.py)
+  ⎿  Added 6 lines
+      70      cs_d = orient_to_match(vol_cs, vol_f_fix)
+      71      st_d = orient_to_match(vol_st, vol_f_fix)
+      72  
+      73 +    # volumes are in unrelated absolute units (mat / kernel / C
+         +S): normalize                                                  
+      74 +    # each by its p99.5 and display on a shared [0, 1] color ax
+         +is                                                             
+      75 +    def nrm(v):                                                
+      76 +        return np.clip(v / np.percentile(v, 99.5), 0, 1)       
+      77 +    vol_f_fix, st_d, cs_d = nrm(vol_f_fix), nrm(st_d), nrm(cs_d
+         +)                                                              
+      78 +                                                               
+      79      idx_f = [j - 1 for j in SLICES_1B]
+      80      idx_o = fraction_matched_slices(N, 80)
+      81      panels = [
+
+⏺ Update(workspace/helpers/recon/cs_montage.py)
+  ⎿  Added 1 line, removed 1 line
+      85      ]
+      86      fig, axes = plt.subplots(3, 1, figsize=(16, 34))
+      87      for ax, (img, t) in zip(axes, panels):
+      88 -        ax.imshow(img, cmap="gray")                            
+      88 +        ax.imshow(img, cmap="gray", vmin=0, vmax=1)            
+      89          ax.set_title(t, fontsize=14)
+      90          ax.axis("off")
+      91      fig.tight_layout()
+
+⏺ Bash(../.venv/bin/python cs_montage.py ../../data/v3_fov250/recon_io --t-rel
+      0.003 2>&1 | tail -1 && ../.venv/bin/python cs_montage.py
+      ../../data/v3_fov250/recon_io…)
+  ⎿  wrote ../../data/v3_fov250/recon_io/montage_cs_t0.003.png
+     wrote ../../data/v3_fov250/recon_io/montage_cs_t0.01.png
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace && git add
+      helpers/recon/cs_montage.py && git commit -q -m "cs_montage: shared [0,1]
+      color axis (p…)
+  ⎿  75e47ad cs_montage: shared [0,1] color axis (per-volume p99.5 normaliz
+     ation)
+
+⏺ Confirmed and fixed — rows were independently autoscaled. Both figures
+  regenerated (overwritten) with each volume normalized by its p99.5 and
+  displayed on a shared [0,1] axis; both open on screen. Committed (75e47ad).
+
+  Note the caveat baked into this: per-volume p99.5 normalization equalizes
+  overall brightness, so rows are comparable in structure/uniformity/background
+  — but absolute intensity between pipelines is still not a meaningful
+  comparison (units differ at the source). For your verdict that's fine: judge
+  texture, edges, inserts, background.
+
+✻ Cogitated for 1m 34s
+
+❯ push it to git                                                                
+
+⏺ Bash(git push 2>&1 | tail -3 && git status -sb | head -2)
+  ⎿  To github.com:HoomHam/asap-recon-workspace.git
+        02ce2ed..75e47ad  main -> main
+     ## main...origin/main
+     ?? archive/fable_5_asap_06-12-2026.txt
+
+⏺ Pushed — 02ce2ed..75e47ad to HoomHam/asap-recon-workspace main. Three commits
+  up: CS layer, montage script, color-axis fix.
+
+  One untracked file sits in the workspace: archive/fable_5_asap_06-12-2026.txt
+  (not from this session's work) — left alone; add it if you want it in.
+
+✻ Cogitated for 20s
+
+❯ write a deep educational markdown for the cs implimentaion and put it in      
+  refrence                                                                      
+
+⏺ Checking Physics_Notes §12 for terminology continuity, then writing
+  reference/CS_Implementation.md.
+
+⏺ Bash(grep -n "^#\|^##" /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/worksp
+      ace/reference/Physics_Notes.md | tail -8 && sed -n "$(grep -n '§\?12\|##
+      12' /Users/hoo…)
+  ⎿  174:### 6.5 The FFT itself: shifts, directions, and flips
+     182:## 7. Multi-coil combination: why it's not just a sum
+     202:## 8. Hyperpolarized-specific physics in the pipeline
+     … +62 lines (ctrl+o to expand)
+
+⏺ Style absorbed. Writing the doc.
+
+⏺ Write(workspace/reference/CS_Implementation.md)
+  ⎿  Wrote 288 lines to workspace/reference/CS_Implementation.md
+       2 # Compressed Sensing on the ASAP Operator — Implementation Notes
+       3 *2026-06-12. Companion to `Physics_Notes.md` (picks up where its
+       4 off) and `Recon_Comparison_StaticGas.md` (whose estimator-object
+         ives capstone
+       6 `helpers/recon/cs_montage.py`. Data: static ACR phantom,n.py`,
+       7 `data/v3_fov250/recon_io/` (M = 424,320 samples, 100³ image grid
+       8 ).*
+       9 This document is educational in the same spirit as `Physics_Note
+      10 concept is mapped to a line of code, and every claim that came f
+         rom a measured
+     … +417 lines (ctrl+o to expand)
+
+⏺ Registering doc in workspace CLAUDE.md reference table + commit/push.
+
+⏺ Update(workspace/CLAUDE.md)
+  ⎿  Added 1 line
+      38  | `reference/Recon_Overview_Steve.md` | Code map — Steve's pipe
+          line: file roles, data flow, entry points, GPU dispatch, magic 
+          numbers | ✅ 2026-06-10 |
+      39  | `reference/Recon_Overview_Faraz.md` | Code map — Faraz's MATL
+          AB pipeline: file roles, data flow, entry points, compute model
+          , magic numbers | ✅ 2026-06-10 |
+      40  | `reference/Physics_Notes.md` | Educational: non-Cartesian rec
+          on from FID + 2D DFT up — signal eq, DCF, gridding, kernels, co
+          il combine, trajectory calibration, CS outlook; every concept m
+          apped to Steve/Faraz code | ✅ 2026-06-10 |
+      41 +| `reference/CS_Implementation.md` | Educational: CS layer on t
+         +he finufft operator — objective, λ-as-threshold parameterizatio
+         +n (two measured failures), DCF-as-preconditioner (CG vs gradien
+         +t solvers), wavelet/TV priors, metric blind spots, first sweep 
+         +results | ✅ 2026-06-12 |                                      
+      42  
+      43  ## Archive
+      44  
+
+⏺ Bash(git add reference/CS_Implementation.md CLAUDE.md && git commit -q -m "Add
+      reference/CS_Implementation.md: educational notes on the CS layer…)
+  ⎿     75e47ad..15301bf  main -> main
+
+⏺ Written, registered, pushed (15301bf):
+  workspace/reference/CS_Implementation.md.
+
+  Structure — same voice as Physics_Notes.md, every concept mapped to code,
+  measured failures kept as lessons:
+
+  1. Why CS — Steve/Faraz implicit objectives made explicit (capstone recap)
+  2. Code map — symbol → file:function table
+  3. Lesson: λ is meaningless without step size — both failed sweeps (no-op +
+  over-kill), threshold-in-coefficient-units rule
+  4. Lesson: CG forgives ill-conditioning, gradient methods don't — 1.8e6
+  density spread, Krylov vs gradient-step math, DCF returning as preconditioner,
+  honest ML-estimator caveat, D3 architecture dividend
+  5. Operator normalization — one scalar, three consequences
+  6. Wavelet vs TV priors — synthesis/analysis forms, why orthogonal db4,
+  failure modes (block texture, staircasing), complex soft-threshold
+  7. Results table with eye column
+  8. How the metrics lie — SNR inflation by background zeroing,
+  threshold-fragile extents, the twice-fooled rule
+  9. Next steps + reproduction commands (incl. trap: recompute density weights
+  per undersampling mask)
+
+  Still pending: your λ verdict (t0.003 vs t0.01 montages), then undersampling
+  experiment.
+
+✻ Sautéed for 12m 52s
+
+❯  /intent-layer:intent-layer-maintenance                                       
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ /intent-layer:intent-layer-maintenance                                        
+
+⏺ Running maintenance flywheel — state check + token measurement first.
+
+⏺ Bash(/Users/hoomham/.claude/plugins/cache/orban/intent-layer/1.2.0/skills/inte
+      nt-layer/scripts/detect_state.sh
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon 2>&1…)
+  ⎿  (eval):1: no such file or directory: /Users/hoomham/.claude/plugins/ca
+     che/orban/intent-layer/1.2.0/skills/intent-layer/scripts/detect_state.
+     sh
+
+⏺ Bash(/Users/hoomham/.claude/plugins/cache/orban/intent-layer/1.2.0/skills/inte
+      nt-layer/scripts/estimate_all_candidates.sh
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_…)  ⎿  (eval):1: no such file or directory: /Users/hoomham/.claude/plugins/ca
+     che/orban/intent-layer/1.2.0/skills/intent-layer/scripts/estimate_all_
+     candidates.sh
+
+  Listed 1 directory (ctrl+o to expand)
+
+⏺ Bash(for d in helpers/recon reference handoffs codes archive; do
+        tok=$(find $d -type f \( -name "*.py" -o -name "*.md" -o -name "*.m" -o
+      -name "*.c" -o -name "*.js…)
+  ⎿  helpers/recon: ~14174 tokens
+     reference: ~22804 tokens
+     handoffs: ~6094 tokens
+     … +7 lines (ctrl+o to expand)
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon && git ls-files
+      CLAUDE.md && git status -s CLAUDE.md)
+  ⎿  (No output)
+
+⏺ User answered Claude's questions:
+  ⎿  · Apply the proposed intent-layer updates? → Apply all (Recommended)
+
+⏺ Write(workspace/helpers/recon/AGENTS.md)
+  ⎿  Wrote 74 lines to workspace/helpers/recon/AGENTS.md
+       2 # helpers/recon — FINUFFT Baseline + CS Layer
+       3 > TL;DR: Hooman's own recon pipeline. Validated finufft operator
+       4 > (`asap_recon.py`) + CG method-of-record + CS layer (`cs_recon.
+         py`).
+       5 > Run everything with `../.venv/bin/python`. `README.md` has fil
+       6 > `../../reference/CS_Implementation.md` has the deep theory.
+       7 
+       9 ## Purpose
+      10 Owns: the independent reconstruction used to arbitrate Steve-vs-
+         Faraz and to
+     … +97 lines (ctrl+o to expand)
+
+⏺ Update(workspace/CLAUDE.md)
+  ⎿  Added 3 lines
+      30  | `archive/` | Old notes, superseded analysis | `Domain_Descrip
+          tion_YYYY-MM.md` |
+      31  | `helpers/` | Hooman's scripts — loaders, plotters, CS tools |
+           subfolder by type |
+      32  
+      33 +`helpers/recon/` has its own node: `helpers/recon/AGENTS.md` (e
+         +ntry points,                                                   
+      34 +contracts, pitfalls for the FINUFFT/CS pipeline).              
+      35 +                                                               
+      36  ## Active Reference Docs
+      37  
+      38  | Doc | Contents | Status |
+
+⏺ Now root CLAUDE.md updates:
+
+⏺ Update(CLAUDE.md)
+  ⎿  Added 3 lines
+      130  | C kernel (Kento's cloud version) | `workspace/codes/kasap.c`
+            |
+      131  | Hooman's MATLAB fork | `workspace/codes/2023_Faraz_Recon_HH/
+           ` |
+      132  | Steve vs Faraz comparison | `workspace/reference/Recon_Compa
+           rison.md` |
+      133 +| Hooman's CS recon (L1-wavelet/TV on finufft) | `workspace/he
+          +lpers/recon/cs_recon.py` |                                    
+      134 +| CS vs Steve vs Faraz montage | `workspace/helpers/recon/cs_m
+          +ontage.py` |                                                  
+      135 +| CS theory + lessons (λ, preconditioning) | `workspace/refere
+          +nce/CS_Implementation.md` |                                   
+      136  
+      137  ### Entry Points
+      138  
+
+⏺ Update(CLAUDE.md)
+  ⎿  Added 2 lines
+      145  | Find Hooman's MATLAB fork | `workspace/codes/2023_Faraz_Reco
+           n_HH/` |
+      146  | Understand Kento's C kernel | `asap/asap.c` vs `workspace/co
+           des/kasap.c` |
+      147  | Read Hooman's deep-dive notes | Obsidian: `~/Library/Mobile 
+           Documents/iCloud~md~obsidian/Documents/Action/MRI/ASAP Recon/`
+            |
+      148 +| Run/extend CS recon | `workspace/helpers/recon/AGENTS.md` (c
+          +ontracts + pitfalls first) |                                  
+      149  
+      150  ### Downlinks
+      151  
+      152  - `workspace/CLAUDE.md` — workspace rules, reference docs, act
+           ive code
+      153  - `workspace/codes/AGENTS.md` — what's in codes/, modification
+            priorities
+      154  - `workspace/codes/2023_Faraz_Recon_HH/AGENTS.md` — Hooman's M
+           ATLAB fork intent
+      155 +- `workspace/helpers/recon/AGENTS.md` — FINUFFT baseline + CS 
+          +layer (entry points, contracts, pitfalls)                     
+      156  
+      157  ### Contracts
+      158  
+
+⏺ Update(CLAUDE.md)
+  ⎿  Added 1 line
+      167  - `raw.py` infers `npts` from |k|² periodicity, not directly f
+           rom header — fragile if trajectory changes
+      168  - Background looks negative in Steve's output (complex/zero-me
+           an); take `np.abs()` for MATLAB-like visuals
+      169  - `asap/asap.c` (Steve) and `workspace/codes/kasap.c` (Kento) 
+           are different — compare before assuming equivalence
+      170 +- On the spiral operator, gradient solvers (FISTA/PDHG) stall 
+          +without DCF preconditioning while CG converges fine — unconver
+          +ged output still looks like an image; see `workspace/helpers/r
+          +econ/AGENTS.md` Pitfalls                                      
+
+⏺ Bash(echo "node size: ~$(($(wc -c < /Users/hoomham/Hooman/Work/Codes/2026_ASAP
+      _Recon/workspace/helpers/recon/AGENTS.md)/4)) tokens" && cd
+      /Users/hoomham/Hooman/Work/…)
+  ⎿  node size: ~928 tokens
+        15301bf..225a34f  main -> main
+
+⏺ Maintenance done. Applied and pushed (225a34f):
+
+  - New node workspace/helpers/recon/AGENTS.md (~928 tokens, well under 4k) —
+  purpose, entry-point commands, contracts (venv, selftest, λ-as-threshold,
+  per-mask DCF, D3 weights, eye rule), six pitfalls from this session's measured
+  failures, navigation links.
+  - workspace/CLAUDE.md — downlink to the new node.
+  - Root CLAUDE.md (untracked file, repo stays clean) — Code Map rows for
+  cs_recon.py/cs_montage.py/CS_Implementation.md, entry-point row, new Pitfall:
+  gradient solvers stall without DCF preconditioning while CG converges, and
+  unconverged output still looks like an image.
+
+  Audit findings, for the record: all 4 existing nodes were accurate (no stale
+  entries found — recon.py Gaussian/KB pitfall, npts inference,
+  asap.c-vs-kasap.c all still true); reference/ crossed 20k tokens but is
+  read-on-demand docs, no node warranted; codes/ at 86k already covered.
+
+✻ Crunched for 2m 31s
+
+※ recap: CS phase started: wavelet recon now beats both Steve's SNR and Faraz's flatness bars on the phantom; code, montages, docs, and intent layer all committed and pushed. Next: your visual verdict picking t0.003 vs t0.01, then undersampling. (disable recaps in /config)
+
+❯ we do not want to undersample as a test, i think for now. we will get back to 
+  it. after fixing our metrics like lambda, i want to compare the cs that was   
+  developed here with another cs from Lustig. and then we move to the temporal  
+  (4D). at that time, we will actually deal with undersampled images for        
+  diaphragm binning. so one question, the pythons that you developed here were  
+  stand alone cs implimination or you used a library from BART or any other     
+  platform?                                                                     
+
+⏺ Answer: hybrid — assembled from primitives, not a packaged CS app, and no BART
+  anywhere.
+
+  Layer: NUFFT A/Aᴴ
+  Source: FINUFFT library (Flatiron), wrapped in our own asap_recon.py with
+    Steve's units/isign conventions — the validated operator
+  ────────────────────────────────────────
+  Layer: Wavelet transform
+  Source: sigpy linop.Wavelet (PyWavelets backend, db4)
+  ────────────────────────────────────────
+  Layer: Finite differences, L1 prox
+  Source: sigpy linop.FiniteDifference, prox.L1Reg
+  ────────────────────────────────────────
+  Layer: Solvers (FISTA, PDHG, MaxEig)
+  Source: sigpy app.LinearLeastSquares
+  ────────────────────────────────────────
+  Layer: DCF preconditioning, λ-as-threshold parameterization, objective
+    assembly, CG of record, metrics
+  Source: ours
+
+  Deliberately did not use sigpy's packaged mri.app.L1WaveletRecon — assembled
+  from primitives to keep our validated operator and conventions.
+
+  One fact that matters for your Lustig comparison: sigpy is from Lustig's own 
+  lab (Frank Ong, Lustig's student, Berkeley). So comparing our CS against
+  sigpy's MRI apps would be partially circular — same solver library, same
+  lineage. For a genuinely independent "Lustig CS" benchmark:
+
+  - BART pics (recommended) — independent C implementation from the
+  Uecker/Lustig ecosystem. Handles non-Cartesian 3D trajectories natively,
+  ℓ1-wavelet + TV, and — relevant to your step 3 — has first-class temporal
+  dimensions with temporal TV/low-rank regularizers for 4D binned recon.
+  Installs via homebrew. One comparison target that also serves the 4D phase.
+  - Lustig's original SparseMRI MATLAB toolbox (2007, nonlinear CG) — the
+  historical reference, but 2D-oriented and clunky for 3D spiral; faithful only
+  if you want to reproduce the paper exactly.
+
+  Plan recorded: undersampling test shelved (returns naturally with diaphragm
+  binning in 4D); order now (1) fix metrics + λ, (2) our CS vs Lustig/BART, (3)
+  temporal 4D. Updating the stale "next: undersampling" lines in
+  AGENTS.md/README:
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 6 lines, removed 2 lines
+      63  ## Status (2026-06-12)
+      64  
+      65  CS layer built and swept; wavelet t0.003–0.01 beats both handof
+          f bars
+      66 -(SNR > 28.7, lowfreq-CV < 0.093). λ verdict pending Hooman's ey
+         -e. Next:                                                       
+      67 -undersampling experiment (1/2, 1/4, 1/8 interleaves).          
+      66 +(SNR > 28.7, lowfreq-CV < 0.093). λ verdict pending Hooman's ey
+         +e.                                                             
+      67 +Plan (2026-06-12): (1) fix metrics + freeze λ, (2) compare our 
+         +CS against an                                                  
+      68 +independent Lustig-lineage implementation (BART `pics` preferre
+         +d; note sigpy                                                  
+      69 +itself is Lustig-lab, so sigpy-vs-sigpy would be circular), (3)
+         + temporal 4D                                                   
+      70 +with diaphragm binning — undersampling returns there, not as a 
+         +standalone                                                     
+      71 +test.                                                          
+      72  
+      73  ## Navigation
+      74  
+
+⏺ Update(workspace/helpers/recon/README.md)
+  ⎿  Added 3 lines, removed 2 lines
+      51        wavelet t0.003-0.01 beats both bars (SNR 32.8-47.2 > 28.7
+          ,
+      52        lowfreqCV 0.084-0.085 < 0.093). λ choice pending Hooman's
+           visual
+      53        verdict on `cs_sweep_sheet.png`
+      54 -- [ ] CS undersampling experiment (1/2, 1/4, 1/8 interleaves; C
+         -S vs CG vs                                                     
+      55 -      Steve-equiv) — handoff CS step 4, after λ verdict        
+      54 +- [ ] CS vs independent Lustig-lineage CS (BART `pics`) — after
+         + λ verdict.                                                    
+      55 +      Undersampling test shelved 2026-06-12; returns with 4D di
+         +aphragm                                                        
+      56 +      binning (temporal phase)                                 
+
+⏺ Bash(git add helpers/recon/AGENTS.md helpers/recon/README.md && git commit -q
+      -m "Plan update: shelve standalone undersampling test; next is
+      CS-vs-BART…)
+  ⎿     225a34f..9d00c94  main -> main
+⏺ Pushed (9d00c94). Plan now recorded in AGENTS.md + README: ① fix metrics,
+  freeze λ → ② our CS vs BART pics → ③ 4D temporal with diaphragm binning
+  (undersampling lives there).
+
+  To restate the direct answer compactly: nothing here came from BART or any
+  end-to-end CS platform. It's our own assembly — FINUFFT for the transforms
+  (our validated wrappers with Steve's conventions), sigpy only for the generic
+  building blocks (wavelet/finite-difference linops, L1 prox, FISTA/PDHG
+  solvers), and the CS-specific decisions (DCF preconditioning, λ-as-threshold,
+  objective form) written by us. That makes BART a clean independent benchmark
+  for step ②, and worth knowing: sigpy comes from Lustig's own lab, so a "Lustig
+  comparison" via sigpy's apps would share lineage with what we built.
+
+  When you're ready for step ① say what metric fixes you want (SNR
+  background-zeroing blind spot and threshold-fragile extents are the two known
+  offenders).
+
+✻ Cooked for 1m 13s
+
+❯ /handoff update and also mention our comparison goals (both matlab Lustig,    
+eventhough circular since it is more a comparison of where i was standing       
+before this project, and the BART c-based)                                      
+
+⏺ Write(handoff-report.md)
+  ⎿  Added 85 lines, removed 47 lines
+      1  # ASAP Recon — Session Handoff
+      2  
+      3 -**Date:** 2026-06-11                                            
+      4 -**Phase closed:** Steve-vs-Faraz comparison — FINALIZED. All doc
+        -uments written, all questions answered, all results committed. D
+        -o not reopen; reference the docs.                               
+      5 -**Next phase:** **Implement compressed sensing (CS).** This hand
+        -off is your spec for it.                                        
+      3 +**Date:** 2026-06-12 (updated in place; previous phase spec arch
+        +ived as `workspace/handoffs/handoff-2026-06-11.md`)             
+      4 +**Phase closed:** Steve-vs-Faraz comparison — FINALIZED (do not 
+        +reopen) — **and CS build steps 1–2 done** (static single-bin CS 
+        +working, λ sweep produced, λ verdict pending).                  
+      5 +**Next phase:** metric fixes + λ freeze → **CS-vs-CS comparison 
+        +(MATLAB Lustig + BART)** → temporal 4D.                         
+      6  
+      7  ---
+      8  
+     ...
+       13  Hooman's model preference for this project: **Fable 5**. See r
+           oot `CLAUDE.md`
+       14  Session Notes.
+       15  
+       16 -## Where everything stands (the closed phase — reference, don'
+          -t re-derive)                                                  
+       16 +## Where everything stands                                    
+       17  
+       18  | Artifact | Path | Contains |
+       19  |----------|------|----------|
+       20 -| Comparison truth | `workspace/reference/Recon_Comparison_Sta
+          -ticGas.md` | 10-step Steve-vs-Faraz diff, scoring, measured re
+          -sults, and the **estimator-objectives capstone** (read its las
+          -t section first — it motivates CS) |                          
+       21 -| Code maps | `workspace/reference/Recon_Overview_{Steve,Faraz
+          -}.md` | Per-pipeline file/dataflow/magic-numbers |            
+       22 -| Physics primer | `workspace/reference/Physics_Notes.md` | No
+          -n-Cartesian recon from first principles; §12 = CS outlook; eve
+          -ry concept mapped to code |                                   
+       23 -| Report to Steve | `workspace/for_steve.md` | Shared with Ste
+          -ve; expect rebuttal — respond consistently with it |          
+       24 -| Working recon code | `workspace/helpers/recon/` | See its `R
+          -EADME.md` for file roles and usage |                          
+       25 -| Measured numbers | `workspace/data/v3_fov250/recon_io/zoom_c
+          -heck_metrics.json`, `cg_tune_metrics.json` | All quantitative 
+          -results |                                                     
+       26 -| Archived handoffs | `workspace/handoffs/handoff-2026-06-{09,
+          -10,11}.md` | Session history if ever needed |                 
+       20 +| CS layer (working) | `workspace/helpers/recon/cs_recon.py` |
+          + L1-wavelet (FISTA) + TV (PDHG) on our finufft operator, DCF-p
+          +reconditioned; λ-as-threshold parameterization |              
+       21 +| CS montage tool | `workspace/helpers/recon/cs_montage.py` | 
+          +CS vs Faraz-corrected vs Steve-equiv, shared [0,1] color axis;
+          + `--t-rel` selects λ |                                        
+       22 +| CS theory + lessons | `workspace/reference/CS_Implementation
+          +.md` | Deep doc: objective, both λ-parameterization failures, 
+          +conditioning trap, priors, metric blind spots |               
+       23 +| Node for helpers/recon | `workspace/helpers/recon/AGENTS.md`
+          + | Contracts + pitfalls — **read before touching recon code** 
+          +|                                                             
+       24 +| Sweep numbers | `workspace/data/v3_fov250/recon_io/cs_sweep_
+          +metrics.json` | maxeig, t_ref, all per-(reg, t) metrics |     
+       25 +| Sweep/verdict figures | same folder: `cs_sweep_sheet.png`, `
+          +montage_cs_t0.003.png`, `montage_cs_t0.01.png` | For Hooman's 
+          +λ verdict |                                                   
+       26 +| Comparison truth (closed phase) | `workspace/reference/Recon
+          +_Comparison_StaticGas.md` | Steve-vs-Faraz, estimator-objectiv
+          +es capstone |                                                 
+       27 +| Physics primer | `workspace/reference/Physics_Notes.md` | §1
+          +2 = CS motivation |                                           
+       28 +| Prior handoffs | `workspace/handoffs/handoff-2026-06-{09,10,
+          +11}.md` | History; 06-11 has the original CS spec |           
+       29  
+       28 -**Headline results (memorize these five):**                   
+       29 -1. Our FINUFFT-CG ≈ Steve's recon at corr **0.984** (phantom, 
+          -fully sampled). Geometry: ours/Steve physically correct; Faraz
+          - ×1.205 magnified (his script's `resizing` block — he hasn't b
+          -een told yet, see open loops).                                
+       30 -2. Steve's SNR lead (28.7 vs CG 19.6) = gplb filter (+2) + **c
+          -ell-averaging bias–variance**; his gridder is a smoothing esti
+          -mator. λI Tikhonov proven a no-op (sweep over 4 decades).     
+       31 -3. Faraz's flatness lead (lowfreq-CV 0.093 vs 0.110) = Pipe–Me
+          -non fixed point `w⊛C=1` — flatness is literally his objective.
+       32 -4. **CS is the explicit version of both implicit objectives** 
+          -— expectation: beat Steve's SNR *and* Faraz's flatness simulta
+          -neously at equal/better resolution. That's the bar.           
+       33 -5. Performance (M4 Pro CPU): FINUFFT adjoint 10M samples → 0.3
+          - s; full CG ~20 s/recon. CPU is sufficient; GPU only if CS ite
+          -ration counts ever hurt.                                      
+       30 +**Headline results this session:**                            
+       31 +1. CS works: wavelet t = 0.003–0.01 beats **both** bars simult
+          +aneously — SNR 32.8–47.2 (> Steve 28.7) and lowfreq-CV 0.084–0
+          +.085 (< Faraz 0.093). The handoff thesis confirmed on the full
+          +y-sampled case. TV never matched it (best lfCV 0.124).        
+       32 +2. Two instructive failures, both measured, both in `CS_Implem
+          +entation.md` §3–4: λ in objective units = silent no-op; unweig
+          +hted AᴴA stalls gradient solvers ~1000× (density spread 1.8e6)
+          + while CG cuts through. Both produced plausible-looking images
+          + — the eye-over-metrics rule held twice.                      
+       33 +3. DCF returned as a *preconditioner* (w = 1/|AAᴴ1| in the dat
+          +a term) — exactly the D3 per-sample-weight slot; bin weights w
+          +ill multiply into the same W.                                 
+       34 +4. Implementation is **ours assembled from primitives**: FINUF
+          +FT operators (our validated wrappers), sigpy only for wavelet/
+          +FD linops + L1 prox + FISTA/PDHG solvers. NOT sigpy's packaged
+          + MRI apps, NOT BART. Matters for the comparison goals below.  
+       35  
+       35 -## The CS implementation spec                                 
+       36 +## Decisions this session                                     
+       37  
+       37 -### Objective                                                 
+       38 -```                                                           
+       39 -min_ρ  Σ_b ‖W_b (A ρ_b − s)‖²  +  λ R(ρ)                      
+       40 -```                                                           
+       41 -- **A** = existing FINUFFT operator pair (`asap_recon.adjoint`
+          -/`forward` — adjointness verified 6e-15; `isign=-1` convention
+          - matches Steve).                                              
+       42 -- **W_b** = per-sample diagonal weights. Static: ones. Binned:
+          - Steve-style soft weights `exp(-Δbin²/2)` per bin (replaces hi
+          -s data-domain mixing — closed-loop prior vs view-sharing argum
+          -ent: Physics_Notes §12 + dialogue export).                    
+       43 -- **R** = start with L1-wavelet (sigpy ships it) and TV; for d
+          -ynamic later: temporal TV and/or low-rank across bins.        
+       38 +- **D4 (plan change, Hooman):** standalone undersampling exper
+          +iment SHELVED. It returns naturally with diaphragm binning in 
+          +the 4D phase. Do not run it as a separate test.               
+       39 +- **D5:** λ is parameterized as soft-threshold in coefficient 
+          +units relative to p99 of |W·x_cg|; never sweep λ in objective 
+          +units (contract in `AGENTS.md`).                              
+       40 +- **D6:** gradient solvers always get the DCF-weighted operato
+          +r; recompute density weights per sampling mask when undersampl
+          +ing eventually returns.                                       
+       41 +- λ choice between t0.003 and t0.01: **Hooman's visual verdict
+          +, still pending** — montages rendered for exactly this.       
+       42  
+       45 -### Build order                                               
+       46 -1. **Static single-bin CS on the ACR phantom** (data ready in 
+          -`workspace/data/v3_fov250/recon_io/`). Start from sigpy's `L1W
+          -aveletRecon`/`TotalVariationRecon` apps wired to our trajector
+          -y (sigpy `NUFFT` linop or wrap our finufft functions as a sigp
+          -y Linop — wrapping ours is preferred: keeps the validated oper
+          -ator and the Steve-units convention in one place).            
+       47 -2. **λ selection** — sweep, contact-sheet figure, **Hooman's v
+          -isual verdict gates the choice** (standing rule: his eye beat 
+          -scalar metrics twice; send figures, decompose lowfreq-vs-noise
+          -, never trust single CV/SNR).                                 
+       48 -3. **Score against the bar**: SNR vs Steve-equiv 28.7, lowfreq
+          --CV vs Faraz 0.093, extents vs ACR truth 190/190/148 mm, edge 
+          -sharpness (don't win SNR by blurring — check the resolution in
+          -serts visually).                                              
+       49 -4. **Undersampling experiment** (the actual point of CS): retr
+          -ospectively decimate interleaves (e.g. keep 1/2, 1/4, 1/8), re
+          -con CS vs CG vs Steve-equiv at each factor. Steve's gridder sh
+          -ould degrade first (cell-average density compensation breaks w
+          -hen cells empty out) — this is the prediction from the capston
+          -e section; verifying it is publishable material.              
+       50 -5. **Binned/dynamic CS** — 16 bins as W_b weight vectors + tem
+          -poral regularizer. Test data for bins doesn't exist yet for th
+          -e phantom (static acquisition); either simulate bin weights or
+          - wait for dynamic data. Architecture must not change: bins = w
+          -eights (decision D3, baked into `recon()`'s API).             
+       43 +## The roadmap (Hooman's ordering, 2026-06-12)                
+       44  
+       52 -### Hard constraints carried forward                          
+       53 -- Run everything with `workspace/helpers/.venv/bin/python` (pi
+          -ns finufft 2.5.1 + sigpy 0.1.27; system base is arm64 Miniforg
+          -e since 06-11).                                               
+       54 -- NEVER git commit/push in repo root; all git in `workspace/` 
+          -(`HoomHam/asap-recon-workspace`).                             
+       45 +### Step 1 — Fix metrics, freeze λ                            
+       46 +Known-broken metrics (`cg_tune.metrics`): SNR inflated when pr
+          +iors zero the                                                 
+       47 +background (σ_bg collapses — t0.1 wavelet scored SNR 68 on a v
+          +isibly worse                                                  
+       48 +image); extents threshold-fragile (CG reads 250 mm because noi
+          +se clears the                                                 
+       49 +mask threshold). Fix candidates: noise σ from a fixed corner R
+          +OI instead of                                                 
+       50 +adaptive background mask; extents from a fixed absolute thresh
+          +old calibrated                                                
+       51 +on the ACR truth; add an edge-sharpness metric (resolution-ins
+          +ert profile)                                                  
+       52 +so SNR can't be won by blurring. Then Hooman picks λ from the 
+          +montages and                                                  
+       53 +it gets frozen in `AGENTS.md`.                                
+       54 +                                                              
+       55 +### Step 2 — CS-vs-CS comparison (the new core goal)          
+       56 +Compare our CS against two external implementations, same raw 
+          +data:                                                         
+       57 +                                                              
+       58 +1. **MATLAB Lustig (SparseMRI toolbox, nonlinear-CG)** — delib
+          +erately                                                       
+       59 +   included *even though partially circular*: this is the CS H
+          +ooman used                                                    
+       60 +   before this project, so it benchmarks **where he was standi
+          +ng before vs                                                  
+       61 +   what was built here**. Personal-baseline comparison, not an
+          + independence                                                 
+       62 +   test. (Expect adaptation work: SparseMRI is 2D-Cartesian-or
+          +iented;                                                       
+       63 +   3D spiral needs its NUFFT hooks or slice-wise treatment — s
+          +cope decision                                                 
+       64 +   for that session.)                                         
+       65 +2. **BART `pics` (C-based)** — the independent benchmark from 
+          +the                                                           
+       66 +   Uecker/Lustig ecosystem. Handles 3D non-Cartesian natively 
+          +(`-t`                                                         
+       67 +   trajectory input, scaled to its [-N/2, N/2] convention — ou
+          +rs is                                                         
+       68 +   grid-index, conversion needed), ℓ1-wavelet (`-l1` + `-R W:…
+          +`) and TV.                                                    
+       69 +   Also the on-ramp for 4D: `pics` has first-class temporal di
+          +ms and                                                        
+       70 +   temporal-TV/low-rank regularizers. Install via homebrew.   
+       71 +                                                              
+       72 +Caveat recorded: sigpy itself is Lustig-lab (Frank Ong), so a 
+          +sigpy-app                                                     
+       73 +comparison would share lineage with our build — that's why BAR
+          +T is the                                                      
+       74 +independence test, and the MATLAB comparison is framed as pers
+          +onal-baseline.                                                
+       75 +                                                              
+       76 +Comparison protocol: same acq/trajectory inputs (`recon_io/`),
+          + align with                                                   
+       77 +`orient_to_match`, fixed metrics from step 1, montage + Hooman
+          +'s eye.                                                       
+       78 +                                                              
+       79 +### Step 3 — Temporal 4D                                      
+       80 +Diaphragm binning → bins as W_b weight vectors (architecture u
+          +nchanged,                                                     
+       81 +decision D3) + temporal regularizer (temporal TV and/or low-ra
+          +nk across                                                     
+       82 +bins). **This is where undersampled recon actually gets dealt 
+          +with.** Needs                                                 
+       83 +dynamic data; b-map output stage (port Steve's `calcb`) become
+          +s relevant                                                    
+       84 +before multi-coil.                                            
+       85 +                                                              
+       86 +## Hard constraints carried forward                           
+       87 +- Run everything with `workspace/helpers/.venv/bin/python` (fi
+          +nufft 2.5.1, sigpy 0.1.27, arm64).                            
+       88 +- NEVER git commit/push in repo root; all git in `workspace/` 
+          +(`HoomHam/asap-recon-workspace`) — everything through commit `
+          +9d00c94` is pushed.                                           
+       89  - Never modify Faraz's code folders; scanner data stays in git
+           ignored `workspace/data/`.
+       56 -- Faraz's mat volumes are display-permuted (x,z,y); both legac
+          -y pipelines use forward FFT k→image (flip/conjugate vs ifft-ba
+          -sed code).                                                    
+       57 -- `selftest.py` must pass after any operator change.          
+       90 +- `selftest.py` must pass after any operator change (operator 
+          +untouched this session).                                      
+       91 +- Read `workspace/helpers/recon/AGENTS.md` pitfalls before tou
+          +ching recon code — λ no-op trap, conditioning trap, `cs_montag
+          +e.py`↔`cs_sweep_metrics.json` coupling.                       
+       92  
+       59 -## Open loops (not blocking CS, don't lose them)              
+       60 -1. **Tell Faraz** about the `resizing` zoom bug — numbers and 
+          -fix suggestion in `Recon_Comparison_StaticGas.md` "Established
+          - results" / `zoom_check_metrics.json`. (His script: `~/Hooman/
+          -Work/Analysis/2025-09-24_ACR/spiral_gpt_ACR_20250915.m:445-452
+          -`.)                                                           
+       61 -2. **Steve's rebuttal** to `for_steve.md` — pending; answer fr
+          -om the comparison doc + benchmarks.                           
+       62 -3. **b-map output stage** (port Steve's `calcb` phase-fill) — 
+          -needed before multi-coil data; the naive local-phase shortcut 
+          -is a documented trap (`phase_corrected_real` tombstone in `far
+          -az_zoom_check.py`).                                           
+       63 -4. **Colab certification** of `steve_kernel_numpy` vs GPU outp
+          -ut — optional, closes the ~1e-6 float question in `for_steve.m
+          -d` §4c.                                                       
+       64 -5. Confounder-neutralized rerun (gplb=0, killpts both ways) — 
+          -paper-time task.                                              
+       93 +## Open loops (not blocking, don't lose)                      
+       94 +1. **λ verdict** — Hooman, from `montage_cs_t0.003.png` vs `mo
+          +ntage_cs_t0.01.png`.                                          
+       95 +2. **Tell Faraz** about the ×1.205 `resizing` zoom bug (number
+          +s in `zoom_check_metrics.json`; his script `~/Hooman/Work/Anal
+          +ysis/2025-09-24_ACR/spiral_gpt_ACR_20250915.m:445-452`).      
+       96 +3. **Steve's rebuttal** to `workspace/for_steve.md` — pending;
+          + answer from comparison doc + benchmarks.                     
+       97 +4. **b-map stage** (Steve's `calcb` port) — needed before mult
+          +i-coil / 4D.                                                  
+       98 +5. Colab certification of `steve_kernel_numpy` vs GPU output —
+          + optional.                                                    
+       99 +6. Parked solver alternatives: ADMM-with-inner-CG (statistical
+          +ly cleaner than DCF-weighted objective); undecimated wavelets 
+          +if block texture survives the chosen λ.                       
+      100 +7. Untracked stray in workspace: `archive/fable_5_asap_06-12-2
+          +026.txt` — not from this session's work; Hooman to keep or del
+          +ete.                                                          
+      101  
+      102  ## Suggested skills
+       67 -- `/handoff update` as CS milestones land                     
+       68 -- `intent-layer:intent-layer-maintenance` after the CS module 
+          -stabilizes (helpers/ will deserve an AGENTS.md by then)       
+      103 +- `/handoff update` as comparison milestones land             
+      104 +- `/code-review` on `cs_recon.py` before the BART comparison s
+          +ession (fresh eyes on the normalization math)                 
+      105  
+      106  ## Quick start for the cold session
+      107  ```bash
+      108  cd workspace/helpers/recon
+       73 -../.venv/bin/python selftest.py                               
+          -           # sanity (~1 min)                                  
+       74 -../.venv/bin/python compare_baseline.py ../../data/v3_fov250/r
+          -econ_io    # reproduce baseline                               
+       75 -# then read Recon_Comparison_StaticGas.md last section + Physi
+          -cs_Notes §12, and build cs_recon.py                           
+      109 +../.venv/bin/python selftest.py                               
+          +         # sanity (~1 min)                                    
+      110 +# read AGENTS.md (this folder) + reference/CS_Implementation.m
+          +d §3-4 & §8                                                   
+      111 +# step 1: fix cg_tune.metrics (SNR corner-ROI, fixed-threshold
+          + extents), rerun                                              
+      112 +#         cs_recon.py, get Hooman's lambda verdict, freeze it 
+      113 +# step 2: brew install bart; wire trajectory conversion (grid-
+          +index -> BART units)                                          
+      114  ```
+
+⏺ Handoff updated in place (handoff-report.md, not archived — update mode). What
+  changed:
+
+  - Status: CS build steps 1–2 marked done; headline results added (wavelet
+  beats both bars; the two measured failures; DCF-as-preconditioner;
+  ours-from-primitives implementation — relevant to comparison framing).
+  - Decisions: D4 undersampling shelved, D5 λ-as-threshold, D6 DCF-per-mask; λ
+  verdict still pending.
+  - Roadmap rewritten to your ordering: ① metric fixes (concrete candidates
+  listed: corner-ROI noise, fixed-threshold extents, edge-sharpness metric) + λ
+  freeze → ② CS-vs-CS comparison with both targets framed as you said — MATLAB
+  Lustig SparseMRI explicitly kept despite circularity as the personal-baseline
+  ("where I stood before this project") with its 2D-Cartesian adaptation caveat,
+  and BART pics as the independent C-based benchmark (plus trajectory-unit
+  conversion note and its 4D on-ramp value) → ③ temporal 4D with diaphragm
+  binning, where undersampling actually gets handled.
+  - Artifact table refreshed (cs_recon, cs_montage, CS_Implementation.md,
+  AGENTS.md, sweep JSON/figures); open loops carried forward + λ verdict and the
+  stray archive txt added.
+
+  Ready for a fresh session.
+
+✻ Brewed for 1m 14s
+
+❯ are we pushed and current on git?                                             
+
+⏺ Bash(git status -sb && git log --oneline origin/main..HEAD | head -3; echo
+      "---root repo---"; cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon &&
+      git status -sb |…)
+  ⎿  ## main...origin/main
+     ?? archive/fable_5_asap_06-12-2026.txt
+     ---root repo---
+     … +5 lines (ctrl+o to expand)
+
+⏺ Yes — both repos current:
+
+  - Workspace (HoomHam/asap-recon-workspace): in sync with origin/main, zero
+  unpushed commits. Everything from this session is up: CS layer, montage script
+  + color fix, CS_Implementation.md, AGENTS.md node, plan update (9d00c94 =
+  HEAD = origin). Only untracked item: archive/fable_5_asap_06-12-2026.txt (the
+  stray not from this session — your call).
+  - Root repo: clean vs origin, nothing committed (per contract). Untracked
+  local-only files: handoff-report.md (by design — current handoff lives
+  untracked in root), .DS_Stores, __pycache__/.
+
+  Note: the updated handoff-report.md itself isn't in any git — it only gets
+  preserved when archived to workspace/handoffs/ at the next /handoff. If you
+  want today's version backed up now, say so and I'll copy it into
+  workspace/handoffs/ and push.
+
+✻ Worked for 20s
+
+❯ /usage 
+  ⎿  Settings dialog dismissed
+
+❯ /exit                                                                         
+  ⎿  See ya!

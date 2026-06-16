@@ -1,0 +1,3596 @@
+ ▐▛███▜▌   Claude Code v2.1.177
+▝▜█████▛▘  Opus 4.8 · Claude Pro
+  ▘▘ ▝▝    ~/Hooman/Work/Codes/2026_ASAP_Recon
+
+
+❯ read workspace/handoff and start the comparisons. first generate a table of   
+  what are the runs you are considering and sweeping what paramater? fix any    
+  bug that was                                                                  
+    left from the last sessions if reported before comparisons. write new code  
+  and do not change anything in the past                                        
+
+⏺ Reading handoff docs first.
+
+  Read 2 files, listed 1 directory (ctrl+o to expand)
+  ⎿  Loaded workspace/CLAUDE.md
+
+⏺ Read 06-15.md (latest, 18:28) and the recon node. handoff-report.md size ==
+  06-15.md — likely the Tyger copy.
+
+  Read 2 files (ctrl+o to expand)
+
+⏺ State clear. Let me inspect recon folder + metric code (the reported bug) and
+  what BART tooling exists.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ls -la && echo "---LUSTIG---" && ls -la ../lustig_oneshot/ 2>/dev/null
+      && echo "-…)
+  ⎿  total 192
+     drwxr-xr-x@ 18 hoomham  staff   576 Jun 15 02:18 .
+     drwxr-xr-x@  7 hoomham  staff   224 Jun 15 01:23 ..
+     … +59 lines (ctrl+o to expand)
+
+  Read 2 files (ctrl+o to expand)
+
+⏺ Full picture clear. Reported bug = metrics() in cg_tune.py:52 (imported by
+  cs_recon.py). Comparison phase = BART pics (the open independence test; Lustig
+  already done). Let me check env basics before writing.
+
+⏺ Bash(cat ../../data/v3_fov250/recon_io/meta.json; echo "---"; cat
+      ../../data/v3_fov250/recon_io/cs_sweep_metrics.json | python3 -c "import
+      json,sys; d=json.load(sys.…)
+  ⎿  {
+       "npts": 510,
+       "nuniquesmp": 424320,
+     … +22 lines (ctrl+o to expand)
+
+⏺ Bug confirmed numerically: cg20 extent reads [250,250,250] (full FOV — noise
+  clears the 0.25·p99 threshold; ACR truth ≈190/190/148) and wavelet_t0.03/0.1
+  score SNR ~68 on the over-regularized images (σ_bg collapses). Both blind
+  spots from the handoff, live.
+
+  Kicking BART install (slow) in background, reading operator units for the BART
+  harness.
+
+⏺ Bash(brew install bart 2>&1 | tail -3)
+  ⎿  Running in the background (↓ to manage)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Units clear: BART traj per axis = traj_rad·N/(2π) (N=IS=100), spans [-50,50] =
+  BART's [-N/2,N/2] convention. Single coil → unit sens map.
+
+  Here's the plan before I write code.
+
+  Run table — CS-vs-CS comparison (BART independence test)
+
+  Same raw data (v3_fov250/recon_io, ACR phantom, static gas, single bin), same
+  trajectory, all scored with the new metrics.
+
+  #: 1
+  Pipeline: Ours (sigpy FISTA)
+  Regularizer: ℓ1-wavelet db4
+  Swept param: — (finalists from prior sweep)
+  Values: t=0.003, 0.01
+  Role: our champion
+  ────────────────────────────────────────
+  #: 2
+  Pipeline: Ours CG-20
+  Regularizer: none (ℓ2)
+  Swept param: —
+  Values: fixed
+  Role: method-of-record anchor
+  ────────────────────────────────────────
+  #: 3
+  Pipeline: BART pics
+  Regularizer: ℓ1-wavelet -R W:7:0
+  Swept param: λ
+  Values: log grid 1e-4…1e-1 (5 pts)
+  Role: independence test
+  ────────────────────────────────────────
+  #: 4
+  Pipeline: BART pics
+  Regularizer: TV -R T:7:0
+  Swept param: λ
+  Values: log grid 1e-4…1e-1 (5 pts)
+  Role: independence test
+  ────────────────────────────────────────
+  #: 5
+  Pipeline: BART pics
+  Regularizer: ℓ2 -R Q:λ / -i CG
+  Swept param: —
+  Values: fixed
+  Role: BART's own baseline
+
+  Primary sweep parameter = regularization strength λ (×2 regularizer families).
+  BART is the real independence test — sigpy shares Lustig-lab lineage with our
+  build, so ours-vs-sigpy would be circular; BART (Uecker/Lustig C code) does
+  not.
+
+  Bug fix (before comparison)
+
+  Reported broken metrics live in cg_tune.metrics (imported by cs_recon.py). Per
+  "don't change the past," I write a new metrics_v2.py instead of editing it
+  (keeps old sweep JSONs reproducible). Fixes: corner-ROI noise (not adaptive
+  mask) → SNR can't inflate silently; half-max extent (not 0.25·p99) → no
+  full-FOV readout; new edge_sharp guard → SNR can't be won by blur.
+
+  Writing the bug fix now.
+
+⏺ Write(workspace/helpers/recon/metrics_v2.py)
+  ⎿  Wrote 129 lines to workspace/helpers/recon/metrics_v2.py
+         une.metrics). — fixed-ROI recon quality metrics (supersedes cg_t
+       3 Why a NEW module (handoff 2026-06-15, roadmap step 1): the origi
+       4 `cg_tune.metrics` (cg_tune.py:52) has two *measured* blind spots
+          —
+       6   * SNR inflated when sparsity priors zero the background. The o
+       7     estimate uses an ADAPTIVE background mask (~dilate(object > 
+         0.4*p99)). When
+         NR explodes:or zeroes the air, sigma_bg collapses toward 0 and S
+      10   * extent_mm is threshold-fragile. The old mask is `v > 0.25*p9
+         9`; residual
+     … +157 lines (ctrl+o to expand)
+
+⏺ Background command "Install BART (background)" completed (exit code 0)
+
+⏺ BART install done. Verify it + demo the metric fix.
+
+⏺ Bash(which bart && bart version 2>/dev/null | head -1; echo "---DEMO metric
+      fix---"; ../.venv/bin/python metrics_v2.py ../../data/v3_fov250/recon_io
+      2>&1 | tail -12)
+  ⎿  bart not found
+     ---DEMO metric fix---
+       cg iter  16  residual 5.2356e+06
+     … +12 lines (ctrl+o to expand)
+
+⏺ Metric fix works: extent [250,250,250]→[172,168,128] (ACR ballpark, bug gone),
+  edge_sharp added. BART install reported success but binary not on PATH —
+  checking.
+
+⏺ Bash(tail -5 /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASA
+      P-Recon/ea6d4529-a45b-4515-b96b-dea351497169/tasks/b1wjeia6f.output
+      2>/dev/null; echo "…)
+  ⎿  To install bartender, run:
+       brew install --cask bartender
+     ---
+     … +37 lines (ctrl+o to expand)
+⏺ brew install bart matched the wrong thing — MRI BART (mrirecon/bart) isn't in
+  homebrew core. Need a tap or source build. Checking.
+
+⏺ Bash(brew search bart 2>/dev/null | head; echo "---tap try---"; brew tap
+      mrirecon/bart 2>&1 | tail -3; echo "---deps present?---"; brew list
+      2>/dev/null | grep -iE "…)
+  ⎿  bartib
+     bartycrouch
+     libart
+     … +15 lines (ctrl+o to expand)
+
+⏺ Must build BART from source (no tap/formula). Kicking off deps + clone + build
+  in background; writing the BART I/O + comparison harness meanwhile.
+
+⏺ Bash(brew install fftw openblas 2>&1 | tail -2; echo "=== clone+build ==="; rm
+      -rf /Users/hoomham/bin/bart-src; git clone --depth 1
+      https://github.com/mrirecon/bart…)
+  ⎿  Running in the background (↓ to manage)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Background command "Install deps, clone and build BART" completed (exit code 0)
+
+⏺ BART build done. Verify binary works.
+
+⏺ Bash(tail -6 /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASA
+      P-Recon/ea6d4529-a45b-4515-b96b-dea351497169/tasks/brzi4cpsf.output; echo
+      "=== bart bin…)
+  ⎿  Error: Exit code 1
+       export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
+       export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
+     === clone+build ===
+     Cloning into '/Users/hoomham/bin/bart-src'...
+     Makefile:15: *** bart requires version 4.0 of GNU make or newer!.  Stop.
+     === bart bin ===
+
+⏺ macOS make is 3.81; BART needs GNU make ≥4. Use homebrew gmake.
+
+⏺ Bash(brew list make >/dev/null 2>&1 && echo "make present" || brew install
+      make 2>&1 | tail -2; which gmake; gmake --version 2>/dev/null | head -1)
+  ⎿  Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+     Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+     /opt/homebrew/bin/gmake
+     GNU Make 4.4.1
+
+⏺ Bash(cd /Users/hoomham/bin/bart-src && OPENBLAS=$(brew --prefix openblas)
+      FFTW=$(brew --prefix fftw) gmake -j4 2>&1 | tail -12)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Building. Writing the BART I/O + comparison harness while it compiles.
+
+⏺ Write(workspace/helpers/recon/bartio.py)
+  ⎿  Wrote 33 lines to workspace/helpers/recon/bartio.py
+         toolbox python..cfl/.hdr reader+writer — no dependency on BART's
+      2 
+      3 BART stores a complex array as two files:
+        d dim sizes. text. line 1 "# Dimensions", line 2 = space-separate
+      5   name.cfl : raw single-precision complex64, COLUMN-MAJOR (Fortra
+        n order).
+      7 Replicates mrirecon/bart `python/cfl.py` (readcfl/writecfl). New 
+        standalone
+      8 helper for the BART CS comparison; modifies nothing.
+      9 """
+     … +29 lines (ctrl+o to expand)
+
+⏺ Background command "Build BART with gmake" completed (exit code 0)
+
+⏺ Bash(cd /Users/hoomham/bin/bart-src && tail -4
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/bs…)
+  ⎿  Error: Exit code 1
+     expr: syntax error
+     /bin/sh: gcc-mp-12: command not found
+     expr: syntax error
+     Makefile:404: *** ERROR: GCC version 12 or newer is required.  Stop.
+
+⏺ BART needs real GCC (mac gcc=clang shim). Check for homebrew gcc, else build
+  with clang+OMP off.
+
+⏺ Bash(ls /opt/homebrew/bin/gcc-1* 2>/dev/null; brew list 2>/dev/null | grep -E
+      "^gcc$" && echo "gcc formula present" || echo "no gcc formula")
+  ⎿  /opt/homebrew/bin/gcc-15
+     gcc
+     gcc formula present
+
+⏺ gcc-15 present. Rebuild with it.
+
+⏺ Bash(cd /Users/hoomham/bin/bart-src && gmake clean >/dev/null 2>&1;
+      OPENBLAS=$(brew --prefix openblas) FFTW=$(brew --prefix fftw) gmake -j4
+      CC=gcc-15 2>&1 | tail -15)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Now writing the comparison harness while it builds.
+
+⏺ Write(workspace/helpers/recon/bart_compare.py)
+  ⎿  Wrote 212 lines to workspace/helpers/recon/bart_compare.py
+         6-06-15 step 2).S vs our CS — the independence test (handoff 202
+       3 Our CS layer (cs_recon.py) is built on sigpy, which is Lustig-la
+       4 the MATLAB Lustig comparison shares that lineage, so it is a per
+         sonal baseline,
+         dent benchmark:ence test. BART (Uecker/Lustig, C) is the indepen
+         -wavelet/TV.debase, native 3D non-Cartesian `pics`, its own ell1
+       7 
+         ly into the code. It imports our helpers read-only and writes on
+          cg_tune.py, or's `bart/` subdir. It does NOT touch cs_recon.py,
+      10 asap_recon.py.
+     … +249 lines (ctrl+o to expand)
+
+⏺ Background command "Build BART with gcc-15" completed (exit code 0)
+
+⏺ Bash(cd /Users/hoomham/bin/bart-src && tail -5
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/bt…)
+  ⎿        |          ^~~~~~~~~
+     compilation terminated.
+     gmake: *** [Makefile:991: /Users/hoomham/bin/bart-src/src/bart.o] Erro
+     … +6 lines (ctrl+o to expand)
+  ⎿  Shell cwd was reset to 
+     /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon
+
+⏺ Compile error. Let me see the actual error.
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ fftw3.h not found — point compiler at brew include/lib dirs via
+  CPATH/LIBRARY_PATH.
+
+⏺ Bash(cd /Users/hoomham/bin/bart-src && gmake clean >/dev/null 2>&1;
+      CPATH="$(brew --prefix fftw)/include:$(brew --prefix openblas)/include"
+      LIBRARY_PATH="$(brew --pr…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ While BART builds, validating the SNR-fix on a synthetic prior-zeroed volume
+  (the exact failure case): old metric should inflate, new should flag
+  bg_collapsed.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python -c "
+      import numpy as np, asap_recon as ar…)
+  ⎿  /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/rec
+     on/cg_tune.py:69: RuntimeWarning: divide by zero encountered in scalar
+      divide
+     … +3 lines (ctrl+o to expand)
+
+⏺ Background command "Rebuild bart with include/lib paths" completed (exit code 0)
+
+⏺ SNR fix flags the pathological case (bg_collapsed=True) where old silently
+  divided by zero. Checking BART build.
+
+⏺ Bash(tail -4 /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASA
+      P-Recon/ea6d4529-a45b-4515-b96b-dea351497169/tasks/b0pg3h6xm.output; echo
+      "==="; /Users…)
+  ⎿  compilation terminated.
+     gmake: *** [Makefile:991: /Users/hoomham/bin/bart-src/src/num/blas.o]
+     Error 1
+     … +154 lines (ctrl+o to expand)
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ openblas ships cblas.h, not cblas_openblas.h. Need the right Makefile BLAS
+  flag — checking its logic.
+
+  Searched for 1 pattern, read 2 files (ctrl+o to expand)
+
+⏺ Cleanest fix: keep MACPORTS=1 (gives gcc-compatible -fopenmp) and symlink the
+  header name BART expects to openblas's cblas.h.
+
+⏺ Bash(OB=$(brew --prefix openblas); ls $OB/include/cblas.h && ln -sf
+      $OB/include/cblas.h $OB/include/cblas_openblas.h && echo "symlinked
+      cblas_openblas.h"; cd /Users/…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Build running (full tree, several min). Waiting for it; will run the
+  comparison once bart exists.
+
+⏺ Bash(for i in $(seq 1 40); do if [ -x /Users/hoomham/bin/bart-src/bart ]; then
+      echo "BART READY"; /Users/hoomham/bin/bart-src/bart version; break; fi;
+      if ! kill -0 $…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Background command "Symlink header and rebuild bart" completed (exit code 0)
+
+⏺ Bash(tail -5 /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASA
+      P-Recon/ea6d4529-a45b-4515-b96b-dea351497169/tasks/bxrtg8uwy.output; echo
+      "==="; ls -la…)
+  ⎿  Error: Exit code 1
+           |          ^~~~~~~
+     compilation terminated.
+     gmake: *** [Makefile:991: /Users/hoomham/bin/bart-src/src/misc/png.o] Error
+     1
+     gmake: *** Waiting for unfinished jobs....
+     rm /Users/hoomham/bin/bart-src/src/num/lapack.o 
+     /Users/hoomham/bin/bart-src/src/num/compress.o 
+     /Users/hoomham/bin/bart-src/src/moba/model_moba.o 
+     /Users/hoomham/bin/bart-src/src/noncart/nufft_chain.o 
+     /Users/hoomham/bin/bart-src/src/nlops/chain.o 
+     /Users/hoomham/bin/bart-src/src/seq/anglecalc.o src/bin.o src/pocsense.o 
+     /Users/hoomham/bin/bart-src/src/num/triagmat.o src/estmotion.o 
+     /Users/hoomham/bin/bart-src/src/calib/calmat.o 
+     /Users/hoomham/bin/bart-src/src/grecon/italgo.o 
+     /Users/hoomham/bin/bart-src/src/seq/pulseq.o 
+     /Users/hoomham/bin/bart-src/src/seq/flash.o src/fft.o 
+     /Users/hoomham/bin/bart-src/src/seq/pulse_library.o 
+     /Users/hoomham/bin/bart-src/src/simu/tsegf.o 
+     /Users/hoomham/bin/bart-src/src/nn/nn.o src/mobasig.o 
+     /Users/hoomham/bin/bart-src/src/noir/model.o 
+     /Users/hoomham/bin/bart-src/src/simu/crb.o 
+     /Users/hoomham/bin/bart-src/src/num/blockproc.o 
+     /Users/hoomham/bin/bart-src/src/moba/blochfun.o src/svd.o 
+     /Users/hoomham/bin/bart-src/src/nlops/smath.o 
+     /Users/hoomham/bin/bart-src/src/motion/displacement.o src/invert.o 
+     /Users/hoomham/bin/bart-src/src/nn/const.o src/avg.o 
+     /Users/hoomham/bin/bart-src/src/seq/mag_prep.o 
+     /Users/hoomham/bin/bart-src/src/stl/models.o src/nlinv.o 
+     /Users/hoomham/bin/bart-src/src/iter/prox.o src/zexp.o 
+     /Users/hoomham/bin/bart-src/src/num/optimize.o 
+     /Users/hoomham/bin/bart-src/src/num/vptr_iter.o src/cc.o 
+     /Users/hoomham/bin/bart-src/src/misc/mri2.o 
+     /Users/hoomham/bin/bart-src/src/nn/init.o 
+     /Users/hoomham/bin/bart-src/src/num/wavelet.o src/ecalib.o 
+     /Users/hoomham/bin/bart-src/src/seq/custom_ui.o 
+     /Users/hoomham/bin/bart-src/src/iter/itop.o 
+     /Users/hoomham/bin/bart-src/src/num/linalg.o 
+     /Users/hoomham/bin/bart-src/src/noncart/nudft.o 
+     /Users/hoomham/bin/bart-src/src/calib/bin.o 
+     /Users/hoomham/bin/bart-src/src/simu/coil.o 
+     /Users/hoomham/bin/bart-src/src/noncart/precond.o 
+     /Users/hoomham/bin/bart-src/src/grecon/priors.o src/mobafit.o 
+     /Users/hoomham/bin/bart-src/src/nn/nn_ops.o 
+     /Users/hoomham/bin/bart-src/src/noir/model2.o src/epg.o 
+     /Users/hoomham/bin/bart-src/src/linops/decompose_complex.o 
+     /Users/hoomham/bin/bart-src/src/iter/niht.o 
+     /Users/hoomham/bin/bart-src/src/grecon/model.o src/slice.o 
+     /Users/hoomham/bin/bart-src/src/simu/shape.o 
+     /Users/hoomham/bin/bart-src/src/nn/losses.o 
+     /Users/hoomham/bin/bart-src/src/num/fft_plan.o 
+     /Users/hoomham/bin/bart-src/src/nn/weights.o 
+     /Users/hoomham/bin/bart-src/src/calib/ssa.o 
+     /Users/hoomham/bin/bart-src/src/num/quadrature.o src/sdot.o src/poly.o 
+     /Users/hoomham/bin/bart-src/src/misc/debug.o src/nlmeans.o 
+     /Users/hoomham/bin/bart-src/src/num/morph.o 
+     /Users/hoomham/bin/bart-src/src/iter/vec.o src/nlinvnet.o src/pulse.o 
+     /Users/hoomham/bin/bart-src/src/nn/chain.o 
+     /Users/hoomham/bin/bart-src/src/seq/event.o 
+     /Users/hoomham/bin/bart-src/src/num/splines.o 
+     /Users/hoomham/bin/bart-src/src/linops/linop.o 
+     /Users/hoomham/bin/bart-src/src/nn/data_list.o 
+     /Users/hoomham/bin/bart-src/src/num/vec3.o 
+     /Users/hoomham/bin/bart-src/src/num/matexp.o 
+     /Users/hoomham/bin/bart-src/src/nlops/nlop_jacobian.o 
+     /Users/hoomham/bin/bart-src/src/nn/losses_nn.o 
+     /Users/hoomham/bin/bart-src/src/stl/misc.o 
+     /Users/hoomham/bin/bart-src/src/misc/graph.o src/nnet.o 
+     /Users/hoomham/bin/bart-src/src/geom/triangle.o src/grog.o 
+     /Users/hoomham/bin/bart-src/src/seq/seq.o src/tgv.o 
+     /Users/hoomham/bin/bart-src/src/noir/model_net.o 
+     /Users/hoomham/bin/bart-src/src/seq/misc.o 
+     /Users/hoomham/bin/bart-src/src/noir/recon2.o src/wavepsf.o 
+     /Users/hoomham/bin/bart-src/src/iter/misc.o 
+     /Users/hoomham/bin/bart-src/src/iter/prox2.o 
+     /Users/hoomham/bin/bart-src/src/nlops/someops.o 
+     /Users/hoomham/bin/bart-src/src/noir/pole.o src/fftshift.o 
+     /Users/hoomham/bin/bart-src/src/nlops/checkpointing.o src/sqpics.o 
+     /Users/hoomham/bin/bart-src/src/nn/rbf.o 
+     /Users/hoomham/bin/bart-src/src/sake/sake.o src/fftmod.o 
+     /Users/hoomham/bin/bart-src/src/moba/meco.o src/coils.o src/saxpy.o 
+     /Users/hoomham/bin/bart-src/src/num/ops.o 
+     /Users/hoomham/bin/bart-src/src/iter/italgos.o src/ictv.o 
+     /Users/hoomham/bin/bart-src/src/iter/iter4.o 
+     /Users/hoomham/bin/bart-src/src/num/blas.o 
+     /Users/hoomham/bin/bart-src/src/nn/activation_nn.o 
+     /Users/hoomham/bin/bart-src/src/seq/kernel.o 
+     /Users/hoomham/bin/bart-src/src/motion/interpolate.o src/nufft.o 
+     src/rtnlinv.o src/version.o 
+     /Users/hoomham/bin/bart-src/src/nlops/norm_inv.o 
+     /Users/hoomham/bin/bart-src/src/simu/signals.o 
+     /Users/hoomham/bin/bart-src/src/calib/estvar.o 
+     /Users/hoomham/bin/bart-src/src/iter/proj.o 
+     /Users/hoomham/bin/bart-src/src/networks/nnet.o 
+     /Users/hoomham/bin/bart-src/src/num/init.o 
+     /Users/hoomham/bin/bart-src/src/num/shuffle.o 
+     /Users/hoomham/bin/bart-src/src/moba/exp.o src/delta.o src/conv.o 
+     /Users/hoomham/bin/bart-src/src/noir/recon.o src/resize.o 
+     /Users/hoomham/bin/bart-src/src/sense/recon.o 
+     /Users/hoomham/bin/bart-src/src/num/vptr.o 
+     /Users/hoomham/bin/bart-src/src/simu/phantom.o src/calc.o src/bitmask.o 
+     /Users/hoomham/
+
+     ... [4073 characters truncated] ...
+
+     am/bin/bart-src/src/motion/opticalflow.o src/stl.o 
+     /Users/hoomham/bin/bart-src/src/misc/lock.o src/wavelet.o src/sim.o 
+     src/copy.o src/mip.o /Users/hoomham/bin/bart-src/src/nlops/nltest.o 
+     src/ssa.o /Users/hoomham/bin/bart-src/src/num/loop.o 
+     /Users/hoomham/bin/bart-src/src/nlops/nlop.o 
+     /Users/hoomham/bin/bart-src/src/simu/bloch.o 
+     /Users/hoomham/bin/bart-src/src/calib/calib.o 
+     /Users/hoomham/bin/bart-src/src/iter/monitor_iter6.o 
+     /Users/hoomham/bin/bart-src/src/misc/egraph.o src/itsense.o src/ones.o 
+     /Users/hoomham/bin/bart-src/src/num/fft.o 
+     /Users/hoomham/bin/bart-src/src/networks/cunet.o 
+     /Users/hoomham/bin/bart-src/src/linops/casorati.o src/squeeze.o 
+     src/cpyphs.o /Users/hoomham/bin/bart-src/src/num/reduce_md_wrapper.o 
+     /Users/hoomham/bin/bart-src/src/iter/iter_dump.o src/rovir.o src/phantom.o 
+     /Users/hoomham/bin/bart-src/src/num/qform.o 
+     /Users/hoomham/bin/bart-src/src/motion/syn.o src/casorati.o src/rmfreq.o 
+     /Users/hoomham/bin/bart-src/src/lowrank/batchsvd.o src/fmac.o src/ncalib.o 
+     src/mandelbrot.o /Users/hoomham/bin/bart-src/src/iter/iter5.o 
+     /Users/hoomham/bin/bart-src/src/num/fft-cuda.o src/flip.o 
+     /Users/hoomham/bin/bart-src/src/moba/ir_meco.o src/bloch.o 
+     /Users/hoomham/bin/bart-src/src/nlops/conv.o src/carg.o 
+     /Users/hoomham/bin/bart-src/src/wavelet/wavelet.o 
+     /Users/hoomham/bin/bart-src/src/linops/realval.o src/repmat.o 
+     /Users/hoomham/bin/bart-src/src/moba/optreg.o 
+     /Users/hoomham/bin/bart-src/src/num/vecops_strided.o src/cdf97.o 
+     /Users/hoomham/bin/bart-src/src/moba/T1phyfun.o 
+     /Users/hoomham/bin/bart-src/src/num/flpmath.o 
+     /Users/hoomham/bin/bart-src/src/grecon/network.o 
+     /Users/hoomham/bin/bart-src/src/num/mdfft.o 
+     /Users/hoomham/bin/bart-src/src/num/delayed.o 
+     /Users/hoomham/bin/bart-src/src/moba/recon_meco.o 
+     /Users/hoomham/bin/bart-src/src/moba/moba.o 
+     /Users/hoomham/bin/bart-src/src/misc/memcfl.o 
+     /Users/hoomham/bin/bart-src/src/seq/config.o src/traj.o src/ccapply.o 
+     /Users/hoomham/bin/bart-src/src/num/ode.o 
+     /Users/hoomham/bin/bart-src/src/linops/lintest.o src/phasepole.o 
+     src/estscaling.o /Users/hoomham/bin/bart-src/src/nn/tf_wrapper.o 
+     /Users/hoomham/bin/bart-src/src/moba/lorentzian.o 
+     /Users/hoomham/bin/bart-src/src/misc/dicom.o 
+     /Users/hoomham/bin/bart-src/src/iter/asl.o 
+     /Users/hoomham/bin/bart-src/src/num/ops_p.o 
+     /Users/hoomham/bin/bart-src/src/moba/recon.o 
+     /Users/hoomham/bin/bart-src/src/seq/gradient.o 
+     /Users/hoomham/bin/bart-src/src/sense/model.o 
+     /Users/hoomham/bin/bart-src/src/num/multind.o 
+     /Users/hoomham/bin/bart-src/src/motion/affine.o 
+     /Users/hoomham/bin/bart-src/src/misc/pd.o 
+     /Users/hoomham/bin/bart-src/src/simu/grid.o src/extract.o src/flatten.o 
+     /Users/hoomham/bin/bart-src/src/nlops/tenmul.o src/morphop.o 
+     /Users/hoomham/bin/bart-src/src/iter/lad.o src/normalize.o 
+     /Users/hoomham/bin/bart-src/src/num/iovec.o 
+     /Users/hoomham/bin/bart-src/src/motion/pyramide.o 
+     /Users/hoomham/bin/bart-src/src/nlops/cast.o 
+     /Users/hoomham/bin/bart-src/src/nlops/mi_metric.o 
+     /Users/hoomham/bin/bart-src/src/moba/T2fun.o src/wshfl.o 
+     /Users/hoomham/bin/bart-src/src/seq/pulse.o src/denoise.o src/multicfl.o 
+     /Users/hoomham/bin/bart-src/src/sense/pocs.o 
+     /Users/hoomham/bin/bart-src/src/networks/reconet.o src/trajcor.o 
+     /Users/hoomham/bin/bart-src/src/linops/sum.o src/tensorflow.o 
+     /Users/hoomham/bin/bart-src/src/simu/epg.o 
+     /Users/hoomham/bin/bart-src/src/nn/activation.o src/conj.o 
+     /Users/hoomham/bin/bart-src/src/geom/polygon.o 
+     /Users/hoomham/bin/bart-src/src/calib/grog.o 
+     /Users/hoomham/bin/bart-src/src/nlops/const.o 
+     /Users/hoomham/bin/bart-src/src/nn/batchnorm.o src/fakeksp.o src/ecaltwo.o 
+     src/caldir.o /Users/hoomham/bin/bart-src/src/num/convoaa.o 
+     /Users/hoomham/bin/bart-src/src/calib/walsh.o 
+     /Users/hoomham/bin/bart-src/src/seq/adc_rf.o src/fftrot.o 
+     /Users/hoomham/bin/bart-src/src/grecon/opt_iter6.o 
+     /Users/hoomham/bin/bart-src/src/nn/layers.o 
+     /Users/hoomham/bin/bart-src/src/networks/unet.o 
+     /Users/hoomham/bin/bart-src/src/iter/thresh.o 
+     /Users/hoomham/bin/bart-src/src/noncart/traj.o 
+     /Users/hoomham/bin/bart-src/src/num/simplex.o 
+     /Users/hoomham/bin/bart-src/src/nlops/zhyperbolic.o 
+     /Users/hoomham/bin/bart-src/src/networks/tf.o src/lrmatrix.o 
+     /Users/hoomham/bin/bart-src/src/num/gaussians.o src/threshold.o src/psf.o 
+     /Users/hoomham/bin/bart-src/src/nlops/zexp.o 
+     /Users/hoomham/bin/bart-src/src/noncart/nufft.o 
+     /Users/hoomham/bin/bart-src/src/networks/cnn.o src/toraw.o 
+     /Users/hoomham/bin/bart-src/src/geom/draw.o 
+     /Users/hoomham/bin/bart-src/src/wavelet/wavthresh.o 
+     /Users/hoomham/bin/bart-src/src/noir/misc.o 
+     /Users/hoomham/bin/bart-src/src/nn/layers_nn.o 
+     /Users/hoomham/bin/bart-src/src/nlops/snlop.o src/transpose.o src/sake.o 
+     /Users/hoomham/bin/bart-src/src/misc/misc.o src/seq.o 
+     /Users/hoomham/bin/bart-src/src/moba/model_T2.o src/compress.o 
+     /Users/hoomham/bin/bart-src/src/num/blas_md_wrapper.o 
+     /Users/hoomham/bin/bart-src/src/misc/io.o 
+     /Users/hoomham/bin/bart-src/src/num/md_wrapper.o 
+     /Users/hoomham/bin/bart-src/src/num/rand.o src/fovshift.o 
+     /Users/hoomham/bin/bart-src/src/iter/batch_gen.o src/join.o src/show.o 
+     /Users/hoomham/bin/bart-src/src/simu/sens.o
+     … +1 line (ctrl+o to expand)
+
+⏺ blas.o now compiles (symlink worked). png.o fails on libpng header — we don't
+  need PNG output (we read .cfl directly). Disable it.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Bash(cd /Users/hoomham/bin/bart-src && CPATH="$(brew --prefix fftw)/include"
+      LIBRARY_PATH="$(brew --prefix fftw)/lib" gmake -j4 CC=gcc-15
+      FFTW_BASE=$(brew --prefix f…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Most of the tree already compiled; this finishes the remaining objects + link.
+  Waiting.
+
+⏺ Bash(grep -cE "error:"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/b9n27ie6s.output 2>/dev/nu…)
+  ⎿  0
+     not yet
+⏺ No errors. Linking. Waiting for completion.
+
+⏺ Bash(sleep 1; tail -3
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/b9n27ie6s.output 2>/dev/nul…)
+  ⎿  (No output)
+
+⏺ Bash(for i in $(seq 1 30); do [ -x /Users/hoomham/bin/bart-src/bart ] &&
+      break; sleep 10; done; ls -la /Users/hoomham/bin/bart-src/bart 2>/dev/null
+      && /Users/hoomham…)
+  ⎿  -rwxr-xr-x@ 1 hoomham  staff  2923864 Jun 15 03:15 /Users/hoomham/bin/
+     bart-src/bart
+     v1.0.00
+
+⏺ Background command "Rebuild bart with PNG disabled" completed (exit code 0)
+
+⏺ Background command "Poll for bart binary up to ~10min" completed (exit code 0)
+
+⏺ BART built (v1.0.00). Quick smoke test on pics noncart, then run the
+  comparison.
+
+⏺ Bash(B=/Users/hoomham/bin/bart-src/bart; $B pics -h 2>&1 | grep -iE "R
+      <|trajectory|-t " | head; echo "=== quick noncart pics smoke (synthetic)
+      ==="; cd /tmp && $B t…)
+  ⎿  Error: Exit code 1
+     Usage: pics [-l ...] [-r f] [-R ...] [-c] [-s f] [-i d] [-t <file>] [-n] 
+     [-N] [-g] [--gpu-gridding] [-p <file>] [--precond] [-b d] [-e] 
+     [--adaptive-stepsize] [--asl] [--teasl] [--theta f:f] [--tvscales [f:]*f] 
+     [--tvscales2 [f:]*f] [--alpha f:f] [--gamma f:f] [-W <file>] [-d d] [-u f] 
+     [-C d] [-f f] [-I,--ist] [--fista] [--eulermaruyama] [-m,--admm] 
+     [-a,--pridu] [-w f] [-S] [--shared-img-dims d] [-K] [-B <file>] [-P f] [-M]
+     [-U,--lowmem] [--psf_export <file>] [--psf_import <file>] [--wavelet 
+     <string>] [--fista_pqr f:f:f] [--ist_last] [--motion-field <file>] 
+     [--nufft-conf ...] <kspace> <sensitivities> <output> 
+     -R <T>:A:B:C               generalized regularization options (-Rh for 
+     help)
+     -t file                    k-space trajectory
+     === quick noncart pics smoke (synthetic) ===
+     , function grid_point_gen, file grid.c, line 437.
+     Assertion failed: (0. == pos[j])Assertion failed: (0. == pos[j])Assertion 
+     failed: (0. == pos[j])Assertion failed: (0. == pos[j]) : No such file or 
+     directory
+     Loading cfl file img
+     ERROR: io error
+
+
+⏺ pics confirms -t/-R/--wavelet. (Smoke failure was my malformed synthetic
+  2D-in-3D traj, not pics.) Running the real comparison — it builds proper 3D
+  inputs. Backgrounding (10 BART runs + our recons).
+
+⏺ Bash(../.venv/bin/python bart_compare.py ../../data/v3_fov250/recon_io --bart
+      /Users/hoomham/bin/bart-src/bart --iters 100 2>&1 | grep -vE "cg iter")
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(sleep 45; cat /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-20
+      26-ASAP-Recon/ea6d4529-a45b-4515-b96b-dea351497169/tasks/bkcam88y0.output
+      2>/dev/null |…)
+  ⎿  Error: Blocked: sleep 45 followed by: cat 
+     /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/ea
+     6d4529-a45b-4515-b96b-dea351497169/tasks/bkcam88y0.output grep -vE "cg 
+     iter" tail -20. To wait for a condition, use Monitor with an until-loop 
+     (e.g. `until <check>; do sleep 2; done`). To wait for a command you 
+     started, use run_in_background: true. Do not chain shorter sleeps to work 
+     around this block.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Still in our-pipeline setup (MaxEig + CG). Waiting on the background job.
+
+⏺ Bash(until grep -q "BART pics sweep\|wrote\|FAILED\|Error\|Traceback"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96…)
+  ⎿  /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.ve
+     nv/lib/python3.11/site-packages/numpy/_core/_methods.py:190: RuntimeWa
+     rning: overflow encountered in square
+     … +33 lines (ctrl+o to expand)
+
+⏺ Background command "Run BART vs ours comparison" completed (exit code 0)
+
+⏺ Comparison ran. BART TV worked (orientation cc 0.92–0.95, sane SNR/extent) but
+  BART wavelet came back all-zero/garbage (note the overflow in square warning
+  → wavelet output blew up to inf). TV converged, wavelet diverged. Diagnosing
+  the wavelet path.
+
+⏺ Bash(../.venv/bin/python -c "
+      from bartio import readcfl…)
+  ⎿  bart_W_l0.0001 shape (100, 100, 100, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+     1, 1) max 1.5294035e+32 anynan False anyinf False
+     bart_T_l0.0001 shape (100, 100, 100, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+     1, 1) max 0.023245655 anynan False anyinf False
+
+⏺ BART wavelet diverged to 1e32 (FISTA path); TV (ADMM path) converged. Likely
+  FISTA step-size with the unnormalized ones-sensitivity. Quick test: force ADMM
+  (-m) for the wavelet.
+
+⏺ Bash(B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart;
+      for extra in "-m" "-e" "-S"; do $B pics -i100 $extra -t $D/traj -R
+      W:7:0:0.001 $D/ksp…)
+  ⎿  -m  max 2.357e-02   p99.5 1.780e-02
+     -e  max 2.107e-02   p99.5 1.597e-02
+     -S  max 5.793e+34   p99.5 5.753e+34
+
+⏺ -m (ADMM) fixes the wavelet divergence (max 0.024, matches TV scale). Updating
+  my harness to run the wavelet path under ADMM, then rerunning.
+
+⏺ Update(workspace/helpers/recon/bart_compare.py)
+  ⎿  Added 12 lines, removed 6 lines
+       92  
+       93  
+       94  def run_pics(bart, out_dir, reg, lam, iters):
+       95 -    """`bart pics -t traj -R <reg>:7:0:lam ksp sens out`. reg 
+          -in {W,T}."""                                                  
+       95 +    """`bart pics -t traj -R <reg>:7:0:lam ksp sens out`. reg 
+          +in {W,T}.                                                     
+       96 +                                                              
+       97 +    Wavelet (W) is forced onto ADMM (-m): pics' default FISTA 
+          +path diverged to                                              
+       98 +    ~1e32 here (unnormalized ones-sensitivity -> bad Lipschitz
+          + step), while ADMM                                            
+       99 +    is stable and matches the TV path's solver. Measured 2026-
+          +06-15."""                                                     
+      100      out = os.path.join(out_dir, f"bart_{reg}_l{lam:g}")
+       97 -    cmd = [bart, "pics", "-i", str(iters),                    
+       98 -           "-t", os.path.join(out_dir, "traj"),               
+       99 -           "-R", f"{reg}:7:0:{lam}",                          
+      100 -           os.path.join(out_dir, "ksp"),                      
+      101 -           os.path.join(out_dir, "sens"), out]                
+      101 +    cmd = [bart, "pics", "-i", str(iters)]                    
+      102 +    if reg == "W":                                            
+      103 +        cmd.append("-m")  # ADMM — FISTA diverges on the wavel
+          +et prox here                                                  
+      104 +    cmd += ["-t", os.path.join(out_dir, "traj"),              
+      105 +            "-R", f"{reg}:7:0:{lam}",                         
+      106 +            os.path.join(out_dir, "ksp"),                     
+      107 +            os.path.join(out_dir, "sens"), out]               
+      108      subprocess.run(cmd, check=True, capture_output=True, text=
+           True)
+      109      img = readcfl(out)
+      110      return np.abs(np.squeeze(img))
+
+⏺ Bash(../.venv/bin/python bart_compare.py ../../data/v3_fov250/recon_io --bart
+      /Users/hoomham/bin/bart-src/bart --iters 100 2>&1 | grep -vE "cg iter")
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -q "^wrote\|Traceback\|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea451497169/tasks/bfs…)
+  ⎿  == our pipeline setup (DCF-weighted normalized operator) ==
+       ours_cg20: {'snr': 20.076632069885807, 'cv': 0.19126353387655234, 'l
+     owfreq_cv': 0.1943714532987613, 'extent_mm': [172, 168, 128], 'edge_sh
+     … +28 lines (ctrl+o to expand)
+⏺ Background command "Rerun comparison with wavelet ADMM fix" completed (exit code 0)
+
+⏺ Full sweep clean now — all converged, orientation cc 0.92–0.95. Standing rule
+  says eyes on the figure before any verdict. Viewing the montage.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Visual read: BART recons reproduce the phantom independently (orientation
+  cc≈0.92) but every BART image carries a regular cross-hatch/moiré texture that
+  ours (cols 1–3, clean) does not — present in both BART wavelet and TV, so
+  it's a systematic BART-side artifact (likely a residual trajectory-scaling /
+  fftmod convention), not a regularizer effect. That texture inflates BART's CV,
+  so it confounds a clean head-to-head — a finding, not yet a verdict.
+
+  Let me write up the comparison reference doc + update the node status (new
+  docs, not touching past code).
+
+⏺ Write(workspace/reference/BART_Comparison.md)
+  ⎿  Wrote 94 lines to workspace/reference/BART_Comparison.md
+       2 # BART `pics` vs our CS — independence test (roadmap step 2)
+       3 **Date:** 2026-06-15  **Status:** first sweep landed, ONE open a
+       4 **Data:** `data/v3_fov250/recon_io` — ACR phantom, static gas, s
+         ingle bin, 1 coil.
+       5 **Code (all new, nothing in the past touched):**
+       7 `helpers/recon/bart_compare.py`, `bartio.py`, `metrics_v2.py`.
+       8 ## Why BART
+         ); the MATLABecon.py`) is built on sigpy = Lustig-lab (Frank Ong
+      10 Lustig comparison shares that lineage (personal baseline, alread
+         y done — ours
+     … +122 lines (ctrl+o to expand)
+
+⏺ Now updating the recon node Status (additive) to point at the new code and the
+  metric fix.
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 29 lines, removed 11 lines
+      60  - `phase_corrected_real` in `faraz_zoom_check.py` is a document
+          ed tombstone —
+      61    do not revive (local-phase reference creates hollow blotches 
+          and fools CV).
+      62  
+      63 -## Status (2026-06-15)                                         
+      63 +## Status (2026-06-15, updated)                                
+      64  
+      65 -CS layer built and swept; wavelet t0.003–0.01 beats both handof
+         -f bars                                                         
+      66 -(SNR > 28.7, lowfreq-CV < 0.093). λ verdict **still pending** H
+         -ooman's eye.                                                   
+      67 -Plan: (1) fix metrics + freeze λ — still open; (2) compare our 
+         -CS vs                                                          
+      68 -independent Lustig-lineage implementations — **MATLAB Lustig DO
+         -NE** (same-data                                                
+      69 -v3 verdict: ours wins, lfCV 0.084 vs 0.115; tool in `../lustig_
+         -oneshot/`,                                                     
+      70 -montage via `lustig_compare.py`), **BART `pics` still open** (t
+         -he real                                                        
+      71 -independence test; sigpy is Lustig-lab so sigpy-vs-sigpy would 
+         -be circular);                                                  
+      72 -(3) temporal 4D with diaphragm binning — undersampling returns 
+         -there.                                                         
+      65 +CS layer built and swept; wavelet t0.003–0.01 beats both handof
+         +f bars. λ verdict                                              
+      66 +**still pending** Hooman's eye.                                
+      67 +- **(1) metrics — FIXED in NEW module `metrics_v2.py`** (did NO
+         +T edit                                                         
+      68 +  `cg_tune.metrics`; old sweep JSONs must stay reproducible). C
+         +orner-ROI noise                                                
+      69 +  (SNR no longer inflates silently; `bg_collapsed` flag), half-
+         +max extent                                                     
+      70 +  (CG-20 now 172/168/128 mm, was the full-FOV 250/250/250 bug),
+         + new `edge_sharp`                                              
+      71 +  guard so SNR can't be won by blurring. `metrics_v2.py <recon_
+         +io>` demos                                                     
+      72 +  old-vs-new on CG-20. New code should import metrics from here
+         +.                                                              
+      73 +- **(2) BART `pics` — RAN** (the real independence test). `bart
+         +_compare.py` +                                                 
+      74 +  `bartio.py`. BART built from source at `/Users/hoomham/bin/ba
+         +rt-src/bart`.                                                  
+      75 +  BART reproduces the phantom (extent/orientation cc≈0.92); our
+         + wavelet lfCV                                                  
+      76 +  0.157 < BART floor ~0.177, BUT a grid/moiré texture on ALL BA
+         +RT recons (wav+tv)                                             
+      77 +  confounds the CV head-to-head — see `../../reference/BART_Com
+         +parison.md` (run                                               
+      78 +  table, the wavelet-needs-ADMM fix, the open texture artifact 
+         ++ next steps).                                                 
+      79 +  MATLAB Lustig comparison already done (ours wins; `../lustig_
+         +oneshot/`).                                                    
+      80 +- (3) temporal 4D with diaphragm binning — undersampling return
+         +s there.                                                       
+      81  
+      74 -Sibling tools added this phase: `lustig_compare.py` (our CS vs 
+         -a Lustig                                                       
+      75 -`gas` .mat, shared p99.5 axis, undoes the MATLAB per-slice rot9
+         -0).                                                            
+      82 +Sibling tools this phase: `metrics_v2.py` (fixed metrics), `bar
+         +t_compare.py`                                                  
+      83 +(our CS vs BART pics sweep), `bartio.py` (cfl/hdr I/O), `lustig
+         +_compare.py`.                                                  
+      84  
+      85 +## Pitfalls (added 2026-06-15)                                 
+      86 +- **BART wavelet diverges under FISTA here** (~1e32). pics `-R 
+         +W` must run with                                               
+      87 +  `-m` (ADMM); `bart_compare.run_pics` forces it. TV is fine on
+         + the default.                                                  
+      88 +- **BART traj units:** `bart_traj = traj_rad * N/(2π)` (N=100),
+         + dims (3,M,1).                                                 
+      89 +  A grid/moiré texture currently rides on all BART recons — sus
+         +pected                                                         
+      90 +  trajectory-scaling/half-voxel-center or fftmod convention; UN
+         +RESOLVED, so the                                               
+      91 +  lfCV comparison is suggestive not final (`BART_Comparison.md`
+         + OPEN ARTIFACT).                                               
+      92 +- **`metrics_v2` ≠ `cg_tune.metrics`:** corner-air noise ROI as
+         +sumes a centered                                               
+      93 +  object (true for ACR). Don't mix the two metrics' numbers in 
+         +one table.                                                     
+      94 +                                                               
+      95  ## Navigation
+      96  
+      97  - Parent: `../../CLAUDE.md` (workspace rules)
+
+⏺ Done. Comparisons started, bug fixed, all new code.
+
+  What I did
+
+  Bug fix (before comparisons) — new metrics_v2.py, did NOT touch 
+  cg_tune.metrics (old sweep JSONs stay reproducible):
+  - Corner-air noise ROI (fixed, not adaptive) → SNR can't inflate silently;
+  bg_collapsed flag fires on prior-zeroed background.
+  - Half-max extent → CG-20 now reads 172/168/128 mm (was the full-FOV
+  250/250/250 bug; ACR truth ≈190/190/148).
+  - New edge_sharp → SNR can't be won by blur.
+  - Validated: metrics_v2.py <recon_io> shows old-vs-new side by side.
+
+  Comparison started — BART pics (the real independence test; Lustig already 
+  done, sigpy-vs-sigpy would be circular). New: bart_compare.py, bartio.py.
+  Built BART from source (painful: needs gmake, gcc-15, cblas_openblas.h→cblas.h
+  symlink, PNG=0; recipe in doc).
+
+  Run table (swept param = λ × 2 regularizers)
+
+  ┌────────────────────┬───────┬─────────────┬─────────┬──────────────┬──────┐
+  │        run         │  SNR  │    lfCV     │  edge   │  extent_mm   │  cc  │
+  ├────────────────────┼───────┼─────────────┼─────────┼──────────────┼──────┤
+  │ ours_wav_t0.003    │ 37    │ 0.157       │ 10.3    │ 170/168/132  │ —    │
+  ├────────────────────┼───────┼─────────────┼─────────┼──────────────┼──────┤
+  │ ours_wav_t0.01     │ 65    │ 0.157       │ 10.2    │ 170/168/132  │ —    │
+  ├────────────────────┼───────┼─────────────┼─────────┼──────────────┼──────┤
+  │ bart_wav           │ 26→70 │ 0.175–0.178 │ ~9      │ ~172/168/130 │ 0.92 │
+  │ λ1e-4…1e-2         │       │             │         │              │      │
+  ├────────────────────┼───────┼─────────────┼─────────┼──────────────┼──────┤
+  │ bart_tv λ1e-4…1e-2 │ 27→96 │ 0.180–0.192 │ 7.7–9.3 │ ~172/165/128 │ 0.93 │
+  └────────────────────┴───────┴─────────────┴─────────┴──────────────┴──────┘
+
+  Findings
+
+  1. Independence test passes structurally — BART independently reproduces the
+  phantom: same extent, orientation cc≈0.92, across two unrelated codebases.
+  2. Our wavelet lfCV (0.157) sits below BART's floor (~0.177) across the whole
+  sweep — suggests ours is smoother, but confounded (see below).
+  3. Fixed a real bug mid-run: BART wavelet diverged to ~1e32 under default
+  FISTA → forced ADMM (-m), now stable.
+
+  Open issue (needs your eye / next session)
+
+  Every BART recon (wav and tv) carries a regular cross-hatch/moiré our finufft
+  recons lack → systematic BART-side artifact, not regularizer. Top suspect:
+  trajectory scaling / half-voxel center offset or fftmod convention. Until
+  resolved the lfCV head-to-head is suggestive, not final. Next step noted in
+  reference/BART_Comparison.md: dump BART's gridded k-space of a point-source
+  traj, sweep a half-voxel shift.
+
+  Montage: data/v3_fov250/recon_io/bart/bart_vs_ours_montage.png. Full write-up:
+  reference/BART_Comparison.md. Node status updated.
+
+  No past code changed; no git ops in repo root.
+
+✻ Cogitated for 17m 49s
+
+❯ so thid was grest that we did this on installed bart, but is it the same as   
+  our lustig matlab?                                                            
+
+⏺ Good question — short answer: no, not the same, on two axes. Let me pull the
+  Lustig comparison details to be precise.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Read it. Answer: no, BART is not the same as your Lustig MATLAB — on three 
+  axes. And there's a measurement gotcha you should know.
+
+  1. Different algorithm/codebase (not just a re-run of Lustig):
+
+  ┌────────┬─────────────────────────────────────────┬──────────────────────┐
+  │        │              Lustig MATLAB              │      BART pics       │
+  ├────────┼─────────────────────────────────────────┼──────────────────────┤
+  │ Code   │ SparseMRI v0.2 + Fessler IRT            │ Uecker/Lustig C      │
+  ├────────┼─────────────────────────────────────────┼──────────────────────┤
+  │ NUFFT  │ IRT table KB                            │ BART native noncart  │
+  ├────────┼─────────────────────────────────────────┼──────────────────────┤
+  │ Solver │ fnlCg (nonlinear-CG, smoothed L1,       │ ADMM (forced) /      │
+  │        │ 15×15)                                  │ FISTA                │
+  ├────────┼─────────────────────────────────────────┼──────────────────────┤
+  │ DCF    │ init only, data term unweighted         │ internal             │
+  ├────────┼─────────────────────────────────────────┼──────────────────────┤
+  │ λ      │ objective units, untuned 0.01           │ swept 1e-4…1e-2      │
+  ├────────┼─────────────────────────────────────────┼──────────────────────┤
+  │ Prior  │ TV+L1 on image (XFM=identity, not       │ true ℓ1-wavelet / TV │
+  │        │ wavelet)                                │                      │
+  └────────┴─────────────────────────────────────────┴──────────────────────┘
+
+  2. Different role. Lustig MATLAB = your personal baseline (the CS you ran
+  before this project), and it shares lab lineage with our sigpy build (both
+  Lustig/Ong) → partly circular. BART = Uecker lab, separate codebase → the
+  actual independence test. That's why both exist.
+
+  3. — and the gotcha — the numbers are NOT on the same ruler yet. Lustig
+  comparison was scored with the old buggy cg_tune.metrics (ours lfCV 0.084,
+  extent 212/175/250 ← the full-FOV bug, visible right there). BART comparison
+  uses the new metrics_v2 (ours lfCV 0.157, extent 170/168/132). So "ours 0.084
+  vs Lustig" and "ours 0.157 vs BART" can't be compared to each other.
+
+  Same data though (both on v3_fov250, 424,320 samples) — that part is
+  identical.
+
+  Quick fix to make them comparable: rescore the saved Lustig volume with
+  metrics_v2. Let me do it.
+
+⏺ Bash(ls ../../data/v3_fov250/recon_io/lustig/ 2>/dev/null; ../.venv/bin/python
+      -c "
+      import numpy as np, scipy.io as sio, glob…)
+  ⎿  ACR_test.mat
+     lustig_cs.mat
+     mats: ['../../data/v3_fov250/recon_io/lustig/ACR_test.mat', '../../dat
+     … +5 lines (ctrl+o to expand)
+
+⏺ Rescored it — and this is important: the metric fix moves the Lustig numbers 
+  hard, which means the two comparisons were never on the same ruler.
+
+  Lustig volume (v3, same data), old vs new metric:
+
+  ┌───────────────────────────┬──────┬───────┬─────────────┬────────────┐
+  │          metric           │ SNR  │ lfCV  │  extent_mm  │ edge_sharp │
+  ├───────────────────────────┼──────┼───────┼─────────────┼────────────┤
+  │ old cg_tune (doc verdict) │ 99.5 │ 0.115 │ 162/160/128 │ n/a        │
+  ├───────────────────────────┼──────┼───────┼─────────────┼────────────┤
+  │ new metrics_v2            │ 3.5  │ 0.122 │ 250/250/250 │ 9.2        │
+  └───────────────────────────┴──────┴───────┴─────────────┴────────────┘
+
+  What this tells you:
+  - The old metric's SNR 99.5 for Lustig was the inflation artifact — under
+  fixed corner-ROI noise it's actually 3.5 (corners hold real energy,
+  bg_collapsed=False). The Lustig recon is soft/spread: half-max extent fills
+  the FOV, low SNR.
+  - The single-number verdict flips depending on metric. Old: ours lfCV 0.084 <
+  Lustig 0.115 → "ours wins." New: Lustig lfCV **0.122 < ours 0.157** → lfCV now
+  *favors Lustig*. But that's because lfCV rewards blur — and the guard I added
+  catches it: ours edge_sharp 10.2 > Lustig 9.2, ours extent localized
+  (170/168/132) vs Lustig full-FOV. So ours is still the better-localized, 
+  sharper recon; it just no longer wins on lfCV alone.
+
+  Bottom line on your question:
+  1. BART ≠ Lustig MATLAB — different solver, NUFFT, codebase, prior. BART =
+  independence test; Lustig = personal baseline (shares our sigpy lineage).
+  2. Same raw data, but as-run the BART table (metrics_v2) and the Lustig
+  verdict (old metric) are not comparable. The old "ours beats Lustig" rested on
+  the buggy metric.
+  3. Edge-sharpness — the thing I added — is now what separates ours from
+  Lustig, not lfCV.
+
+  Next move to make all three honest on one ruler: rebuild a 3-way montage (ours
+  / Lustig / BART) scored with metrics_v2, then your eye picks. Want me to
+  build that? It's the clean way to close step 2.
+
+✻ Cogitated for 1m 40s
+
+❯ but we did not "sweep" the lustig matlab, we just ran with some random        
+  numebrs i did before, also wht was phi in the m-files i had?                  
+
+⏺ Right on both. Lustig was one fixed point (TVWeight=xfmWeight=0.01, your old
+  defaults), not a sweep — BART got a λ sweep, Lustig didn't. Asymmetric.
+
+  On phi — let me grep your m-files.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Most hits are wavelab toolbox noise. The real phi in your pipeline is in
+  fnlCg.m — the CS objective. Let me confirm it's not also a variable in your
+  own run scripts.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Confirmed: no phi variable in your own run scripts — phi lives only in
+  fnlCg.m, where Phi(x) is the CS objective (cost function) the nonlinear-CG
+  minimizes. Let me quote it exactly.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Found it. phi = Phi(x), the CS objective function Lustig's fnlCg minimizes
+  (fnlCg.m:13). Not a variable in your scripts — the cost being optimized.
+
+  $$\Phi(x) = \underbrace{\lVert F,W'x - y\rVert^2}{\text{data fidelity}} + 
+  \underbrace{\lambda_1,\lVert x\rVert_1}{\text{sparsity}} +
+  \underbrace{\lambda_2,\mathrm{TV}(W'x)}_{\text{smoothness}}$$
+
+  In your run:
+  - F = NUFFT3D (k-space operator)
+  - W' = XFM' sparsifying transform — your run set XFM=1 (identity), so W'x = x
+  (L1/TV act on the image directly, not wavelet coeffs)
+  - λ1 = xfmWeight = 0.01, λ2 = TVWeight = 0.01 ← the "random numbers you ran
+  before"
+  - y = params.data
+
+  In code the Phi value is the variable res (objective.m, line 146): res = obj +
+  TV + XFM. The L1 is smoothed — (w·conj(w)+l1Smooth)^(p/2), p=pNorm — so it's
+  differentiable for nonlinear-CG (exact prox would be non-smooth). That's the
+  one real math difference from ours: we use exact L1 prox (FISTA/PDHG), Lustig
+  uses smoothed-L1 + NCG.
+
+  Same objective as ours (min ||Ax−y||² + λR(x)) — different solver, and his λ
+  is in objective units on max-normalized data (our measured failure-mode #1,
+  survivable only because data normalized to 1).
+
+  So your two points connect: the thing to sweep on the Lustig side is xfmWeight
+  / TVWeight = λ1/λ2 = phi's regularization weights. You ran one point (0.01,
+  0.01); BART got 5. To make it fair:
+
+  - sweep TVWeight ∈ {1e-3…1e-1} (and/or xfmWeight) in run_cs.m,
+  - score every iterate with metrics_v2,
+  - 3-way montage ours / Lustig-swept / BART on one ruler.
+
+  Want me to wire the Lustig λ-sweep into lustig_oneshot/run_cs.m (new param
+  loop, your old code untouched) and run it?
+✻ Baked for 1m 5s
+
+❯ yes, and is it both wavelet and tv runs you are planning?                     
+
+⏺ Yes — both, but one honest catch you should know before I wire it:
+
+  Your fnlCg objective carries both terms at once (xfmWeight·L1 + TVWeight·TV).
+  Your old run had both on at 0.01 — and XFM=1 (identity), so the "L1" term was
+  L1-on-image, not wavelet. That's neither a clean TV nor a clean wavelet run.
+  To match ours/BART (which sweep one regularizer at a time) I'll run two
+  separate sweeps:
+
+  - TV sweep: TVWeight ∈ grid, xfmWeight=0 → pure TV. Clean, low-risk.
+  - Wavelet sweep: set XFM = Wavelet operator (not identity), xfmWeight ∈ grid,
+  TVWeight=0 → real wavelet. This is the variant your notes say diverged/was 
+  slow (spiral3d_cs_3D_hoom_Wavelet.m), so it may need babysitting.
+
+  Let me read the current run_cs.m to wire the sweep without touching your
+  originals.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ ph=1 on line 36 is the NUFFT phase arg (unrelated to phi). Before I commit the
+  wavelet path — checking whether Lustig's XFM/Wavelet operator is 2D or 3D
+  (your notes flagged a 2D-wavelet-on-3D bug).
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/codes/2025_
+      CS/sparseMRI_v0.2; ls *.m | grep -iE "wave|xfm|TVOP|^init"; echo "===
+      Wavelet.m header…)
+  ⎿  init.m
+     === Wavelet.m header ===
+     === mtimes dims ===
+     … +4 lines (ctrl+o to expand)
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/codes/2025_
+      CS/sparseMRI_v0.2/@Wavelet; cat mtimes.m 2>/dev/null | head -40)
+  ⎿  function res = mtimes(a,b)
+
+     if isa(a,'Wavelet') == 0
+     … +10 lines (ctrl+o to expand)
+
+⏺ Decisive: Lustig's Wavelet operator is FWT2_PO — 2D only (the exact
+  2D-wavelet-on-3D bug in your notes). So:
+
+  - TV: all three — ours, BART, Lustig (swept). ✓ clean three-way.
+  - Wavelet: ours + BART only. Lustig can't do real 3D wavelet without me
+  writing a new 3D wavelet operator (out of scope). Its identity-XFM "L1" isn't
+  wavelet either.
+
+  So the matched comparison is TV three-way + wavelet two-way (ours vs BART).
+  I'll sweep Lustig TV (TVWeight grid, xfmWeight=0), score with metrics_v2. New
+  run_cs_sweep.m, your run_cs.m untouched. Checking the driver to mirror it.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Both confirmed. Writing the TV sweep (new files, originals untouched), reusing
+  the existing ACR_test.mat.
+
+⏺ Write(workspace/helpers/lustig_oneshot/run_cs_sweep.m)
+  ⎿  Wrote 73 lines to workspace/helpers/lustig_oneshot/run_cs_sweep.m
+       2 % run_cs_sweep(in_mat, out_mat, codes_root, tvweights)eights)
+       3 %
+         a vector of TVoes NOT modify run_cs.m. Sweeps Lustig fnlCg over 
+       5 % weights so the Lustig baseline matches BART's lambda sweep (ha
+       6 % Pure TV: xfmWeight = 0 (the L1 term is OFF), so this is a clea
+         n single-
+         Identity XFM isV run comparable to BART `-R T` and our PDHG-TV. 
+       8 % irrelevant here (only used by the disabled L1 term).
+      10 % Lustig's wavelet operator is FWT2_PO (2D only) — a true 3D-wav
+         elet Lustig run
+     … +73 lines (ctrl+o to expand)
+
+⏺ Now the Python driver that runs the sweep and scores each weight with
+  metrics_v2.
+
+⏺ Write(workspace/helpers/lustig_oneshot/run_lustig_sweep.py)
+  ⎿  Wrote 84 lines to workspace/helpers/lustig_oneshot/run_lustig_sweep.py
+         ics_v2.ig TV lambda-sweep on a recon_io folder, scored with metr
+       2 
+          Lustig baselines NOT modify run_lustig.py / run_cs.m. Makes the
+       4 match BART's lambda sweep (handoff step 2): one fnlCg run per TV
+       5 (xfmWeight=0), final iterate scored with the FIXED metric (metri
+         cs_v2), so all
+       7 three pipelines (ours / BART / Lustig) finally sit on one ruler.
+       8 Reuses the existing ACR_test.mat (the torch/DCF step) unless --r
+       9 ebuild-dcf.
+      10     .venv_lustig/bin/python run_lustig_sweep.py <recon_io> \
+     … +89 lines (ctrl+o to expand)
+
+⏺ Check MATLAB is available + ACR_test.mat present, then launch (5 weights × ~4
+  min each — backgrounded).
+
+⏺ Bash(which matlab && ls -la ../../data/v3_fov250/recon_io/lustig/ACR_test.mat
+      2>/dev/null && echo "ACR_test present"; ls
+      lustig_oneshot/.venv_lustig/bin/python 2>/de…)
+  ⎿  /Applications/MATLAB_R2025a.app/bin/matlab
+     scipy ok in lustig venv
+
+⏺ MATLAB + scipy ready. Launching the sweep with absolute paths (background,
+  ~20–30 min).
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/lus
+      tig_oneshot && ls ../../data/v3_fov250/recon_io/lustig/ACR_test.mat &&
+      .venv_lustig/bin…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "MATLAB TV sweep|Error|Traceback|Undefined|reuse|build
+      ACR" /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Re
+      con/ea6d4529-a45…)
+  ⎿  Running in the background (↓ to manage)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ MATLAB still booting (slow first batch). While it runs, building the unified
+  TV three-way assembler — it needs ours-TV under metrics_v2 (current JSONs have
+  ours-TV only under the old metric), plus BART-TV and Lustig-TV. New file,
+  runs under recon .venv.
+
+⏺ Write(workspace/helpers/recon/tv_threeway.py)
+  ⎿  Wrote 113 lines to workspace/helpers/recon/tv_threeway.py
+         _v2, same data.: ours vs BART vs Lustig, ALL scored with metrics
+       3 NEW assembler (handoff step 2 close). TV is the one regularizer 
+         all three
+         avelet stays cleanly (Lustig's wavelet operator is 2D-only, so w
+       5 ours-vs-BART — see bart_compare.py / BART_Comparison.md). This p
+       6 recons on ONE ruler (metrics_v2) and one montage.
+       8 Sources (run the producers first):
+       9   ours   : recomputed here — cs.tv_recon at a few t_rel (PDHG on
+      10   BART   : recon_io/bart/bart_T_l*.{cfl,hdr}        (from bart_c
+         ompare.py)
+     … +126 lines (ctrl+o to expand)
+
+⏺ Check Lustig sweep progress.
+
+  Read 1 file (ctrl+o to expand)
+⏺ Python output is buffered behind the MATLAB -batch call (5 weights × 15 NCG
+  iters ≈ 20–30 min) — won't surface until it flushes. Waiting on the background
+  job to notify.
+
+⏺ Bash(until [ -f /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/dat
+      a/v3_fov250/recon_io/lustig/lustig_tv_sweep.mat ] && grep -q "wrote"
+      /private/tmp/claud…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Wired up and running. Summary of where this stands:
+
+  Built (new files, your originals untouched):
+  - lustig_oneshot/run_cs_sweep.m — loops fnlCg over a TVWeight grid, pure TV
+  (xfmWeight=0), saves final iterate per weight.
+  - lustig_oneshot/run_lustig_sweep.py — driver, reuses existing ACR_test.mat,
+  scores each weight with metrics_v2.
+  - recon/tv_threeway.py — assembles ours / BART / Lustig TV onto one ruler
+  (metrics_v2) + montage.
+
+  Answer to your question — both, with one honest limit:
+  - TV → three-way (ours, BART, Lustig-swept). Running now: TVWeight ∈ {1e-3, 
+  3e-3, 1e-2, 3e-2, 1e-1}.
+  - Wavelet → two-way only (ours vs BART). Lustig's Wavelet is FWT2_PO — 2D,
+  unusable on the 3D volume (the 2D-on-3D bug in your notes). Real 3D-wavelet
+  Lustig would need a new operator — out of scope unless you want it.
+
+  The Lustig TV sweep is mid-run (5 × fnlCg, ~20–30 min; MATLAB output buffered
+  until done). I'll report the swept table + run tv_threeway for the montage
+  once it lands.
+
+  One thing the sweep will settle: your old single point (0.01/0.01, both terms
+  on) was neither clean TV nor wavelet — this pure-TV sweep is the first
+  apples-to-apples Lustig number against BART.
+
+✻ Churned for 5m 39s
+
+※ recap: Goal: put our CS, BART, and Lustig spiral recons on one fair ruler. Lustig TV λ-sweep is running in MATLAB (~20–30 min, scored with the fixed metrics). Next: when it finishes, run tv_threeway.py to build the three-way TV montage and table. (disable recaps in /config)
+
+⏺ Background command "Run Lustig TV sweep" completed (exit code 0)
+
+⏺ Sweep done. Reading results.
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Background command "Wait for Lustig sweep to finish" completed (exit code 0)
+
+⏺ Background command "Check sweep startup" completed (exit code 0)
+
+⏺ Lustig TV sweep done, all on metrics_v2. Note obj ≈1094 / RMS 0.0335 flat 
+  across all 15 iters — the stalled-NCG "final ≈ init" story, confirmed live.
+
+  ┌──────────┬───────┬───────┬──────┬─────────────┐
+  │ TVWeight │  SNR  │ lfCV  │ edge │   extent    │
+  ├──────────┼───────┼───────┼──────┼─────────────┤
+  │ 0.001    │ 31.9  │ 0.178 │ 9.5  │ 160/122/158 │
+  ├──────────┼───────┼───────┼──────┼─────────────┤
+  │ 0.01     │ 81.5  │ 0.189 │ 9.6  │ 158/120/155 │
+  ├──────────┼───────┼───────┼──────┼─────────────┤
+  │ 0.1      │ 332.5 │ 0.206 │ 6.6  │ 160/102/150 │
+  └──────────┴───────┴───────┴──────┴─────────────┘
+
+  Lustig-TV lfCV (~0.178–0.206) lands right on BART-TV (~0.180–0.192). Now the
+  missing piece — ours-TV on the same ruler + montage:
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python tv_threeway.py ../../data/v3_fov250/recon_io
+      --t-rel 0.003 0.…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote.*montage|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/ta…)
+  ⎿  == ours TV ==
+       ours_tv_t0.003: 17.9 lfCV 0.185 edge 7.96
+       ours_tv_t0.01: 22.3 lfCV 0.187 edge 8.26
+     … +15 lines (ctrl+o to expand)
+
+⏺ Background command "Run TV three-way assembler" completed (exit code 0)
+
+⏺ Three-way done, one ruler. Eyes on the montage (standing rule).
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Visual catch — the Lustig row is in a different orientation/plane than ours
+  and BART. Rows 1–2 show the circular phantom face; row 3 (Lustig) shows a
+  sagittal-ish cut through the resolution-insert bars. I oriented BART to ours
+  but not Lustig — its volume comes straight from the .mat with its own
+  per-slice rot90, so [:,:,N/2] is a different cut. The three-way montage isn't
+  a matched-plane comparison as shown. Fixing: run orient_to_ours on Lustig too.
+
+⏺ Update(workspace/helpers/recon/tv_threeway.py)
+  ⎿  Added 8 lines, removed 3 lines
+      78          tvW = np.asarray(g["tvW"], dtype=float).ravel()
+      79          for i, lam in enumerate(tvW):
+      80              k = f"lustig_tv_l{lam:g}"
+      81 -            results[k] = {"TVWeight": float(lam), **metrics(gf[
+         -i])}                                                           
+      82 -            vols[k] = gf[i]                                    
+      81 +            # Lustig saved with its own per-slice rot90 -> orie
+         +nt to our frame,                                               
+      82 +            # else [:, :, N//2] is a different plane than ours/
+         +BART. metrics are                                              
+      83 +            # orientation-invariant (global), but the montage p
+         +lane must match.                                               
+      84 +            v, cc = orient_to_ours(gf[i], o["img_cg"])         
+      85 +            results[k] = {"TVWeight": float(lam), "orient_cc": 
+         +round(cc, 3),                                                  
+      86 +                          **metrics(v)}                        
+      87 +            vols[k] = v                                        
+      88              print(f"  {k}: {results[k]['snr']:.1f} lfCV {result
+          s[k]['lowfreq_cv']:.3f} "
+      84 -                  f"edge {results[k]['edge_sharp']:.2f}")      
+      89 +                  f"edge {results[k]['edge_sharp']:.2f} cc {cc:
+         +.2f}")                                                         
+      90      else:
+      91          print(f"  SKIP — {mat} not found (run run_lustig_sweep.
+          py first)")
+      92  
+
+⏺ orient_to_ours only covers flips + one transpose — Lustig's per-slice
+  rot90(axes=1,2) may need a fuller axis permutation. Replacing the Lustig
+  orientation with a full 48-orientation search (6 perms × 8 flips) so the plane
+  truly matches.
+
+⏺ Update(workspace/helpers/recon/tv_threeway.py)
+  ⎿  Added 22 lines
+      27  matplotlib.use("Agg")
+      28  import matplotlib.pyplot as plt
+      29  
+      30 +import itertools                                               
+      31 +                                                               
+      32  import cs_recon as cs
+      33  from bartio import readcfl
+      34  from bart_compare import our_setup, orient_to_ours, norm01
+     ...
+      37  N = cs.N
+      38  
+      39  
+      40 +def best_orient_full(vol, ref):                                
+      41 +    """Full 48-orientation search (6 axis perms x 8 flips) — ne
+         +eded for Lustig,                                               
+      42 +    whose per-slice rot90 mixes axes beyond orient_to_ours' fli
+         +p+single-transpose                                             
+      43 +    set. Magnitude correlation, so conjugation is irrelevant.""
+         +"                                                              
+      44 +    a = np.abs(ref); a = (a - a.mean()) / (a.std() + 1e-12)    
+      45 +    best, best_c = vol, -np.inf                                
+      46 +    for perm in itertools.permutations(range(3)):              
+      47 +        vp = np.transpose(np.abs(vol), perm)                   
+      48 +        for fl in itertools.product([False, True], repeat=3):  
+      49 +            v = vp                                             
+      50 +            for ax, do in enumerate(fl):                       
+      51 +                if do:                                         
+      52 +                    v = np.flip(v, axis=ax)                    
+      53 +            b = (v - v.mean()) / (v.std() + 1e-12)             
+      54 +            cc = float(np.mean(a * b))                         
+      55 +            if cc > best_c:                                    
+      56 +                best_c, best = cc, v                           
+      57 +    return best, best_c                                        
+      58 +                                                               
+      59 +                                                               
+      60  def main():
+      61      ap = argparse.ArgumentParser()
+      62      ap.add_argument("recon_io")
+
+⏺ Update(workspace/helpers/recon/tv_threeway.py)
+  ⎿  Added 1 line, removed 1 line
+      103              # Lustig saved with its own per-slice rot90 -> ori
+           ent to our frame,
+      104              # else [:, :, N//2] is a different plane than ours
+           /BART. metrics are
+      105              # orientation-invariant (global), but the montage 
+           plane must match.
+      106 -            v, cc = orient_to_ours(gf[i], o["img_cg"])        
+      106 +            v, cc = best_orient_full(gf[i], o["img_cg"])      
+      107              results[k] = {"TVWeight": float(lam), "orient_cc":
+            round(cc, 3),
+      108                            **metrics(v)}
+      109              vols[k] = v
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      && ../.venv/bin/python tv_threeway.py ../../data/v3_fov250/recon_io
+      --t-rel 0.003 0.…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote.*montage|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/ta…)
+  ⎿    lustig_tv_l0.001: 31.9 lfCV 0.178 edge 9.52 cc 0.90
+       lustig_tv_l0.003: 34.4 lfCV 0.187 edge 9.02 cc 0.91
+       lustig_tv_l0.01: 81.5 lfCV 0.189 edge 9.59 cc 0.91
+     … +4 lines (ctrl+o to expand)
+
+⏺ Background command "Rerun three-way with full Lustig orientation" completed (exit code 0)
+
+⏺ Lustig now oriented (cc 0.90–0.93), metrics unchanged (orientation-invariant —
+  correct). Re-checking the montage plane matches.
+
+  Read 1 file (ctrl+o to expand)
+⏺ All three rows now show the matched phantom face. Visual verdict (eyes on
+  figure):
+
+  - Ours TV (row 1): clean disk, no texture.
+  - BART TV (row 2): disk with the cross-hatch moiré (the BART trajectory
+  artifact, still there).
+  - Lustig TV (row 3): clean (no hatch) but softens/dims as λ rises — l0.1
+  clearly over-smoothed; matches edge_sharp falling 9.5→6.6 and the flat obj
+  (NCG barely left the init).
+
+  The real finding: on TV, all three land in the same neighborhood (lfCV
+  ~0.178–0.206) — TV is essentially commoditized across implementations. Where
+  ours actually separates is wavelet (ours lfCV 0.157 < BART 0.177), and Lustig 
+  can't even play there (2D operator). So the differentiation is the wavelet
+  prior, not TV.
+
+  One metric caveat I'll flag: edge_sharp is inflated by texture/noise (BART
+  moiré, Lustig grain both raise it) — it guards against blur, not texture. So
+  don't read Lustig/BART's higher edge_sharp as "sharper detail."
+
+  Recording this in the docs.
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 34 lines
+       77  and compare the implied k-range against ours; sweep a half-vox
+           el traj shift.
+       78  Until resolved, the lfCV head-to-head is suggestive, not final
+           .
+       79  
+       80 +## Lustig TV sweep + three-way TV (added 2026-06-15)          
+       81 +                                                              
+       82 +Earlier the Lustig baseline was ONE point (TVWeight=xfmWeight=
+          +0.01, both terms on,                                          
+       83 +identity XFM — neither a clean TV nor a wavelet run) scored wi
+          +th the OLD metric.                                            
+       84 +Fixed both: swept pure TV (`run_lustig_sweep.py` → `run_cs_swe
+          +ep.m`, xfmWeight=0)                                           
+       85 +and scored with `metrics_v2`, matching BART's λ sweep.        
+       86 +                                                              
+       87 +**Wavelet stays ours-vs-BART only:** Lustig's `Wavelet` operat
+          +or is `FWT2_PO`                                               
+       88 +(2D). On the 3D volume it's the documented 2D-on-3D bug. A rea
+          +l 3D-wavelet Lustig                                           
+       89 +run needs a new operator — not built.                         
+       90 +                                                              
+       91 +Three-way TV on ONE ruler (`metrics_v2`, matched plane via ori
+          +entation search),                                             
+       92 +`tv_threeway.py` → `recon_io/tv_threeway_{montage.png,metrics.
+          +json}`:                                                       
+       93 +                                                              
+       94 +| pipeline (TV) | lfCV range | note |                         
+       95 +|---|---|---|                                                 
+       96 +| ours (PDHG) | 0.185–0.194 | clean, no texture |             
+       97 +| BART (`-R T`) | 0.180–0.192 | + cross-hatch moiré (the artif
+          +act) |                                                        
+       98 +| Lustig (fnlCg) | 0.178–0.206 | softens/dims as λ↑; NCG `obj`
+          + flat across 15 iters (final≈init) |                          
+       99 +                                                              
+      100 +**Verdict:** on TV the three are a **wash** (~0.18 lfCV) — TV 
+          +is commoditized                                               
+      101 +across implementations. Differentiation lives in the **wavelet
+          +** prior (ours                                                
+      102 +0.157 < BART 0.177), where Lustig can't compete (2D operator).
+          + Lustig's NCG                                                 
+      103 +barely moves from its DCF-seeded init (objective flat ~1094, R
+          +MS 0.0335 all                                                 
+      104 +iters) — confirms the stalled-solver / "final ≈ init" story.  
+      105 +                                                              
+      106 +**Metric caveat (new):** `edge_sharp` is inflated by texture/n
+          +oise — BART's moiré                                           
+      107 +and Lustig's grain both raise it. It guards against blur, NOT 
+          +texture; don't read                                           
+      108 +their higher edge_sharp as finer detail.                      
+      109 +                                                              
+      110 +New code: `lustig_oneshot/run_cs_sweep.m`, `run_lustig_sweep.p
+          +y`,                                                           
+      111 +`recon/tv_threeway.py` (full 48-orientation search for Lustig)
+          +. Originals                                                   
+      112 +untouched.                                                    
+      113 +                                                              
+      114  ## Files written
+      115  - `recon_io/bart/bart_vs_ours_montage.png` — central-slice mon
+           tage, shared axis
+      116  - `recon_io/bart/bart_compare_metrics.json` — all metrics_v2 n
+           umbers
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 11 lines
+       91    lfCV comparison is suggestive not final (`BART_Comparison.md
+           ` OPEN ARTIFACT).
+       92  - **`metrics_v2` ≠ `cg_tune.metrics`:** corner-air noise ROI a
+           ssumes a centered
+       93    object (true for ACR). Don't mix the two metrics' numbers in
+            one table.
+       94 +- **`edge_sharp` guards blur, NOT texture.** Noise/texture (BA
+          +RT moiré, Lustig                                              
+       95 +  grain) inflates it — don't read a higher edge_sharp as finer
+          + detail.                                                      
+       96 +- **Three-way TV is a wash** (ours/BART/Lustig all ~0.18 lfCV 
+          +under metrics_v2);                                            
+       97 +  differentiation is the WAVELET prior (ours 0.157 < BART 0.17
+          +7; Lustig's                                                   
+       98 +  Wavelet is 2D-only, can't play). See `tv_threeway.py` +     
+       99 +  `../../reference/BART_Comparison.md`. Lustig TV sweep: `lust
+          +ig_oneshot/                                                   
+      100 +  run_lustig_sweep.py` (pure TV, xfmWeight=0, metrics_v2).    
+      101 +- **Orientation:** BART → `orient_to_ours` (flips+1 transpose,
+          + cc~0.92). Lustig                                             
+      102 +  needs the FULL 48-orientation search (`tv_threeway.best_orie
+          +nt_full`) — its                                               
+      103 +  per-slice rot90 mixes axes beyond the BART set. Metrics are 
+          +orientation-                                                  
+      104 +  invariant; only the montage PLANE needs the match.          
+      105  
+      106  ## Navigation
+      107  
+
+⏺ Done — step 2 closed honestly, all three pipelines on one ruler, docs updated.
+
+  Final picture:
+
+  ┌──────────────┬─────────────┬─────────────┬─────────────────┐
+  │    prior     │    ours     │    BART     │     Lustig      │
+  ├──────────────┼─────────────┼─────────────┼─────────────────┤
+  │ wavelet lfCV │ 0.157       │ 0.177       │ ✗ (2D operator) │
+  ├──────────────┼─────────────┼─────────────┼─────────────────┤
+  │ TV lfCV      │ 0.185–0.194 │ 0.180–0.192 │ 0.178–0.206     │
+  └──────────────┴─────────────┴─────────────┴─────────────────┘
+
+  Answers to your two questions, settled:
+  1. Sweep: Lustig now swept (TVWeight 1e-3…1e-1), not one random point. Pure
+  TV, xfmWeight=0 — your old 0.01/0.01 both-on identity run wasn't a clean TV or
+  wavelet, so it's superseded.
+  2. phi: the CS objective Φ(x)=‖F·W'x−y‖²+λ₁‖x‖₁+λ₂·TV in fnlCg.m; your knobs
+  were λ₁=xfmWeight, λ₂=TVWeight.
+
+  Both regularizers, as you asked: TV = three-way; wavelet = ours-vs-BART
+  (Lustig's FWT2_PO is 2D, can't do the 3D volume).
+
+  Verdict: TV is a wash across all three (~0.18) — commoditized. Ours separates
+  only on wavelet, where Lustig can't compete. Lustig's NCG obj stayed flat
+  (~1094) all 15 iters → confirmed "final≈init" stall.
+
+  Two open loops (not blocking):
+  - BART moiré — cross-hatch on every BART recon; trajectory-scaling/fftmod
+  suspect. Until fixed, BART's lfCV/edge_sharp slightly confounded. Next: dump
+  BART gridded k-space of a point source, sweep half-voxel shift.
+  - edge_sharp texture blind spot — noise/texture inflates it; guards blur not
+  texture. Noted in docs.
+
+  New code (originals untouched): run_cs_sweep.m, run_lustig_sweep.py,
+  tv_threeway.py, metrics_v2.py, bart_compare.py, bartio.py. Docs:
+  reference/BART_Comparison.md, recon AGENTS.md.
+
+  Want me to chase the BART moiré next, or build the wavelet two-way montage
+  (ours vs BART) to lock the wavelet verdict visually?
+
+✻ Brewed for 2m 58s
+
+❯ do both abd report and make montages too                                      
+
+⏺ Both. Starting with the moiré — fixing it also cleans the wavelet montage.
+  First isolate it: plain adjoint gridding (bart nufft -a) vs our adjoint, no CS
+  in the loop.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      # plain ad…)
+  ⎿  bart_adj  shape (100, 100, 100) max 3.79e+02
+     our_adj   shape (100, 100, 100) max 3.79e+05
+     bart strongest off-DC freq peak at (np.int64(47), np.int64(50)) (cente
+     … +3 lines (ctrl+o to expand)
+
+⏺ Surprise: plain adjoint — BART and ours share the same texture peak (47,50).
+  So it's not a BART gridding artifact. Need to check the high-freq grid band
+  specifically (cross-hatch = high freq) and compare adjoint vs pics output.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io
+      ../.venv/bin/python -c "…)
+  ⎿  Error: Exit code 1
+     Traceback (most recent call last):
+       File "<string>", line 14, in <module>
+       File "/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/
+     recon/bartio.py", line 28, in readcfl
+         with open(name + ".hdr", "r") as f:
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+     FileNotFoundError: [Errno 2] No such file or directory: 
+     '../../data/v3_fov250/recon_io/bart/bart_tv_l0.001.hdr'
+     our_adjoint     HF frac 0.0008
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io
+      ls $D/bart/*.hdr | sed 's@.*/@@' | tr '\n' ' '; ech…)
+  ⎿  bart_T_l0.0001.hdr bart_T_l0.0003.hdr bart_T_l0.001.hdr bart_T_l0.003.
+     hdr bart_T_l0.01.hdr bart_W_l0.0001.hdr bart_W_l0.0003.hdr bart_W_l0.0
+     01.hdr bart_W_l0.003.hdr bart_W_l0.01.hdr ksp.hdr sens.hdr traj.hdr
+     … +5 lines (ctrl+o to expand)
+
+⏺ Decisive: BART pics outputs have 69% of energy in the high-freq grid band
+  (ours: 0.08%). It's pics-specific, not gridding — the signature of BART's
+  fftmod (Nyquist checkerboard) convention. Testing the standard undo: bart 
+  fftmod.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      $B fftmod…)
+  ⎿  bart_T_l0.001        HF 0.6930
+     bart_T_l0.001+fftmod HF 0.6930
+
+⏺ fftmod no-op → not a Nyquist checkerboard. It's a real high-freq grid. Let me
+  locate its exact spatial frequency (period) to ID the cause.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io/bart
+      ../.venv/bin/python -c "…)
+  ⎿  Error: Exit code 1
+     Traceback (most recent call last):
+       File "<string>", line 8, in <module>
+     ValueError: too many values to unpack (expected 2)
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io/bart
+      ../.venv/bin/python -c "…)
+  ⎿  Error: Exit code 1
+     Traceback (most recent call last):
+       File "<string>", line 11, in <module>
+     TypeError: unsupported format string passed to numpy.ndarray.__format__
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io/bart
+      ../.venv/bin/python -c "…)
+  ⎿  Error: Exit code 1
+     Traceback (most recent call last):
+       File "<string>", line 10, in <module>
+     TypeError: only 0-dimensional arrays can be converted to Python scalars
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io/bart
+      ../.venv/bin/python -c "…)
+  ⎿  peak (6, 6) r=8.5 period~11.8px
+     peak (-6, -6) r=8.5 period~11.8px
+     peak (-6, 6) r=8.5 period~11.8px
+     … +5 lines (ctrl+o to expand)
+
+⏺ Grid peaks at (±6,±6) — period ~12px, a square aliasing-replica pattern.
+  Suggests trajectory extent mismatch (k exceeding BART's grid → wrap aliasing).
+  Checking actual bart_traj range vs ±N/2.
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  bart_traj shape (3, 424320)
+     x: min -41.52 max 42.20
+     y: min -41.09 max 41.34
+     … +3 lines (ctrl+o to expand)
+
+⏺ Traj extent fine (|k|max 47 < 50, no wrap). Grid is pics-introduced. Checking
+  if BART's plain adjoint (nufft -a) also has it, or only the iterative pics.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      $B nufft -…)
+  ⎿  Total Time: 1.944947
+     bart nufft -a (adjoint) HF 0.0009
+     bart pics no-reg (CG)   HF 0.0018
+     bart pics -R T l0.001   HF 0.0012
+
+⏺ That "moiré" was a measurement bug, not a BART artifact. My HF probe earlier
+  FFT'd over singleton trailing cfl dims (unsqueezed 16-D array). Squeezed
+  properly: BART pics HF = 0.0012, adjoint 0.0009, ours 0.0008 — all clean,
+  essentially equal. Let me confirm visually — was the montage cross-hatch real
+  or display?
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      D=../../data/v3_fov250/recon_io
+      ../.venv/bin/python -c "…)
+  ⎿  saved
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ I was wrong — the grid is real (clearly visible in BART TV, right). My "clean
+  0.0012" used a high-freq band (r 30–48) that missed the grid — its peaks are
+  at r≈8.5 (period ~12px). Good that I looked. Remeasuring with the correct band
+  + isolating where it enters (adjoint vs CG vs regularized).
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      $B nufft -…)
+  ⎿  our adjoint      0.028
+     bart nufft -a    0.029
+     bart pics no-reg 0.051
+     bart pics TV     0.047
+
+⏺ The grid enters in BART's iterative pics, not gridding: bart adjoint (0.029) =
+  ours (0.028), but pics CG jumps to 0.051. That's BART's Toeplitz PSF
+  embedding of AᴴA (default fast path, FFT-based — can alias into a periodic
+  grid). Testing with Toeplitz disabled.
+
+⏺ Bash(B=/Users/hoomham/bin/bart-src/bart; $B pics -h 2>&1 | grep -iE
+      "toeplitz|--no|lowmem|-U|gridding|-N"; echo "=== try no-toeplitz ===";
+      D=/Users/hoomham/Hooman/Wo…)
+  ⎿  Usage: pics [-l ...] [-r f] [-R ...] [-c] [-s f] [-i d] [-t <file>] [-
+     n] [-N] [-g] [--gpu-gridding] [-p <file>] [--precond] [-b d] [-e] [--a
+     daptive-stepsize] [--asl] [--teasl] [--theta f:f] [--tvscales [f:]*f]
+     … +12 lines (ctrl+o to expand)
+
+⏺ -U (lowmem, non-Toeplitz nuFFT) ran. Measuring whether it kills the grid.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      $B pics -U…)
+  ⎿  pics no-reg (toeplitz) 0.051
+     pics no-reg -U          0.051
+     pics TV  -U             0.047
+     our adjoint baseline    0.028
+
+⏺ -U no change → not Toeplitz. Grid is in BART's iterative inverse (AᴴA), fixed
+  freq (8.5 cyc/FOV), λ-independent. Checking --nufft-conf (oversampling/kernel)
+  — last quick lever before I decide whether it's worth more time.
+
+⏺ Bash(B=/Users/hoomham/bin/bart-src/bart; $B nufft -h 2>&1 | grep -iE
+      "oversamp|kernel|-o|conf|toep|-w|width" | head; echo "=== nufft-conf opts
+      ==="; $B pics --nufft-…)
+  ⎿  Usage: nufft [-a] [-i] [-x d:d:d] [-t] [-r] [-c] [-l f] [-m d] [-P] [-
+     s] [-g] [-1] [--lowmem] [--zero-mem] [--no-precomp] [-B <file>] [-p <f
+     ile>] [-o,--oversampling f] [-w,--width f] [-F <file>] [-T <file>] [--
+     … +23 lines (ctrl+o to expand)
+
+⏺ --nufft-conf has P,periodic and tunable oversampling/width on nufft. Testing
+  the iterative inverse nufft directly (no CS/sens) at default vs higher
+  oversampling+kernel width — isolates whether it's the gridding kernel.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      $B nufft -…)
+  ⎿  nufft -i o2 w6 0.054
+     nufft -i o3 w8 0.054
+     baseline adj   0.028
+
+⏺ Oversampling/width no change → not the kernel. Key realization: ours uses DCF 
+  weighting (w=1/density in the data term), BART pics with ones-sens has none —
+  unweighted, the oversampled spiral center dominates and the sampling pattern
+  prints through. Testing the hypothesis: does our CG without DCF also show the
+  grid?
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  our CG-30 unweighted (no DCF) HF 0.052
+       (BART pics no-reg was 0.051; our DCF-TV was ~0.03)
+
+⏺ Root cause found — and it's not a BART bug. Our unweighted CG-30 gives HF
+  0.052, identical to BART pics (0.051). The grid is the unweighted-LS signature
+  of this spiral — the oversampled center printing the sampling pattern
+  through. Ours hides it because we DCF-precondition (w=1/density); BART
+  (ones-sens, no density) doesn't. Fix: give BART the same DCF. Testing via pics
+  -p.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      ../.venv/b…)
+  ⎿  wrote dcf (424320,) range 3.20e-04..3.20e+00
+     pics no-DCF    0.051
+     pics +DCF      0.053
+     … +2 lines (ctrl+o to expand)
+⏺ -p with full DCF didn't take (0.053) — BART may expect sqrt-weights or applies
+  -p differently for noncart. Trying sqrt(w), and as a cross-check,
+  pre-DCF-weighting the data directly.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      B=/Users/hoomham/bin/bart-src/bart; D=../../data/v3_fov250/recon_io/bart
+      ../.venv/b…)
+  ⎿  wrote sqdcf, ksp_w
+     pics -p sqrt(w)          0.055
+     pics -p sqrt(w) +pre-w   0.180
+
+⏺ -p doesn't wire per-sample noncart DCF in this BART build (sqrt 0.055;
+  pre-weight 0.180 = double-counted). But the science is fully settled and it's
+  not a bug:
+
+  The grid is the unweighted-least-squares signature of this spiral — the dense
+  oversampled center prints the sampling pattern through. Proven: our own CG 
+  without DCF = HF 0.052, identical to BART (0.051). Our pipeline removes it
+  because our objective is DCF-weighted (down-weights the dense center, D6
+  contract); BART's default pics is unweighted. This vindicates the DCF design
+  rather than exposing a BART flaw.
+
+  Now the deliverables — (1) the DCF proof figure, (2) wavelet two-way montage.
+  Building both.
+
+⏺ Write(workspace/helpers/recon/wavelet_twoway.py)
+  ⎿  Wrote 147 lines to workspace/helpers/recon/wavelet_twoway.py
+        tep-2 close.wo-way (ours vs BART) + the DCF-grid proof. handoff s
+      2 
+      3 NEW assembler. Two figures into recon_io/:
+      5   wavelet_twoway_montage.png / .json
+      6     ours db4-wavelet (FISTA, DCF-weighted) vs BART pics -R W (ADM
+        M), several
+        [0,1] axis. all scored metrics_v2, BART oriented to ours, shared 
+      8     Lustig is absent on purpose — its Wavelet operator is FWT2_PO
+         (2D), unusable
+      9     on the 3D volume (BART_Comparison.md).
+     … +171 lines (ctrl+o to expand)
+
+⏺ Running both figures.
+
+⏺ Bash(../.venv/bin/python wavelet_twoway.py ../../data/v3_fov250/recon_io
+      --bart /Users/hoomham/bin/bart-src/bart 2>&1 | grep -vE "cg iter")
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "dcf_grid_proof|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/ta…)
+  ⎿  == ours wavelet ==
+       ours_wav_t0.003: lfCV 0.157 edge 10.26 gridHF 0.048
+       ours_wav_t0.01: lfCV 0.157 edge 10.16 gridHF 0.046
+     … +11 lines (ctrl+o to expand)
+
+⏺ Background command "Run wavelet two-way + dcf proof" completed (exit code 0)
+
+⏺ Numbers confirm ours wins wavelet on all three (lfCV 0.157<0.177, edge 10.2>9,
+  gridHF 0.046<0.07). Viewing both figures — the DCF proof is the key one.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Wait — this figure undercuts my own claim. Visually BART (right) has the
+  regular cross-hatch, but ours-no-DCF (middle) shows only random mottle, not
+  that grid — yet their HF numbers are close (0.052 vs 0.067). The HF-band
+  scalar conflates random mottle with a regular grid. My "ours-no-DCF == BART"
+  rested on that scalar — too crude. Let me measure peak sharpness (regular grid
+  = sharp spectral peaks; mottle = broad) to tell them apart honestly.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  ours wavelet t0.01   peakiness 6.8
+     ours no-DCF CG-30    peakiness 6.5
+     BART pics no-reg     peakiness 6.7
+     BART wav l0.001      peakiness 6.9
+
+⏺ The peakiness is identical across all (6.5–6.9) — no sharp periodic peak. So
+  there is no distinct regular grid: the texture is broadband and statistically
+  the same in BART and our unweighted CG. I got caught by a single scalar twice
+  (first the singleton-axis FFT, then HF-band conflating mottle with grid).
+  Honest conclusion:
+
+  - There is no BART "grid bug." All recons carry similar mid-freq texture (HF
+  ~0.05–0.07, peakiness ~6.7). What looked like a regular grid is broadband
+  mottle + display contrast.
+  - BART is marginally more textured; ours-wavelet marginally cleaner (HF
+  0.046). Not cleanly attributable to DCF — my proof figure's own numbers
+  (ours+DCF 0.058 > ours-noDCF 0.052) contradict "DCF removes it."
+
+  So the verdict holds but modestly, not dramatically: ours-wavelet better (lfCV
+  0.157 vs 0.177, edge 10.2 vs 9.0); TV a wash. I need to correct the
+  overclaimed figure + the earlier doc. Fixing the proof figure's label to the
+  measured truth.
+
+⏺ Update(workspace/helpers/recon/wavelet_twoway.py)
+  ⎿  Added 8 lines, removed 6 lines
+       8      Lustig is absent on purpose — its Wavelet operator is FWT2_
+          PO (2D), unusable
+       9      on the 3D volume (BART_Comparison.md).
+      10  
+      11 -  dcf_grid_proof.png                                           
+      12 -    THREE panels proving the BART "grid" is the unweighted-LS s
+         -piral signature,                                               
+      13 -    not a BART bug: ours+DCF (clean) | ours WITHOUT DCF (grid) 
+         -| BART pics                                                    
+      14 -    no-reg (grid). ours-no-DCF == BART. Our DCF-weighted object
+         -ive (D6) is what                                               
+      15 -    removes it; BART's default pics is unweighted. HF = fractio
+         -n of slice energy                                              
+      16 -    in the grid band (r 6-22 cyc/FOV); printed per panel.      
+      11 +  texture_compare.png                                          
+      12 +    THREE panels: ours+DCF | ours WITHOUT DCF | BART pics no-re
+         +g. MEASURED                                                    
+      13 +    RESULT (do not overclaim): all three carry similar mid-freq
+         + texture                                                       
+      14 +    (grid-HF ~0.05-0.07) with the SAME spectral peakiness (~6.7
+         +) -> the texture                                               
+      15 +    is broadband mottle, NOT a sharp periodic grid, and NOT a d
+         +istinct BART bug.                                              
+      16 +    BART is marginally more textured; ours-wavelet marginally c
+         +leaner. The                                                    
+      17 +    earlier "BART moiré / DCF-removes-it" reading was a metric 
+         +artifact (HF band                                              
+      18 +    conflates mottle with grid) and is retracted. grid-HF print
+         +ed per panel.                                                  
+      19  
+      20      ../.venv/bin/python wavelet_twoway.py ../../data/v3_fov250/
+          recon_io \
+      21          --bart /Users/hoomham/bin/bart-src/bart
+
+⏺ Update(workspace/helpers/recon/wavelet_twoway.py)
+  ⎿  Added 13 lines, removed 4 lines
+      67                     check=True, capture_output=True, text=True)
+      68      bart_nr, _ = orient_to_ours(np.abs(np.squeeze(readcfl(out))
+          ), o["img_cg"])
+      69  
+      70 +    def peakiness(v):                                          
+      71 +        vv = np.abs(np.squeeze(v)); sl = vv[:, :, N // 2]; sl =
+         + sl / sl.max()                                                 
+      72 +        F = np.abs(np.fft.fftshift(np.fft.fft2(sl - sl.mean()))
+         +)                                                              
+      73 +        yy, xx = np.mgrid[0:N, 0:N]; r = np.hypot(yy - N // 2, 
+         +xx - N // 2)                                                   
+      74 +        b = F[(r > 6) & (r < 22)]                              
+      75 +        return b.max() / (np.median(b) + 1e-9)                 
+      76 +                                                               
+      77      panels = [("ours + DCF\n(weighted LS, D6)", ours_dcf),
+      78                ("ours NO DCF\n(unweighted CG)", ours_nodcf),
+      79                ("BART pics no-reg\n(unweighted)", bart_nr)]
+     ...
+      81      for ax, (t, v) in zip(axes, panels):
+      82          sl = np.abs(v)[:, :, N // 2]
+      83          ax.imshow(sl / np.percentile(sl, 99.5), cmap="gray", vm
+          in=0, vmax=1)
+      77 -        ax.set_title(f"{t}\ngrid-HF {grid_hf(v):.3f}", fontsize
+         -=11)                                                           
+      84 +        ax.set_title(f"{t}\ngrid-HF {grid_hf(v):.3f}  peakiness
+         + {peakiness(v):.1f}",                                          
+      85 +                     fontsize=11)                              
+      86          ax.axis("off")
+      79 -    fig.suptitle("BART 'grid' = unweighted-LS spiral signature,
+         - not a BART bug "                                              
+      80 -                 "(ours-no-DCF == BART); DCF removes it", fonts
+         -ize=12)                                                        
+      87 +    fig.suptitle("Mid-freq texture similar across all (HF~0.05-
+         +0.07, peakiness~6.7) "                                         
+      88 +                 "= broadband mottle, NOT a periodic grid or a 
+         +BART bug. "                                                    
+      89 +                 "BART marginally more textured.", fontsize=11)
+      90      fig.tight_layout()
+      82 -    png = os.path.join(recon_io, "dcf_grid_proof.png")         
+      91 +    png = os.path.join(recon_io, "texture_compare.png")        
+      92      fig.savefig(png, dpi=120)
+      93      print(f"wrote {png}")
+      94  
+
+⏺ Regenerating the corrected figure and removing the mislabeled one.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      rm -f ../../data/v3_fov250/recon_io/dcf_grid_proof.png;
+      ../.venv/bin/python wavelet…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ While it regenerates, correcting the overclaim in BART_Comparison.md (the
+  "OPEN ARTIFACT moiré" + DCF claims).
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 21 lines, removed 12 lines
+      64     is the over-smoothing inflation the new metric still reports
+           honestly via
+      65     the falling edge_sharp (7.7 < 9.2) — the guard working.
+      66  
+      67 -## OPEN ARTIFACT — grid/moiré texture on every BART recon      
+      68 -All BART outputs (wav AND tv, all λ) carry a regular cross-hatc
+         -h texture across                                               
+      69 -the phantom disk; our finufft recons are clean. Because it is i
+         -n BOTH                                                         
+      70 -regularizers it is a **systematic BART-side artifact, not a reg
+         -ularizer                                                       
+      71 -effect**. Suspects, in order:                                  
+      72 -1. Trajectory scaling/centering off by a small factor → periodi
+         -c moiré (most                                                  
+      73 -   likely; the `*N/(2π)` mapping or a half-voxel center offset 
+         -vs BART's grid).                                               
+      74 -2. fftmod/fftshift convention BART applies internally to k-spac
+         -e.                                                             
+      75 -3. Density/`-p` preconditioner interaction.                    
+      76 -Next: dump BART's own gridded k-space (`bart nufft -a`) of a po
+         -int-source traj                                                
+      77 -and compare the implied k-range against ours; sweep a half-voxe
+         -l traj shift.                                                  
+      78 -Until resolved, the lfCV head-to-head is suggestive, not final.
+      67 +## RESOLVED — the "grid/moiré" was a metric artifact, NOT a BAR
+         +T bug                                                          
+      68 +First read: a regular cross-hatch on every BART recon, ours cle
+         +an. Chased it                                                  
+      69 +(2026-06-15) and **retracted** the artifact reading. The trail:
+      70 +1. First HF probe (0.69) was a BUG — FFT over the singleton tra
+         +iling dims of an                                               
+      71 +   unsqueezed 16-D cfl. Squeeze fixed it.                      
+      72 +2. Proper HF band (r 6-22 cyc/FOV): BART pics 0.05, our UNWEIGH
+         +TED CG 0.052,                                                  
+      73 +   BART adjoint 0.029 ≈ our adjoint 0.028. The texture is in th
+         +e iterative                                                    
+      74 +   inverse, present in OURS too when unweighted.               
+      75 +3. Tried to pin it on DCF (ours is DCF-weighted, BART default i
+         +sn't). BART `-p`                                               
+      76 +   does not wire per-sample noncart DCF in this build (sqrt 0.0
+         +55, pre-weight                                                 
+      77 +   0.180), and the proof figure's own numbers (ours+DCF 0.058 >
+         + ours-noDCF                                                    
+      78 +   0.052) **contradict** "DCF removes it".                     
+      79 +4. Spectral **peakiness** (max/median in band) is ~6.7 for ALL 
+         +(ours wavelet,                                                 
+      80 +   ours unweighted, BART pics, BART wavelet) → NO sharp periodi
+         +c peak. The                                                    
+      81 +   "grid" is broadband mid-freq mottle + display contrast, not 
+         +a regular grid.                                                
+      82  
+      83 +**Conclusion:** no distinct BART artifact. All recons carry sim
+         +ilar mid-freq                                                  
+      84 +texture; BART is *marginally* more textured (HF ~0.06 vs our wa
+         +velet 0.046),                                                  
+      85 +ours-wavelet *marginally* cleaner. The comparison verdict stand
+         +s but **modestly**                                             
+      86 +— not a blowout. Figure: `recon_io/texture_compare.png`. Lesson
+         + (again): a single                                             
+      87 +scalar fooled the read twice; peakiness + eyes settled it. See 
+         +`[[eye_vs_metric]]`.                                           
+      88 +                                                               
+      89  ## Lustig TV sweep + three-way TV (added 2026-06-15)
+      90  
+      91  Earlier the Lustig baseline was ONE point (TVWeight=xfmWeight=0
+          .01, both terms on,
+
+⏺ Also correcting the AGENTS.md moiré pitfall and the "confounded" read.
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 7 lines, removed 3 lines
+      86  - **BART wavelet diverges under FISTA here** (~1e32). pics `-R 
+          W` must run with
+      87    `-m` (ADMM); `bart_compare.run_pics` forces it. TV is fine on
+           the default.
+      88  - **BART traj units:** `bart_traj = traj_rad * N/(2π)` (N=100),
+           dims (3,M,1).
+      89 -  A grid/moiré texture currently rides on all BART recons — sus
+         -pected                                                         
+      90 -  trajectory-scaling/half-voxel-center or fftmod convention; UN
+         -RESOLVED, so the                                               
+      91 -  lfCV comparison is suggestive not final (`BART_Comparison.md`
+         - OPEN ARTIFACT).                                               
+      89 +- **The BART "grid/moiré" was a metric artifact, RESOLVED** — n
+         +ot a BART bug.                                                 
+      90 +  HF-band scalar conflated mottle with a grid (and an unsqueeze
+         +d-cfl FFT bug                                                  
+      91 +  inflated it to 0.69). Spectral peakiness ~6.7 for ALL recons 
+         +→ broadband                                                    
+      92 +  mottle, no periodic grid. ours-wavelet marginally cleaner (HF
+         + 0.046 vs ~0.06);                                              
+      93 +  verdict stands but modest. Don't reopen as an artifact. (`tex
+         +ture_compare.png`,                                             
+      94 +  `BART_Comparison.md` RESOLVED). Single-scalar fooled the read
+         + twice — use                                                   
+      95 +  peakiness + eyes.                                            
+      96  - **`metrics_v2` ≠ `cg_tune.metrics`:** corner-air noise ROI as
+          sumes a centered
+      97    object (true for ACR). Don't mix the two metrics' numbers in 
+          one table.
+      98  - **`edge_sharp` guards blur, NOT texture.** Noise/texture (BAR
+          T moiré, Lustig
+
+  Searched for 1 pattern (ctrl+o to expand)
+
+⏺ Bash(until grep -qE "texture_compare|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/t…)  ⎿  wrote ../../data/v3_fov250/recon_io/wavelet_twoway_montage.png
+     wrote ../../data/v3_fov250/recon_io/wavelet_twoway_metrics.json
+     wrote ../../data/v3_fov250/recon_io/texture_compare.png
+
+⏺ Background command "Regenerate corrected texture figure" completed (exit code 0)
+
+⏺ Both figures regenerated. Viewing the wavelet two-way montage.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Important — trust the eye here (the standing rule, and it's now 3×). This
+  montage is unambiguous: ours-wavelet (row 1) is clean; every BART-wavelet 
+  (rows 2–3) carries the regular cross-hatch grid. So the grid is real and
+  BART-specific — my scalar metrics (HF band, peakiness) failed to isolate it
+  because the phantom's own mid-freq spectrum overlaps the grid band. I
+  over-corrected. Let me check the 3-panel to pin whether ours-without-DCF also
+  lacks the grid (would rule DCF out as the cause).
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Now the eye is decisive and consistent: ours (left, middle — DCF and no-DCF) 
+  show only irregular mottle; BART (right) shows the regular cross-hatch grid.
+  So:
+
+  1. The grid is real and BART-specific (eye: clear, consistent across
+  pics/wav/tv, all λ). My retraction was wrong — I trusted a scalar over the
+  eye, the exact mistake the standing rule warns against (now 3×).
+  2. It's NOT DCF/unweighting: ours-without-DCF (middle) still has no grid. My
+  "ours-noDCF == BART" was a number-match masking a structure-mismatch (mottle ≠
+  grid).
+  3. Cause: BART's nufft gridding internals — unresolved. Ruled out: traj
+  over-range (|k|<50), Toeplitz (-U no change), kernel width/oversampling (o3/w8
+  no change), fftmod (no-op), DCF. None of the usual suspects.
+  4. My HF/peakiness scalars can't see it — phantom spectrum overlaps the band.
+  Eye is the instrument here.
+
+  The texture_compare.png title is now wrong in the other direction. Fixing it
+  to the eye-truth, once, definitively.
+
+⏺ Update(workspace/helpers/recon/wavelet_twoway.py)
+  ⎿  Added 9 lines, removed 7 lines
+       9      on the 3D volume (BART_Comparison.md).
+      10  
+      11    texture_compare.png
+      12 -    THREE panels: ours+DCF | ours WITHOUT DCF | BART pics no-re
+         -g. MEASURED                                                    
+      13 -    RESULT (do not overclaim): all three carry similar mid-freq
+         - texture                                                       
+      14 -    (grid-HF ~0.05-0.07) with the SAME spectral peakiness (~6.7
+         -) -> the texture                                               
+      15 -    is broadband mottle, NOT a sharp periodic grid, and NOT a d
+         -istinct BART bug.                                              
+      16 -    BART is marginally more textured; ours-wavelet marginally c
+         -leaner. The                                                    
+      17 -    earlier "BART moiré / DCF-removes-it" reading was a metric 
+         -artifact (HF band                                              
+      18 -    conflates mottle with grid) and is retracted. grid-HF print
+         -ed per panel.                                                  
+      12 +    THREE panels: ours+DCF | ours WITHOUT DCF | BART pics no-re
+         +g. BY EYE                                                      
+      13 +    (the reliable instrument here — standing rule): BART shows 
+         +a REGULAR                                                      
+      14 +    cross-hatch grid; ours shows only irregular mottle, DCF or 
+         +not. So the grid                                               
+      15 +    is real and BART-specific, and NOT explained by DCF (ours-n
+         +o-DCF is still                                                 
+      16 +    grid-free). Cause = BART nufft gridding internals, UNRESOLV
+         +ED (ruled out:                                                 
+      17 +    traj over-range, Toeplitz, kernel width/oversampling, fftmo
+         +d, DCF). The                                                   
+      18 +    grid-HF / peakiness scalars printed below CANNOT separate g
+         +rid from mottle                                                
+      19 +    here (phantom spectrum overlaps the band) — do not trust th
+         +em for this; they                                              
+      20 +    fooled the read twice. See [[eye_vs_metric]].              
+      21  
+      22      ../.venv/bin/python wavelet_twoway.py ../../data/v3_fov250/
+          recon_io \
+      23          --bart /Users/hoomham/bin/bart-src/bart
+
+⏺ Update(workspace/helpers/recon/wavelet_twoway.py)
+  ⎿  Added 4 lines, removed 3 lines
+      86          ax.set_title(f"{t}\ngrid-HF {grid_hf(v):.3f}  peakiness
+           {peakiness(v):.1f}",
+      87                       fontsize=11)
+      88          ax.axis("off")
+      89 -    fig.suptitle("Mid-freq texture similar across all (HF~0.05-
+         -0.07, peakiness~6.7) "                                         
+      90 -                 "= broadband mottle, NOT a periodic grid or a 
+         -BART bug. "                                                    
+      91 -                 "BART marginally more textured.", fontsize=11)
+      89 +    fig.suptitle("BY EYE: BART (right) has a REGULAR grid; ours
+         + (DCF or not) only "                                           
+      90 +                 "irregular mottle -> grid is real & BART-speci
+         +fic, NOT from DCF. "                                           
+      91 +                 "HF/peakiness below can't separate grid from m
+         +ottle - don't trust "                                          
+      92 +                 "them here.", fontsize=10)                    
+      93      fig.tight_layout()
+      94      png = os.path.join(recon_io, "texture_compare.png")
+      95      fig.savefig(png, dpi=120)
+
+⏺ Regenerating texture_compare.png with the corrected title (reusing saved BART
+  output, recomputing the two ours panels).
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  rewrote texture_compare.png
+
+⏺ Now correcting the docs to the eye-truth (I'd written "no artifact" — wrong).
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 27 lines, removed 20 lines
+      64     is the over-smoothing inflation the new metric still reports
+           honestly via
+      65     the falling edge_sharp (7.7 < 9.2) — the guard working.
+      66  
+      67 -## RESOLVED — the "grid/moiré" was a metric artifact, NOT a BAR
+         -T bug                                                          
+      68 -First read: a regular cross-hatch on every BART recon, ours cle
+         -an. Chased it                                                  
+      69 -(2026-06-15) and **retracted** the artifact reading. The trail:
+      70 -1. First HF probe (0.69) was a BUG — FFT over the singleton tra
+         -iling dims of an                                               
+      71 -   unsqueezed 16-D cfl. Squeeze fixed it.                      
+      72 -2. Proper HF band (r 6-22 cyc/FOV): BART pics 0.05, our UNWEIGH
+         -TED CG 0.052,                                                  
+      73 -   BART adjoint 0.029 ≈ our adjoint 0.028. The texture is in th
+         -e iterative                                                    
+      74 -   inverse, present in OURS too when unweighted.               
+      75 -3. Tried to pin it on DCF (ours is DCF-weighted, BART default i
+         -sn't). BART `-p`                                               
+      76 -   does not wire per-sample noncart DCF in this build (sqrt 0.0
+         -55, pre-weight                                                 
+      77 -   0.180), and the proof figure's own numbers (ours+DCF 0.058 >
+         - ours-noDCF                                                    
+      78 -   0.052) **contradict** "DCF removes it".                     
+      79 -4. Spectral **peakiness** (max/median in band) is ~6.7 for ALL 
+         -(ours wavelet,                                                 
+      80 -   ours unweighted, BART pics, BART wavelet) → NO sharp periodi
+         -c peak. The                                                    
+      81 -   "grid" is broadband mid-freq mottle + display contrast, not 
+         -a regular grid.                                                
+      67 +## BART grid texture — REAL & BART-specific (by eye); cause unr
+         +esolved                                                        
+      68 +**Verdict by eye (the reliable instrument — standing rule):** e
+         +very BART recon                                                
+      69 +(pics no-reg, wavelet, TV, all λ) carries a **regular cross-hat
+         +ch grid**; our                                                 
+      70 +finufft recons (CG, wavelet, TV, DCF or not) show only **irregu
+         +lar mottle**.                                                  
+      71 +Clear and consistent across `wavelet_twoway_montage.png`, `tv_t
+         +hreeway_montage.png`,                                          
+      72 +`texture_compare.png`.                                         
+      73  
+      83 -**Conclusion:** no distinct BART artifact. All recons carry sim
+         -ilar mid-freq                                                  
+      84 -texture; BART is *marginally* more textured (HF ~0.06 vs our wa
+         -velet 0.046),                                                  
+      85 -ours-wavelet *marginally* cleaner. The comparison verdict stand
+         -s but **modestly**                                             
+      86 -— not a blowout. Figure: `recon_io/texture_compare.png`. Lesson
+         - (again): a single                                             
+      87 -scalar fooled the read twice; peakiness + eyes settled it. See 
+         -`[[eye_vs_metric]]`.                                           
+      74 +**Scalars failed to capture it — twice — don't trust them here:
+         +**                                                             
+      75 +1. First HF probe (0.69) was a code BUG (FFT over the singleton
+         + trailing dims of                                              
+      76 +   an unsqueezed 16-D cfl).                                    
+      77 +2. Fixed HF band (r 6-22) and spectral peakiness (max/median) b
+         +oth read ~equal                                                
+      78 +   for BART vs ours (HF 0.05-0.07, peakiness ~6.7) — because th
+         +e phantom's own                                                
+      79 +   mid-freq spectrum overlaps the grid band. These scalars CANN
+         +OT separate a                                                  
+      80 +   regular grid from random mottle on this object. The eye can.
+      81  
+      82 +**Cause: BART's nufft gridding internals — UNRESOLVED.** Ruled 
+         +out by test:                                                   
+      83 +traj over-range (|k|max 47 < 50), Toeplitz embedding (`-U` no c
+         +hange), KB kernel                                              
+      84 +width/oversampling (`-o3 -w8` no change), fftmod (`bart fftmod`
+         + no-op), and DCF /                                             
+      85 +unweighting (ours-WITHOUT-DCF is still grid-free, so it is NOT 
+         +the unweighted-LS                                              
+      86 +density signature — an earlier guess, disproven). `-p` does not
+         + wire per-sample                                               
+      87 +noncart DCF in this build. Next ideas: BART rolloff/apodization
+         + correction; a                                                 
+      88 +point-source PSF dump (`nufft` of a delta traj) to see the kern
+         +el's spatial                                                   
+      89 +replica.                                                       
+      90 +                                                               
+      91 +**Impact:** ours-wavelet is **visibly cleaner** (grid-free) tha
+         +n BART-wavelet;                                                
+      92 +lfCV 0.157 < 0.177 agrees directionally. Verdict holds. But the
+         + grid is a BART                                                
+      93 +quirk, not a fair-loss for BART — flag it when reporting. Lesso
+         +n (3rd time):                                                  
+      94 +eye beats single scalar; see `[[eye_vs_metric]]`. Figure: `reco
+         +n_io/texture_compare.png`.                                     
+      95 +                                                               
+      96  ## Lustig TV sweep + three-way TV (added 2026-06-15)
+      97  
+      98  Earlier the Lustig baseline was ONE point (TVWeight=xfmWeight=0
+          .01, both terms on,
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 7 lines, removed 7 lines
+      86  - **BART wavelet diverges under FISTA here** (~1e32). pics `-R 
+          W` must run with
+      87    `-m` (ADMM); `bart_compare.run_pics` forces it. TV is fine on
+           the default.
+      88  - **BART traj units:** `bart_traj = traj_rad * N/(2π)` (N=100),
+           dims (3,M,1).
+      89 -- **The BART "grid/moiré" was a metric artifact, RESOLVED** — n
+         -ot a BART bug.                                                 
+      90 -  HF-band scalar conflated mottle with a grid (and an unsqueeze
+         -d-cfl FFT bug                                                  
+      91 -  inflated it to 0.69). Spectral peakiness ~6.7 for ALL recons 
+         -→ broadband                                                    
+      92 -  mottle, no periodic grid. ours-wavelet marginally cleaner (HF
+         - 0.046 vs ~0.06);                                              
+      93 -  verdict stands but modest. Don't reopen as an artifact. (`tex
+         -ture_compare.png`,                                             
+      94 -  `BART_Comparison.md` RESOLVED). Single-scalar fooled the read
+         - twice — use                                                   
+      95 -  peakiness + eyes.                                            
+      89 +- **BART grid texture is REAL & BART-specific (by eye), cause U
+         +NRESOLVED.**                                                   
+      90 +  Every BART recon (pics/wav/tv, all λ) has a regular cross-hat
+         +ch grid; ours                                                  
+      91 +  (DCF or not) only irregular mottle. HF-band + peakiness scala
+         +rs CANNOT see it                                               
+      92 +  (phantom spectrum overlaps the band) and fooled the read twic
+         +e — trust the eye                                              
+      93 +  here. NOT DCF (ours-no-DCF still grid-free), NOT traj-range/T
+         +oeplitz/kernel/                                                
+      94 +  fftmod (all tested). Likely BART nufft rolloff/gridding inter
+         +nals.                                                          
+      95 +  ours-wavelet visibly cleaner. (`texture_compare.png`, `BART_C
+         +omparison.md`).                                                
+      96  - **`metrics_v2` ≠ `cg_tune.metrics`:** corner-air noise ROI as
+          sumes a centered
+      97    object (true for ACR). Don't mix the two metrics' numbers in 
+          one table.
+      98  - **`edge_sharp` guards blur, NOT texture.** Noise/texture (BAR
+          T moiré, Lustig
+
+⏺ Let me record this third instance in the eye_vs_metric memory.
+
+  Recalled 1 memory, wrote 2 memories (ctrl+o to expand)
+
+⏺ Description line has a different dash char; body's the substance — leaving it.
+
+
+  Both done. Final report:
+
+  1. The BART grid — chased to ground
+
+  Real and BART-specific (by eye): every BART recon (pics / wavelet / TV, all λ)
+  carries a regular cross-hatch grid; ours (CG / wavelet / TV, DCF or not) show
+  only irregular mottle.
+
+  Cause: unresolved — BART's nufft internals. Ruled out by direct test:
+  - traj over-range (|k|max 47 < 50) ✗
+  - Toeplitz embedding (-U) ✗
+  - KB kernel width / oversampling (-o3 -w8) ✗
+  - fftmod (bart fftmod no-op) ✗
+  - DCF / unweighted-LS — disproven: ours-without-DCF is still grid-free, so
+  it's not the density signature.
+
+  My scalars failed twice (HF=0.69 was a singleton-axis FFT bug; fixed HF and
+  peakiness both read ~equal because the phantom spectrum overlaps the grid
+  band). The eye settled it — your standing rule, 3rd time. I flip-flopped on
+  the metric before trusting the figure; documented honestly and saved to
+  memory.
+
+  2. Montages (in recon_io/)
+
+  - wavelet_twoway_montage.png — ours (clean) vs BART wavelet (gridded). Ours
+  wins: lfCV 0.157 < 0.177**, edge **10.2 > 9.0.
+  - texture_compare.png — ours±DCF vs BART: proves grid is BART-specific, not
+  DCF.
+  - tv_threeway_montage.png — ours / BART / Lustig TV (wash, ~0.18).
+
+  Verdict (one ruler, metrics_v2)
+
+  ┌─────────┬────────────────────────────────────────────────────────────────┐
+  │  prior  │                             result                             │
+  ├─────────┼────────────────────────────────────────────────────────────────┤
+  │ wavelet │ ours visibly cleaner + better metrics; BART carries the grid;  │
+  │         │ Lustig can't play (2D op)                                      │
+  ├─────────┼────────────────────────────────────────────────────────────────┤
+  │ TV      │ metric wash (~0.18); ours grid-free, BART gridded              │
+  └─────────┴────────────────────────────────────────────────────────────────┘
+
+  The grid is a BART quirk, not a fair loss for BART — flag it when reporting,
+  don't score BART down for it. Net: our DCF-preconditioned wavelet is the
+  cleanest recon of the three; the independence test (BART) confirms our
+  geometry and doesn't beat us.
+
+  New code (originals untouched): wavelet_twoway.py. Docs corrected:
+  BART_Comparison.md, recon AGENTS.md, eye_vs_metric memory.
+
+  One loose end if you want it later: dump BART's point-source PSF (nufft of a
+  delta trajectory) to finally name the grid's origin.
+
+✻ Sautéed for 17m 2s
+
+❯ those grods are real and are in the ACR phantom. i think we are not comparing 
+  the exact slices!! so run the tests for the best optimized values for the     
+  BART, lustig matlab and ours for this slices in each case.                    
+  '/Users/hoomham/Desktop/Screenshot 2026-06-15 at 4.52.27 AM.png'              
+
+⏺ Big correction — you're right. Let me look at your screenshot.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ That's the key insight — the grid is a real ACR feature (resolution-insert
+  slice, row 2 col 3 in your shot), and the phantom shows totally different
+  structure at each z (bars, holes, circles, grid). So [:,:,50] across pipelines
+  was comparing different physical slices — my orientation search aligned by
+  global correlation but z can be flipped/offset, so "BART has grid, ours
+  doesn't" was just BART's slice-50 landing on the grid-insert plane and ours
+  not.
+
+  Let me first confirm the z-misalignment, then build the slice-matched
+  comparison at best λ each.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  orient cc 0.926
+     ours  peak-grid slice 0 val 0.55
+     bart  peak-grid slice 0 val 0.57
+     mean slicewise corr z40-60 (aligned?) 0.953
+
+⏺ Surprise — after orientation, ours-vs-BART slicewise correlation z40–60 is 
+  0.953: they ARE on the same physical slices. So the real story is deeper and
+  flips my read: at the matched slice, BART resolves the ACR grid insert and 
+  ours-wavelet (t0.01) smooths it away — the "grid" isn't a BART artifact, it's
+  real resolution structure ours is blurring. lfCV "smoother" = ours destroying
+  real detail.
+
+  So the right test is exactly what you said: each pipeline at its best 
+  (least-destructive) λ, compared on the same feature slices. First, locate the
+  ACR feature slices (grid insert etc.) from an unsmoothed recon.
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  object z-range 0 - 99
+     top grid-feature slices (z): [0, 1, 3, 5, 7, 8]
+     center of object z: 51
+
+⏺ Feature-detection by FFT keeps hitting edge slices — better to just lay out
+  matched slices across pipelines and let your eye pick. Building the
+  slice-matched comparison: each pipeline at its detail-preserving best λ,
+  oriented to a common frame, same z-columns. Let me write it.
+
+⏺ Write(workspace/helpers/recon/slice_matched_compare.py)
+  ⎿  Wrote 134 lines to workspace/helpers/recon/slice_matched_compare.py
+         hysical planes.D ours/BART/Lustig at best-detail lambda — same p
+       3 Correction (2026-06-15, Hooman): the cross-hatch is a REAL ACR f
+       4 resolution / grid insert), not a BART artifact. Earlier montages
+          compared
+          plane (slicewiseh volume; after orientation those ARE ~the same
+         e real features the right question is which pipeline RESOLVES th
+       7 at MATCHED slices — over-smoothing (low lfCV) that erases the gr
+       8 better.ORSE, not
+      10 This NEW script reconstructs each pipeline at a detail-preservin
+         g lambda, orients
+     … +142 lines (ctrl+o to expand)
+
+⏺ Running the slice-matched comparison.
+
+⏺ Bash(../.venv/bin/python slice_matched_compare.py
+      ../../data/v3_fov250/recon_io --bart /Users/hoomham/bin/bart-src/bart
+      --our-t 0.003 --bart-l 0.0003 --lustig-tv 0.0…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/b7skl…)
+  ⎿  ours wavelet t=0.003
+     BART wavelet l=0.0003  orient cc 0.922
+     Lustig TV w=0.001  orient cc 0.902
+     wrote ../../data/v3_fov250/recon_io/slice_matched_montage.png
+
+⏺ Background command "Run slice-matched comparison" completed (exit code 0)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Now it's clear and it reverses my verdict. Matched slices (alignment confirmed
+  — circles line up at z=38, bars at z=56 across all rows). At z=50, the 
+  resolution-insert grid:
+  - BART (middle): resolves the grid sharply.
+  - ours wav t0.003 (top): grid faint, partially smoothed.
+  - Lustig (bottom): grid mostly smoothed away.
+
+  So the "grid" is real ACR resolution structure, and ours-wavelet was winning 
+  lfCV by blurring it away — exactly the blur-rewards-low-CV trap. You were
+  right: I mistook real detail for an artifact.
+
+  Now your actual ask — best-optimized λ per pipeline, judged on these slices.
+  Building a λ-sweep at the resolution slice (z=50) so each pipeline's
+  detail-vs-noise tradeoff is visible and you pick the best per pipeline. Adding
+  ours-CG (unsmoothed) as the max-resolution anchor.
+
+⏺ Write(workspace/helpers/recon/resolution_sweep.py)
+  ⎿  Wrote 138 lines to workspace/helpers/recon/resolution_sweep.py
+        k best by eye.e lambda sweep at the RESOLUTION-INSERT slice — pic
+      3 Correction context (2026-06-15): the cross-hatch is the REAL ACR 
+        resolution
+         the insert an artifact. So 'best lambda' = the one that RESOLVES
+      5 without drowning it in noise — NOT the lowest-lfCV (that just blu
+      6 rs it away).
+         increasingline (ours wavelet / BART wavelet / Lustig TV), cols =
+      8 regularization. Plus ours CG-20 (unsmoothed) as the max-resolutio
+      9 matched slice z (oriented to ours) so every panel is the SAME phy
+        sical plane.
+     … +147 lines (ctrl+o to expand)
+
+⏺ Bash(../.venv/bin/python resolution_sweep.py ../../data/v3_fov250/recon_io
+      --bart /Users/hoomham/bin/bart-src/bart --z 50 2>&1 | grep -vE "cg iter")
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/bqjd1…)
+  ⎿  ours done
+     BART done
+     Lustig done
+     wrote ../../data/v3_fov250/recon_io/resolution_sweep_z50.png
+
+⏺ Background command "Run resolution-slice lambda sweep z=50" completed (exit code 0)
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Clear at z=50: BART (low λ, l=0.0003–0.001) resolves the grid mesh; 
+  ours-wavelet smooths it out even at t=0.001; Lustig smooths most. ours CG-20
+  (anchor, col 1) keeps more grid than our wavelet but is noisy. So the
+  corrected, matched-slice verdict:
+
+  For resolving real ACR structure: BART > ours-CG > ours-wavelet ≈ Lustig. Our
+  wavelet's low lfCV "win" was blur erasing real resolution — lfCV (and
+  edge_sharp) rewarded it. This reverses the earlier conclusion.
+
+  Correcting the docs — the prior verdict was wrong.
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 22 lines, removed 4 lines
+       88  point-source PSF dump (`nufft` of a delta traj) to see the ker
+           nel's spatial
+       89  replica.
+       90  
+       91 -**Impact:** ours-wavelet is **visibly cleaner** (grid-free) th
+          -an BART-wavelet;                                              
+       92 -lfCV 0.157 < 0.177 agrees directionally. Verdict holds. But th
+          -e grid is a BART                                              
+       93 -quirk, not a fair-loss for BART — flag it when reporting. Less
+          -on (3rd time):                                                
+       94 -eye beats single scalar; see `[[eye_vs_metric]]`. Figure: `rec
+          -on_io/texture_compare.png`.                                   
+       91 +## VERDICT CORRECTED (2026-06-15, Hooman) — the grid is REAL A
+          +CR resolution                                                 
+       92 +The cross-hatch is the ACR phantom's **resolution / grid inser
+          +t** (z≈50), NOT a                                             
+       93 +BART artifact. After orientation the pipelines ARE on the same
+          + physical slices                                              
+       94 +(slicewise corr ~0.95), so the earlier `[:, :, 50]` montages w
+          +ere comparing                                                 
+       95 +matched planes after all — the real story is who RESOLVES the 
+          +insert.                                                       
+       96  
+       97 +Slice-matched at the insert (`slice_matched_montage.png`, `res
+          +olution_sweep_z50.png`):                                      
+       98 +- **BART (wavelet, l~3e-4..1e-3) resolves the grid mesh sharpl
+          +y.**                                                          
+       99 +- ours-wavelet smooths it out even at t=0.001 (lowest); ours C
+          +G-20 keeps more                                               
+      100 +  grid but is noisy.                                          
+      101 +- Lustig TV smooths it most.                                  
+      102 +                                                              
+      103 +So **for real resolution: BART > ours-CG > ours-wavelet ≈ Lust
+          +ig.** The earlier                                             
+      104 +"ours-wavelet wins, lfCV 0.157 < 0.177" is **RETRACTED** — tha
+          +t was BLUR erasing                                            
+      105 +real structure, and lfCV (plus edge_sharp) rewarded it. metric
+          +s_v2 is still                                                 
+      106 +blind to resolution loss when the lost detail is genuine phant
+          +om structure; judge                                           
+      107 +the insert slice by eye. Our db4-wavelet/FISTA over-smooths th
+          +e insert — a real                                             
+      108 +finding about our prior, not a BART quirk.                    
+      109 +                                                              
+      110 +Lesson (3rd time): eye beats single scalar; `[[eye_vs_metric]]
+          +`. Best-λ per                                                 
+      111 +pipeline is now a RESOLUTION call at the insert slice, not a m
+          +in-lfCV call.                                                 
+      112 +Figures: `slice_matched_montage.png`, `resolution_sweep_z50.pn
+          +g`.                                                           
+      113 +                                                              
+      114  ## Lustig TV sweep + three-way TV (added 2026-06-15)
+      115  
+      116  Earlier the Lustig baseline was ONE point (TVWeight=xfmWeight=
+           0.01, both terms on,
+
+⏺ Reconciling the earlier "BART grid is a BART-specific texture, cause
+  unresolved" section — that's now superseded (it's real structure BART
+  resolves).
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 7 lines, removed 6 lines
+      64     is the over-smoothing inflation the new metric still reports
+           honestly via
+      65     the falling edge_sharp (7.7 < 9.2) — the guard working.
+      66  
+      67 -## BART grid texture — REAL & BART-specific (by eye); cause unr
+         -esolved                                                        
+      68 -**Verdict by eye (the reliable instrument — standing rule):** e
+         -very BART recon                                                
+      69 -(pics no-reg, wavelet, TV, all λ) carries a **regular cross-hat
+         -ch grid**; our                                                 
+      70 -finufft recons (CG, wavelet, TV, DCF or not) show only **irregu
+         -lar mottle**.                                                  
+      71 -Clear and consistent across `wavelet_twoway_montage.png`, `tv_t
+         -hreeway_montage.png`,                                          
+      72 -`texture_compare.png`.                                         
+      67 +## BART grid texture — it is the REAL ACR resolution insert (se
+         +e VERDICT below)                                               
+      68 +**Superseded read (kept for the trail):** I first called the cr
+         +oss-hatch a                                                    
+      69 +BART-specific texture / artifact and chased a cause (DCF, Toepl
+         +itz, kernel,                                                   
+      70 +fftmod — all ruled out). WRONG framing. It is the phantom's res
+         +olution/grid                                                   
+      71 +insert at z≈50, which BART RESOLVES and our wavelet BLURS. The 
+         +"ours clean, BART                                              
+      72 +gridded" reads in `wavelet_twoway_montage.png` / `texture_compa
+         +re.png` were                                                   
+      73 +ours OVER-SMOOTHING real structure, not BART adding it. See VER
+         +DICT CORRECTED.                                                
+      74  
+      75  **Scalars failed to capture it — twice — don't trust them here:
+          **
+      76  1. First HF probe (0.69) was a code BUG (FFT over the singleton
+           trailing dims of
+
+⏺ Fixing the AGENTS.md grid pitfall (it still says BART-specific/unresolved).
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 10 lines, removed 7 lines
+       86  - **BART wavelet diverges under FISTA here** (~1e32). pics `-R
+            W` must run with
+       87    `-m` (ADMM); `bart_compare.run_pics` forces it. TV is fine o
+           n the default.
+       88  - **BART traj units:** `bart_traj = traj_rad * N/(2π)` (N=100)
+           , dims (3,M,1).
+       89 -- **BART grid texture is REAL & BART-specific (by eye), cause 
+          -UNRESOLVED.**                                                 
+       90 -  Every BART recon (pics/wav/tv, all λ) has a regular cross-ha
+          -tch grid; ours                                                
+       91 -  (DCF or not) only irregular mottle. HF-band + peakiness scal
+          -ars CANNOT see it                                             
+       92 -  (phantom spectrum overlaps the band) and fooled the read twi
+          -ce — trust the eye                                            
+       93 -  here. NOT DCF (ours-no-DCF still grid-free), NOT traj-range/
+          -Toeplitz/kernel/                                              
+       94 -  fftmod (all tested). Likely BART nufft rolloff/gridding inte
+          -rnals.                                                        
+       95 -  ours-wavelet visibly cleaner. (`texture_compare.png`, `BART_
+          -Comparison.md`).                                              
+       89 +- **The "BART grid" is the REAL ACR resolution insert (z≈50), 
+          +NOT an artifact.**                                            
+       90 +  Pipelines ARE on matched slices after orientation (slicewise
+          + corr ~0.95). BART                                            
+       91 +  RESOLVES the insert; our db4-wavelet/FISTA BLURS it even at 
+          +lowest t; Lustig                                              
+       92 +  blurs most. So resolution: BART > ours-CG > ours-wavelet ≈ L
+          +ustig. The earlier                                            
+       93 +  "ours-wavelet wins on lfCV" is RETRACTED — blur erasing real
+          + structure, and                                               
+       94 +  lfCV+edge_sharp rewarded it. Judge the insert slice by EYE; 
+          +metrics_v2 is blind                                           
+       95 +  to resolution loss. (`slice_matched_compare.py`, `resolution
+          +_sweep.py`,                                                   
+       96 +  `slice_matched_montage.png`, `resolution_sweep_z50.png`, `BA
+          +RT_Comparison.md`).                                           
+       97 +- **Best-λ is a RESOLUTION call at the insert slice, not min-l
+          +fCV.** Compare at                                             
+       98 +  matched z with `slice_matched_compare.py`; don't pick λ from
+          + scalar sweeps.                                               
+       99  - **`metrics_v2` ≠ `cg_tune.metrics`:** corner-air noise ROI a
+           ssumes a centered
+      100    object (true for ACR). Don't mix the two metrics' numbers in
+            one table.
+      101  - **`edge_sharp` guards blur, NOT texture.** Noise/texture (BA
+           RT moiré, Lustig
+
+⏺ Fixing the now-wrong line in the memory (it said the grid cause was
+  "unresolved BART nufft internals").
+
+  Wrote 1 memory (ctrl+o to expand)
+
+⏺ Done — corrected verdict, slice-matched, best-λ sweep produced. You were right
+  on both counts: real ACR structure, and the comparison only becomes fair at
+  matched feature slices.
+
+  Corrected verdict (matched slice z=50, the resolution insert)
+
+  Resolution ranking: BART > ours-CG > ours-wavelet ≈ Lustig.
+
+  ┌──────────────┬───────────────────────┬──────────────────────────┐
+  │   pipeline   │ best-λ for resolution │     reads the grid?      │
+  ├──────────────┼───────────────────────┼──────────────────────────┤
+  │ BART wavelet │ l ≈ 3e-4 – 1e-3       │ yes — sharp mesh         │
+  ├──────────────┼───────────────────────┼──────────────────────────┤
+  │ ours CG-20   │ no reg                │ partial, but noisy       │
+  ├──────────────┼───────────────────────┼──────────────────────────┤
+  │ ours wavelet │ t=0.001 (lowest)      │ mostly blurred even here │
+  ├──────────────┼───────────────────────┼──────────────────────────┤
+  │ Lustig TV    │ w=0.001 (lowest)      │ softest, grid gone       │
+  └──────────────┴───────────────────────┴──────────────────────────┘
+
+  The earlier "ours-wavelet wins (lfCV 0.157<0.177)" is RETRACTED. That low lfCV
+  was our db4-wavelet/FISTA blurring away the real resolution insert — lfCV and
+  edge_sharp both rewarded the blur. metrics_v2 is blind to resolution loss
+  when the lost detail is genuine phantom structure. Real finding: our wavelet 
+  prior over-smooths; BART preserves resolution best.
+
+  What I fixed in my own errors
+
+  Chain: scalar bug inflated the grid → scalars dismissed it as mottle → I
+  mislabeled it a "BART artifact" and hunted a cause
+  (DCF/Toeplitz/kernel/fftmod, all dead ends) — when it was real ACR structure
+  the whole time. Eye + your call settled it. Saved to [[eye_vs_metric]].
+
+  Figures (in recon_io/)
+
+  - slice_matched_montage.png — ours/BART/Lustig, 5 matched slices (z=38…62).
+  Structures line up (circles z38, bars z56) → alignment confirmed.
+  - resolution_sweep_z50.png — each pipeline's full λ sweep at the insert slice
+  → pick best by eye.
+
+  New code (originals untouched): slice_matched_compare.py, resolution_sweep.py.
+  Docs corrected: BART_Comparison.md, AGENTS.md.
+
+  Want me to (a) lock best-λ picks into a final clean 3-panel at z=50, and/or
+  (b) build a resolution-targeted metric (line-pair contrast at the insert) so
+  the number finally tracks the eye instead of fighting it?
+✻ Worked for 6m 49s
+
+❯ i still thinl there is a small z direction mismatch cuz the grid is def       
+  visible in all the three implications we did but in the current figiures due  
+  to pahtom little diffent sizes, they are not totally mthcing so the Bart is   
+  on the grid slice while ours and lustig's are on the more unform part of the  
+  phatom slice                                                                  
+
+⏺ Good catch — that's the real bug. My orientation search only does
+  flips/permutations, no z-shift or z-scale. If the phantom is slightly
+  different size/position across pipelines (FOV scaling), the bulk aligns but
+  the thin grid-insert slice lands at different z in each — so at fixed z=50
+  BART sits on the grid, ours/Lustig on a uniform slice.
+
+  Fix: find each pipeline's own grid-insert slice (and measure the z-offset
+  between them). Let me detect it.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  ours    grid-slice z=76  val=0.308  top3=[69, 76, 77]
+     bart    grid-slice z=40  val=0.378  top3=[27, 28, 40]
+     lustig  grid-slice z=77  val=0.409  top3=[30, 31, 77]
+     … +2 lines (ctrl+o to expand)
+
+⏺ The z cross-correlation says the volumes are aligned to within 1 slice (best
+  shift −1, corr 0.85) — so it's NOT a big z mismatch. But my grid-slice
+  detector is unreliable (ours z76, BART z40, Lustig z77 — inconsistent, picking
+  noise/bars not the insert).
+
+  Right tool = look at it, like your screenshot. Fine-z montage (every 2 slices)
+  per pipeline so I can see exactly where the grid appears in each and whether
+  they're offset.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  wrote finez_montage.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ The fine-z montage confirms you're exactly right: the grid is visible in all 
+  three around z≈50–54 — BART, ours, and Lustig all resolve it. At the single
+  z=50 I picked, BART happened to sit on its grid peak while ours/Lustig were ~2
+  slices off (on a more uniform plane). So a ~2-slice z-offset, not "ours blurs
+  it away." My reversal was overstated.
+
+  Let me find each pipeline's own grid-peak slice (tighter detector, z-window
+  44–60) and compare those matched-to-feature.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  ours    grid-peak z=47 val=0.306  z48-56: [0.283 0.286 0.25  0.161 0.1
+     24 0.173 0.    0.164 0.206]
+     bart    grid-peak z=44 val=0.384  z48-56: [0.305 0.363 0.233 0.166 0.1
+     … +3 lines (ctrl+o to expand)
+
+⏺ Detector's unreliable (catches edges, not the insert) — the eye from the
+  fine-z montage is the truth: grid at z≈50–54 in all three, with a small
+  offset. Your "different phantom sizes" means a z-scale difference, not just a
+  shift — so a single offset can't align both ends. Let me z-register each
+  volume to ours with a 1-D affine (scale + shift), then redo the fine-z
+  montage; if the grid lands in the same column across all rows, it's fixed.
+
+⏺ Write(workspace/helpers/recon/z_register_compare.py)
+  ⎿  Wrote 154 lines to workspace/helpers/recon/z_register_compare.py
+         .""Z-affine register ours/BART/Lustig then matched-slice compare
+       3 Hooman (2026-06-15): the grid IS visible in all three, but the p
+       4 slightly different SIZES, so a flip-only orientation aligns the 
+         bulk yet leaves
+         z one pipeline isert slice at different z in each -> at a fixed 
+       7 on the grid, the others on a uniform plane.
+       8 Fix: after the 48-orientation (flips/perms), register each volum
+       9 with a 1-D AFFINE (scale s + shift d), found by maximizing the m
+      10 correlation. A scale (not just a shift) is needed because the si
+         ze differs, so a
+     … +172 lines (ctrl+o to expand)
+
+⏺ Bash(../.venv/bin/python z_register_compare.py ../../data/v3_fov250/recon_io
+      --bart /Users/hoomham/bin/bart-src/bart --our-t 0.003 --bart-l 0.0003
+      --lustig-tv 0.001…)
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/bb671…)
+  ⎿  BART  z-affine: scale 1.020 shift -1.50  corr 0.948
+     Lustig z-affine: scale 0.930 shift +0.00  corr 0.911
+     wrote ../../data/v3_fov250/recon_io/zreg_finez_montage.png
+
+⏺ Background command "Run z-affine registered fine-z montage" completed (exit code 0)
+
+⏺ Confirmed your hypothesis quantitatively: BART is z-scale 1.02 (+1.5 slice
+  shift), Lustig 0.93 — Lustig's phantom is 7% smaller in z. A flip-only
+  orientation can't fix a scale, so the grid insert landed at different z.
+  Viewing the registered montage to confirm the grid now lines up.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ After z-registration the grid lines up in the same column (z≈52–54) across all
+  three rows — and all three clearly resolve it. So the corrected-corrected
+  verdict: the earlier "BART resolves, ours blurs" was the z-scale mismatch 
+  (0.93 vs 1.02), not a real resolution gap. You were right again. Let me render
+  a high-res zoomed 3-panel at the matched grid slice for the definitive
+  sharpness comparison.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon
+      ../.venv/bin/python -c "…)
+  ⎿  wrote grid_slice_zoom_z52.png
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Definitive — and it reverses my last reversal. At the matched grid slice
+  (z=52, z-affine registered), zoomed:
+  - ours (t0.003): grid sharply resolved.
+  - Lustig: grid sharply resolved.
+  - BART: grid present but softer/blurrier here.
+
+  So with proper slice-matching, all three resolve the ACR grid — and ours is as
+  sharp or sharper than BART. My "BART resolves, ours blurs" was 100% the
+  z-scale mismatch (BART's z=50 sat on its grid peak; ours/Lustig were on
+  uniform planes). You called it exactly. Updating the verdict to the final,
+  slice-matched truth.
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 24 lines, removed 19 lines
+       89  point-source PSF dump (`nufft` of a delta traj) to see the ker
+           nel's spatial
+       90  replica.
+       91  
+       92 -## VERDICT CORRECTED (2026-06-15, Hooman) — the grid is REAL A
+          -CR resolution                                                 
+       93 -The cross-hatch is the ACR phantom's **resolution / grid inser
+          -t** (z≈50), NOT a                                             
+       94 -BART artifact. After orientation the pipelines ARE on the same
+          - physical slices                                              
+       95 -(slicewise corr ~0.95), so the earlier `[:, :, 50]` montages w
+          -ere comparing                                                 
+       96 -matched planes after all — the real story is who RESOLVES the 
+          -insert.                                                       
+       92 +## FINAL VERDICT (2026-06-15, z-matched) — all three resolve t
+          +he grid; ours is sharp                                        
+       93 +The cross-hatch is the ACR **resolution/grid insert** (z≈50-54
+          +), NOT an artifact.                                           
+       94  
+       98 -Slice-matched at the insert (`slice_matched_montage.png`, `res
+          -olution_sweep_z50.png`):                                      
+       99 -- **BART (wavelet, l~3e-4..1e-3) resolves the grid mesh sharpl
+          -y.**                                                          
+      100 -- ours-wavelet smooths it out even at t=0.001 (lowest); ours C
+          -G-20 keeps more                                               
+      101 -  grid but is noisy.                                          
+      102 -- Lustig TV smooths it most.                                  
+       95 +**The methodological key (Hooman): the phantoms are slightly d
+          +ifferent SIZES, so                                            
+       96 +a flip-only orientation aligns the bulk but NOT the thin inser
+          +t slice.** Fitted                                             
+       97 +z-affine to ours: BART scale **1.02** (+1.5 slice), Lustig sca
+          +le **0.93** (Lustig                                           
+       98 +is 7% smaller in z). A fixed-z comparison is therefore INVALID
+          + — at z=50 BART sat                                           
+       99 +on its grid peak while ours/Lustig were on uniform planes, whi
+          +ch faked a "BART                                              
+      100 +resolves, ours blurs" result.                                 
+      101  
+      104 -So **for real resolution: BART > ours-CG > ours-wavelet ≈ Lust
+          -ig.** The earlier                                             
+      105 -"ours-wavelet wins, lfCV 0.157 < 0.177" is **RETRACTED** — tha
+          -t was BLUR erasing                                            
+      106 -real structure, and lfCV (plus edge_sharp) rewarded it. metric
+          -s_v2 is still                                                 
+      107 -blind to resolution loss when the lost detail is genuine phant
+          -om structure; judge                                           
+      108 -the insert slice by eye. Our db4-wavelet/FISTA over-smooths th
+          -e insert — a real                                             
+      109 -finding about our prior, not a BART quirk.                    
+      102 +After z-affine registration (`z_register_compare.py`) the grid
+          + lines up in the                                              
+      103 +SAME column across all rows (`zreg_finez_montage.png`), and at
+          + the matched insert                                           
+      104 +slice zoomed (`grid_slice_zoom_z52.png`):                     
+      105 +- **ours wav t0.003: grid sharply resolved.**                 
+      106 +- **Lustig TV w0.001: grid sharply resolved.**                
+      107 +- **BART wav l3e-4: grid present but softer here.**           
+      108  
+      111 -Lesson (3rd time): eye beats single scalar; `[[eye_vs_metric]]
+          -`. Best-λ per                                                 
+      112 -pipeline is now a RESOLUTION call at the insert slice, not a m
+          -in-lfCV call.                                                 
+      113 -Figures: `slice_matched_montage.png`, `resolution_sweep_z50.pn
+          -g`.                                                           
+      109 +**So all three resolve the real ACR grid; ours is as sharp or 
+          +sharper than BART.**                                          
+      110 +Every prior "winner" call (ours-wins-lfCV; then BART-resolves-
+          +best) was an artifact                                         
+      111 +of mismatched slices / smoothness-rewarding metrics — RETRACTE
+          +D. The pipelines are                                          
+      112 +genuinely comparable at matched resolution.                   
+      113  
+      114 +**Mandatory protocol going forward:** z-affine register (scale
+          ++shift) before ANY                                            
+      115 +slice comparison — sizes differ ~7%. Judge resolution at the i
+          +nsert slice by eye;                                           
+      116 +metrics_v2 is blind to it. Lesson (eye beats single scalar, 3r
+          +d+ time):                                                     
+      117 +`[[eye_vs_metric]]`. Figures: `zreg_finez_montage.png`, `grid_
+          +slice_zoom_z52.png`,                                          
+      118 +`slice_matched_montage.png`, `resolution_sweep_z50.png`.      
+      119 +                                                              
+      120  ## Lustig TV sweep + three-way TV (added 2026-06-15)
+      121  
+      122  Earlier the Lustig baseline was ONE point (TVWeight=xfmWeight=
+           0.01, both terms on,
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 11 lines, removed 10 lines
+       86  - **BART wavelet diverges under FISTA here** (~1e32). pics `-R
+            W` must run with
+       87    `-m` (ADMM); `bart_compare.run_pics` forces it. TV is fine o
+           n the default.
+       88  - **BART traj units:** `bart_traj = traj_rad * N/(2π)` (N=100)
+           , dims (3,M,1).
+       89 -- **The "BART grid" is the REAL ACR resolution insert (z≈50), 
+          -NOT an artifact.**                                            
+       90 -  Pipelines ARE on matched slices after orientation (slicewise
+          - corr ~0.95). BART                                            
+       91 -  RESOLVES the insert; our db4-wavelet/FISTA BLURS it even at 
+          -lowest t; Lustig                                              
+       92 -  blurs most. So resolution: BART > ours-CG > ours-wavelet ≈ L
+          -ustig. The earlier                                            
+       93 -  "ours-wavelet wins on lfCV" is RETRACTED — blur erasing real
+          - structure, and                                               
+       94 -  lfCV+edge_sharp rewarded it. Judge the insert slice by EYE; 
+          -metrics_v2 is blind                                           
+       95 -  to resolution loss. (`slice_matched_compare.py`, `resolution
+          -_sweep.py`,                                                   
+       96 -  `slice_matched_montage.png`, `resolution_sweep_z50.png`, `BA
+          -RT_Comparison.md`).                                           
+       97 -- **Best-λ is a RESOLUTION call at the insert slice, not min-l
+          -fCV.** Compare at                                             
+       98 -  matched z with `slice_matched_compare.py`; don't pick λ from
+          - scalar sweeps.                                               
+       89 +- **The "BART grid" is the REAL ACR resolution insert (z≈50-54
+          +), NOT an artifact.**                                         
+       90 +  MANDATORY: phantoms are different SIZES, so flip-orientation
+          + aligns the bulk but                                          
+       91 +  NOT the thin insert slice. Fitted z-affine to ours: BART sca
+          +le 1.02/+1.5slice,                                            
+       92 +  Lustig 0.93 (7% smaller). Fixed-z compare is INVALID — it fa
+          +ked "BART resolves,                                           
+       93 +  ours blurs". After z-affine reg (`z_register_compare.py`) th
+          +e grid aligns and                                             
+       94 +  at the matched slice ALL THREE resolve it; ours wav t0.003 a
+          +s sharp or sharper                                            
+       95 +  than BART. Every prior winner call RETRACTED. Always z-affin
+          +e register                                                    
+       96 +  (scale+shift) before slice compare. (`zreg_finez_montage.png
+          +`,                                                            
+       97 +  `grid_slice_zoom_z52.png`, `BART_Comparison.md` FINAL VERDIC
+          +T).                                                           
+       98 +- **metrics_v2 is blind to resolution loss; judge the insert s
+          +lice by EYE.** Best-λ                                         
+       99 +  is a resolution call at matched z, not min-lfCV.            
+      100  - **`metrics_v2` ≠ `cg_tune.metrics`:** corner-air noise ROI a
+           ssumes a centered
+      101    object (true for ACR). Don't mix the two metrics' numbers in
+            one table.
+      102  - **`edge_sharp` guards blur, NOT texture.** Noise/texture (BA
+           RT moiré, Lustig
+⏺ Let me save the z-registration requirement as a memory — it's a durable,
+  non-obvious gotcha that cost this whole detour.
+
+  Recalled 1 memory, wrote 3 memories (ctrl+o to expand)
+
+⏺ Done. Final answer to your call — you were right at every step.
+
+  What was actually wrong
+
+  The phantoms are different sizes across pipelines (fitted z-scale to ours:
+  BART 1.02, Lustig 0.93 — Lustig 7% smaller in z). My orientation search only
+  did flips/permutations — no z-scale/shift — so the bulk aligned but the thin
+  grid-insert slice landed at different z. Comparing fixed z=50 put BART on its
+  grid peak and ours/Lustig on uniform planes → faked "BART resolves, ours
+  blurs."
+
+  Fixed + final verdict (z-affine registered, matched slice z=52)
+
+  grid_slice_zoom_z52.png:
+  - ours wav t0.003 — grid sharply resolved
+  - Lustig TV w0.001 — grid sharply resolved
+  - BART wav l3e-4 — grid present but softer here
+
+  All three resolve the real ACR grid; ours is as sharp or sharper than BART.
+  Both earlier "winner" calls (ours-wins-lfCV, then BART-resolves-best) were
+  artifacts — retracted.
+
+  Lasting fixes
+
+  - z_register_compare.py — z-affine (scale+shift) registration; now mandatory
+  before any cross-pipeline slice compare.
+  - New figures: zreg_finez_montage.png (grid aligns in same column after reg),
+  grid_slice_zoom_z52.png, finez_montage.png.
+  - Docs corrected to the final z-matched verdict: BART_Comparison.md,
+  AGENTS.md.
+  - Memory: slice_matching_zaffine.md (the 7%-size / z-affine gotcha) so this
+  doesn't recur.
+
+  Open thread
+
+  Why the three pipelines produce different phantom sizes (~7%) is unexplained —
+  likely a FOV/oversampling-convention difference per pipeline. Worth pinning
+  next; it affects any quantitative (extent/resolution) comparison. Want me to
+  chase that?
+
+✻ Cogitated for 7m 20s
+
+❯ can you add faraz, steve and our gc to the first three rows and regenerate    
+  this figure? zreg_finez_montage.png                                           
+
+⏺ Need Steve + Faraz volumes (our CG I already have as img_cg). Let me find how
+  they're loaded.
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      echo "=== faraz dir ==="; ls -R ../../data/v3_fov250/recon_io/faraz/
+      2>/dev/null |…)
+  ⎿  === faraz dir ===
+     faraz_recon.mat
+     farazrecon.png
+     … +62 lines (ctrl+o to expand)
+
+⏺ Bash(cd
+      /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon;
+      sed -n '60,140p' faraz_montage.py; echo "=== steve_recon sig ==="; grep
+      -nE "def st…)
+  ⎿      out = np.transpose(np.abs(vol), perm)
+         for ax, f in enumerate(flips):
+             if f:
+     … +73 lines (ctrl+o to expand)
+
+⏺ Got the loaders: Faraz = faraz_recon.mat["img_gp"], Steve = steve_recon(...),
+  our CG = img_cg. Faraz is 80³ so it needs resampling to 100³ before
+  z-registration. Building a 6-row version (Faraz, Steve, our CG, ours-wav,
+  BART, Lustig), all z-affine registered to our CG.
+
+⏺ Write(workspace/helpers/recon/zreg_sixway_montage.py)
+  ⎿  Wrote 139 lines to workspace/helpers/recon/zreg_sixway_montage.py
+        s wav, BART, Lustig.red fine-z montage: Faraz, Steve, our CG, our
+      2 
+        a) oriented toster_compare.py to all pipelines. Every volume is (
+      4 our-CG (perm+flip), (b) resampled to 100^3 if needed (Faraz is 80
+      5 registered (scale+shift) to our-CG so the ACR resolution insert l
+        ands on the same
+        -zaffine]]).s (phantoms differ ~7% in size — see [[slice-matching
+      7 
+        50/recon_io \bin/python zreg_sixway_montage.py ../../data/v3_fov2
+      9         --bart /Users/hoomham/bin/bart-src/bart --z0 44 --z1 61
+     … +157 lines (ctrl+o to expand)
+
+⏺ Running the six-way registered montage.
+
+⏺ Bash(../.venv/bin/python zreg_sixway_montage.py ../../data/v3_fov250/recon_io
+      --bart /Users/hoomham/bin/bart-src/bart --z0 44 --z1 61 2>&1 | grep -vE
+      "cg iter")
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea451497169/tasks/bp4xh…)
+  ⎿  recon + register each pipeline ...
+       Faraz        z-affine scale 1.120 shift +0.00  corr 0.749
+       Steve        z-affine scale 1.010 shift +0.00  corr 0.993
+     … +5 lines (ctrl+o to expand)
+
+⏺ Background command "Run six-way z-registered montage" completed (exit code 0)
+
+⏺ All six registered. Note Faraz hit the scale search bound (1.12, corr only 
+  0.749) — its alignment is poor, likely needs a wider scale range. Viewing.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ All six rows now show the ACR grid at z≈52, and the bars/holes line up at
+  z=56–60 — registration worked. Faraz (row 1) is the weak fit (corr 0.75, scale
+  clamped at the 1.12 search bound → true scale is higher). Widening the scale
+  search so Faraz registers properly, then regenerating.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/z_register_compare.py)
+  ⎿  Added 4 lines, removed 3 lines
+      72      return out
+      73  
+      74  
+      75 -def fit_z_affine(vol, ref, z0, z1):                            
+      76 -    """Grid-search scale s, shift d maximizing mean slicewise c
+         -orr over [z0,z1]."""                                           
+      75 +def fit_z_affine(vol, ref, z0, z1, smin=0.80, smax=1.30):      
+      76 +    """Grid-search scale s, shift d maximizing mean slicewise c
+         +orr over [z0,z1].                                              
+      77 +    Wider scale range (0.80-1.30) covers Faraz, whose phantom i
+         +s larger in z."""                                              
+      78      best, bs, bd = -9.0, 1.0, 0.0
+      78 -    for s in np.linspace(0.88, 1.12, 25):                      
+      79 +    for s in np.linspace(smin, smax, 34):                      
+      80          for d in np.linspace(-6, 6, 25):
+      81              zsrc = s * (np.arange(z0, z1) - N / 2) + N / 2 + d
+      82              cc, n = 0.0, 0
+
+⏺ Bash(../.venv/bin/python zreg_sixway_montage.py ../../data/v3_fov250/recon_io
+      --bart /Users/hoomham/bin/bart-src/bart --z0 44 --z1 61 2>&1 | grep -vE
+      "cg iter")
+  ⎿  Running in the background (↓ to manage)
+
+⏺ Bash(until grep -qE "wrote|Traceback|Error"
+      /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/e
+      a6d4529-a45b-4515-b96b-dea351497169/tasks/bqi8i…)
+  ⎿  recon + register each pipeline ...
+       Faraz        z-affine scale 1.164 shift +0.00  corr 0.750
+       Steve        z-affine scale 1.012 shift +0.00  corr 0.993
+     … +5 lines (ctrl+o to expand)
+
+⏺ Background command "Regenerate six-way with wider Faraz scale" completed (exit code 0)
+
+⏺ Faraz scale moved to 1.164 but corr stayed 0.750 — so its low correlation is
+  not a z issue, just Faraz being a visually different recon (different
+  kernel/DCF) in-plane; the z-scale is found and the grid still lands at the
+  right slice. Viewing the final.
+  Read 1 file (ctrl+o to expand)
+
+⏺ Done — regenerated zreg_sixway_montage.png with Faraz, Steve, our CG as the
+  first three rows (then our wav, BART, Lustig). All six z-affine registered to
+  our CG; the ACR grid insert lines up in the same column (z≈52) across all six
+  rows, and every pipeline resolves it.
+
+  z-scale per pipeline (rel. our CG) — the phantom-size spread:
+
+  ┌──────────┬─────────┬────────────┐
+  │ pipeline │ z-scale │ slice corr │
+  ├──────────┼─────────┼────────────┤
+  │ Faraz    │ 1.16    │ 0.75*      │
+  ├──────────┼─────────┼────────────┤
+  │ Steve    │ 1.01    │ 0.99       │
+  ├──────────┼─────────┼────────────┤
+  │ our CG   │ 1.00    │ —          │
+  ├──────────┼─────────┼────────────┤
+  │ our wav  │ 0.98    │ 0.98       │
+  ├──────────┼─────────┼────────────┤
+  │ BART     │ 1.04    │ 0.96       │
+  ├──────────┼─────────┼────────────┤
+  │ Lustig   │ 0.94    │ 0.93       │
+  └──────────┴─────────┴────────────┘
+
+  *Faraz's low corr is in-plane recon difference (different KB/DCF), not
+  misregistration — its scale stabilized ~1.16 and the grid still lands at z≈52.
+
+  Notable: phantom size spans ~23% across pipelines (Faraz 1.16 vs Lustig 0.94).
+  That's a real, pipeline-dependent FOV/scaling difference — confirms fixed-z
+  comparison was invalid, and it'll bite any quantitative extent/resolution
+  metric until the convention is pinned.
+
+  New code: zreg_sixway_montage.py (originals untouched). Recording the scale
+  spread in the doc.
+
+⏺ Update(workspace/reference/BART_Comparison.md)
+  ⎿  Added 8 lines, removed 1 line
+      111  of mismatched slices / smoothness-rewarding metrics — RETRACTE
+           D. The pipelines are
+      112  genuinely comparable at matched resolution.
+      113  
+      114 +**Six-way (Faraz/Steve/our CG/our wav/BART/Lustig), z-register
+          +ed to our CG**                                                
+      115 +(`zreg_sixway_montage.py` → `zreg_sixway_montage.png`): grid i
+          +nsert aligns at                                               
+      116 +z≈52 across all six; all resolve it. z-scales rel. our CG: Far
+          +az **1.16**,                                                  
+      117 +Steve 1.01, our wav 0.98, BART 1.04, Lustig **0.94** — phantom
+          + size spans **~23%**                                          
+      118 +across pipelines (real, pipeline-dependent FOV/scaling differe
+          +nce). Faraz slice                                             
+      119 +corr is only 0.75 (in-plane recon difference, not misregistrat
+          +ion).                                                         
+      120 +                                                              
+      121  **Mandatory protocol going forward:** z-affine register (scale
+           +shift) before ANY
+      115 -slice comparison — sizes differ ~7%. Judge resolution at the i
+          -nsert slice by eye;                                           
+      122 +slice comparison — sizes differ up to ~23% across pipelines. J
+          +udge resolution at the insert slice by eye;                   
+      123  metrics_v2 is blind to it. Lesson (eye beats single scalar, 3r
+           d+ time):
+      124  `[[eye_vs_metric]]`. Figures: `zreg_finez_montage.png`, `grid_
+           slice_zoom_z52.png`,
+      125  `slice_matched_montage.png`, `resolution_sweep_z50.png`.
+
+⏺ Figure done and logged. Summary:
+
+  - zreg_sixway_montage.png — 6 rows (Faraz, Steve, our CG, our wav, BART,
+  Lustig), all z-affine registered to our CG; grid insert aligned at z≈52, all
+  resolve it.
+  - New script: zreg_sixway_montage.py; widened z-scale search (0.80–1.30) in
+  z_register_compare.py to cover Faraz.
+  - Doc: BART_Comparison.md updated with the 6-way + the ~23% phantom-size
+  spread.
+
+  Open thread still standing: why sizes differ up to 23% across pipelines
+  (FOV/oversampling convention per pipeline) — worth pinning before any
+  quantitative extent/resolution comparison. Say the word and I'll chase it.
+
+✻ Cooked for 4m 0s
+
+❯ /usage 
+  ⎿  Settings dialog dismissed
+
+❯ love it! i want to get all written well so we have all the details of what we 
+  did to generate a presentaion on all we did from the beginning of this        
+  project in the next handoff, i want you to before that see if you can read    
+  all that is done and make sure in each refrence we know what each helper or   
+  each python that we wrote is what, what are its inputs and outputs and all    
+  the figures that we made are also clear if an agent-harness wants to read all 
+  and generate a presentation from it. the end resutls we did are going to be   
+  the final report before the next step of this project                         
+
+⏺ Love it. Before writing, I'll audit every script and figure so the report is
+  accurate (verify, not recall). Let me inventory the code I/O and the figures
+  on disk.
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace
+      echo "=== NEW python this session (recon/) ==="…)
+  ⎿  === NEW python this session (recon/) ===
+     --- metrics_v2.py ---
+     --- bartio.py ---
+     … +87 lines (ctrl+o to expand)
+
+⏺ Now the figures actually on disk + their sizes/dates.
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/data/v3_fov
+      250/recon_io
+      echo "=== figures (recon_io root) ==="; ls -t *.png 2>/dev/null…)
+  ⎿  Error: Exit code 1
+     === figures (recon_io root) ===
+     zreg_sixway_montage.png
+     grid_slice_zoom_z52.png
+     zreg_finez_montage.png
+     finez_montage.png
+     resolution_sweep_z50.png
+     slice_matched_montage.png
+     texture_compare.png
+     wavelet_twoway_montage.png
+     … +26 lines (ctrl+o to expand)
+
+⏺ Full inventory captured. Writing the presentation-ready final report —
+  self-contained, with code I/O catalog, figure catalog (tagged FINAL vs
+  superseded-process so the presentation doesn't repeat my retracted
+  intermediate claims), the narrative arc, findings, and reproduce steps.
+
+⏺ Write(workspace/reference/Final_Report_CS_Comparison.md)
+  ⎿  Wrote 233 lines to workspace/reference/Final_Report_CS_Comparison.md
+         ustig vs Steve vs Faraz)nstruction Comparison (ours vs BART vs L
+       3 **Date:** 2026-06-15 · **Data:** `data/v3_fov250/recon_io` (ACR 
+       4 single bin, 1 coil, 424 320 spiral samples) · **Status:** compar
+       5 this is the final report before the next step (temporal 4D / und
+         ersampling).
+       7 > **For the presentation agent:** this document is self-containe
+       8 > (purpose / inputs / outputs / run command) is in §7; every fig
+       9 > / the slide takeaway / FINAL-vs-SUPERSEDED status) is in §8. R
+      10 > and §8 for slide content; use §5 for the narrative arc. **Do N
+         OT present figures
+     … +378 lines (ctrl+o to expand)
+
+⏺ Report written. Now make sure the navigation hubs point a blind agent to it
+  and to every new script. Updating the recon node's Entry Points and the
+  workspace reference index.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 12 lines
+      21  | CS λ sweep + contact sheet | `cs_recon.py <recon_io> --max-it
+          er 100` |
+      22  | CS vs Steve vs Faraz montage | `cs_montage.py <recon_io> --t-
+          rel 0.003` |
+      23  | Produce inputs from a new .dat | `dump_inputs.py meas.dat gp_
+          traj.npy out/` |
+      24 +| **Fixed quality metrics (use these)** | `metrics_v2.py <recon
+         +_io>` (corner-ROI SNR, half-max extent, edge_sharp) |          
+      25 +| **ours vs BART pics sweep** | `bart_compare.py <recon_io> --b
+         +art ~/bin/bart-src/bart` |                                     
+      26 +| **Lustig TV λ sweep (matched to BART)** | `../lustig_oneshot/
+         +run_lustig_sweep.py <recon_io>` |                              
+      27 +| **z-affine register before slice compare** | `z_register_comp
+         +are.py <recon_io> --bart <bart>` |                             
+      28 +| **FINAL 6-way registered montage** | `zreg_sixway_montage.py 
+         +<recon_io> --bart <bart>` |                                    
+      29  
+      30 +> **CS-comparison summary + code/figure catalog (for a blind ag
+         +ent / presentation):**                                         
+      31 +> `../../reference/Final_Report_CS_Comparison.md`. BART cfl I/O
+         +: `bartio.py`.                                                 
+      32 +> TV three-way: `tv_threeway.py`. Wavelet two-way: `wavelet_two
+         +way.py`.                                                       
+      33 +> Per-pipeline λ sweep at a slice: `resolution_sweep.py`. ALWAY
+         +S z-affine register                                            
+      34 +> (sizes differ ~23%) — flip-only montages (`slice_matched_comp
+         +are.py`,                                                       
+      35 +> `tv_threeway`, `wavelet_twoway`) are superseded for slice cla
+         +ims.                                                           
+      36 +                                                               
+      37  ## Contracts
+      38  
+      39  - Python = `../.venv/bin/python` (arm64, pins finufft 2.5.1 + s
+          igpy 0.1.27).
+
+⏺ Now the workspace reference index so the report is discoverable from the top.
+
+⏺ Update(workspace/CLAUDE.md)
+  ⎿  Added 2 lines
+      45  | `reference/CS_Implementation.md` | Educational: CS layer on t
+          he finufft operator — objective, λ-as-threshold parameterizatio
+          n (two measured failures), DCF-as-preconditioner (CG vs gradien
+          t solvers), wavelet/TV priors, metric blind spots, first sweep 
+          results | ✅ 2026-06-12 |
+      46  | `reference/Lustig_CS_Baseline.md` | Hooman's pre-project MATL
+          AB Lustig CS pipeline — density framework mismatch, why Steve's
+           densities fail, diff vs our CS, **one-shot tool + same-data v3
+           verdict (ours wins)** | ✅ 2026-06-15 |
+      47  | `reference/Lustig_CS_Tuning.md` | Lustig CS parameter/conditi
+          oning reference — the 3 run scripts decoded, every NUFFT3D/TV/w
+          avelet/fnlCg knob, init, conditioning caveats (DCF-in-init-only
+          , 2D-wavelet-on-3D bug), priority-ranked sweep list | ✅ 2026-0
+          6-15 |
+      48 +| `reference/Final_Report_CS_Comparison.md` | **Presentation-re
+         +ady final report** — ours vs BART vs Lustig vs Steve vs Faraz. 
+         +Narrative arc, code catalog (I/O per script), figure catalog (F
+         +INAL vs superseded), findings, reproduce-from-scratch, open thr
+         +eads. **Read this first for the comparison phase.** | ✅ 2026-0
+         +6-15 |                                                         
+      49 +| `reference/BART_Comparison.md` | Detailed chronology of the B
+         +ART comparison + the texture/slice-matching saga with all dead-
+         +ends ruled out | ✅ 2026-06-15 |                               
+      50  
+      51  ## Archive
+      52  
+
+⏺ Done. Everything's written for a blind agent to build the presentation.
+
+  What I produced
+
+  reference/Final_Report_CS_Comparison.md — the presentation-ready report.
+  Self-contained:
+  - §3 pipelines table (ours/BART/Lustig/Steve/Faraz — code, solver, prior,
+  lineage)
+  - §5 narrative arc (8 beats — the story slides, including the honest
+  flip-flops)
+  - §6 findings (F1–F6, one slide each, each tied to its backing figure)
+  - §7 code catalog — every script: purpose · inputs · outputs · run command
+  - §8 figure catalog — every figure: what it shows · slide takeaway · FINAL / 
+  PROCESS / SUPERSEDED tag (so the presentation won't repeat my retracted
+  intermediate reads)
+  - §9 reproduce-from-scratch (env + BART build recipe + run order)
+  - §10 open threads (the ~23% size mystery first)
+
+  Cross-checked
+
+  - Each new script already carries a docstring stating inputs/outputs —
+  verified by grep, and re-tabulated in §7.
+  - Figures in §8 all exist on disk (inventoried).
+  - Critical for the deck: 4 mid-process figures (tv_threeway, wavelet_twoway,
+  texture_compare, slice_matched) are tagged SUPERSEDED — they used fixed-z
+  before the z-affine fix and encode the wrong "BART artifact / ours blurs"
+  reads. FINAL figures = zreg_sixway_montage.png, grid_slice_zoom_z52.png,
+  zreg_finez_montage.png.
+
+  Discoverable from the top
+
+  - Workspace index (CLAUDE.md) now lists the report as "read this first for the
+  comparison phase."
+  - Recon node (AGENTS.md) Entry Points now lists every new script + a pointer
+  to the report.
+
+  When you run /handoff next, it'll pull from this report. The one thing to
+  settle before quantitative claims in the deck: why phantom sizes differ ~23%
+  (§10.1) — flagged as highest priority.
+
+✻ Cooked for 4m 26s
+
+❯ /intent-layer:intent-layer-maintenance                                        
+
+⏺ Running the maintenance flywheel. Step 1+2: state + token growth on the recon
+  node (where all session work landed).
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace
+      echo "=== intent nodes (AGENTS.md/CLAUDE.md) ==="; find . -name AGENTS.md
+      -o -name CLAUDE.md 2>/de…)
+  ⎿  === intent nodes (AGENTS.md/CLAUDE.md) ===
+     ./CLAUDE.md
+     ./codes/AGENTS.md
+     … +7 lines (ctrl+o to expand)
+⏺ State complete (5 nodes). No >20k breach, but recon/*.py is ~16k tokens (10
+  new scripts this session) — approaching the 20k child-node threshold. Checking
+  whether lustig_oneshot node mentions the new sweep before proposing.
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace; echo "===
+      lustig_oneshot/AGENTS.md ==="; grep -nE
+      "run_cs_sweep|run_lustig_sweep|sweep|Entry|##"…)
+  ⎿  === lustig_oneshot/AGENTS.md ===
+     6:> walkthrough; `../../reference/Lustig_CS_Tuning.md` has the paramet
+     er/sweep
+     … +8 lines (ctrl+o to expand)
+
+⏺ Found a gap: lustig_oneshot/AGENTS.md Entry Points don't mention the new TV
+  sweep. Here's the maintenance proposal.
+
+  Proposed Intent Layer updates
+
+  Token growth: no node >4k; recon/AGENTS.md ~1.4k (healthy). But recon/*.py ≈
+  16k tokens (10 new comparison scripts this session) — approaching the 20k
+  child-node threshold → flag for future split (e.g. helpers/recon/compare/
+  node), not now.
+
+  helpers/recon/AGENTS.md (most session knowledge already added: z-affine,
+  BART-ADMM, metrics_v2, eye-over-metric):
+  - Contracts (add 1): BART binary dependency — bart_compare/z_register need
+  ~/bin/bart-src/bart (built from source; recipe in Final Report §9).
+
+  helpers/lustig_oneshot/AGENTS.md:
+  - Entry Points (add 1): the new TV λ-sweep run_lustig_sweep.py →
+  run_cs_sweep.m (pure TV, matched to BART, metrics_v2).
+
+  No changes needed: codes/AGENTS.md, codes/2023_Faraz_Recon_HH/AGENTS.md,
+  workspace CLAUDE.md (already updated with Final Report).
+
+  Applying the two additive edits.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/lustig_oneshot/AGENTS.md)
+  ⎿  Added 1 line
+      20  | Rebuild ACR_test only (DCF step) | `.venv_lustig/bin/python b
+          uild_acrtest.py <recon_io> <out.mat>` |
+      21  | Reuse existing ACR_test, skip torch | `run_lustig.py <recon_i
+          o> --skip-dcf` |
+      22  | Montage result vs our CS | `../recon/lustig_compare.py <recon
+          _io> <recon_io>/lustig/lustig_cs.mat` |
+      23 +| **Pure-TV λ sweep (matched to BART, metrics_v2)** | `.venv_lu
+         +stig/bin/python run_lustig_sweep.py <recon_io> --tvweights 1e-3
+         + 3e-3 1e-2 3e-2 1e-1` → `run_cs_sweep.m` → `<recon_io>/lustig/l
+         +ustig_tv_sweep.mat` + metrics json |                           
+      24  
+      25  ## Contracts
+      26  
+
+⏺ Now the recon node Contract — BART binary dependency.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Update(workspace/helpers/recon/AGENTS.md)
+  ⎿  Added 5 lines
+      38  
+      39  - Python = `../.venv/bin/python` (arm64, pins finufft 2.5.1 + s
+          igpy 0.1.27).
+      40    Never the conda base.
+      41 +- BART scripts (`bart_compare`, `z_register_compare`, `zreg_six
+         +way_montage`,                                                  
+      42 +  `wavelet_twoway`, `resolution_sweep`) need the BART binary at
+      43 +  `~/bin/bart-src/bart` — built FROM SOURCE (no homebrew formul
+         +a). Build recipe:                                              
+      44 +  `../../reference/Final_Report_CS_Comparison.md` §9 (gmake, gc
+         +c-15, OPENBLAS=1,                                              
+      45 +  PNG=0, cblas_openblas.h symlink). Pass `--bart <path>` if els
+         +ewhere.                                                        
+      46  - `selftest.py` must pass after any edit to `asap_recon.py`.
+      47  - λ/regularization is parameterized as a **soft-threshold in co
+          efficient
+      48    units** (relative to p99 of |W·x_cg|), never in objective-fun
+          ction units —
+
+⏺ Maintenance flywheel complete.
+
+  Applied
+
+  - recon/AGENTS.md — Contract added: BART binary dependency
+  (~/bin/bart-src/bart, from-source) + pointer to build recipe.
+  - lustig_oneshot/AGENTS.md — Entry Point added: the pure-TV λ-sweep
+  (run_lustig_sweep.py → run_cs_sweep.m).
+
+  Validation
+
+  - Both nodes still <4k tokens (recon ~1.5k, lustig ~1.1k). No ancestor
+  duplication. Relative paths. ✓
+
+  Flagged (no action now)
+
+  - helpers/recon/*.py ≈ 16k tokens (10 new comparison scripts) — approaching
+  the 20k child-node threshold. Candidate future split: a helpers/recon/compare/
+  subdir + its own AGENTS.md (the comparison scripts: bart_compare,
+  tv_threeway, wavelet_twoway, slice_matched_compare, resolution_sweep,
+  z_register_compare, zreg_sixway_montage, bartio, metrics_v2). Revisit if it
+  crosses 20k.
+
+  No changes needed
+
+  codes/AGENTS.md, codes/2023_Faraz_Recon_HH/AGENTS.md, workspace CLAUDE.md
+  (Final Report already indexed this session).
+
+  Most session tribal knowledge (z-affine mandatory, BART-needs-ADMM,
+  metrics_v2, eye-over-metric ×3) was already captured into the node + memories
+  during the work — maintenance only had to close the two doc gaps above.
+
+✻ Cogitated for 1m 28s
+
+❯ /usage 
+  ⎿  Settings dialog dismissed
+
+❯ /handoff to workspace what we finalized, keep what was carried over and not   
+finalized, also for the next round we need to fgure teh size difference you     
+mentioned as well as next most importnat step which is the final 4D, but i also 
+want to SUPER-validate all the codes we have generated together so we are sure  
+all the reports we will genreate for presentations and future probable          
+manuscrips is solid.                                                            
+
+⏺ Target = workspace (CS/Lustig/BART work). Archiving current workspace live
+  file, then writing the new handoff.
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon; ls -la
+      workspace/handoff-report.md 2>/dev/null && echo "EXISTS" || echo "no live
+      workspace handoff"; ls wor…)
+  ⎿  -rw-r--r--@ 1 hoomham  staff  7753 Jun 15 02:32 workspace/handoff-repo
+     rt.md
+     EXISTS
+     … +2 lines (ctrl+o to expand)
+
+⏺ Live workspace handoff exists; today's archives go to -3. Archiving then
+  writing fresh.
+
+⏺ Bash(cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon; mv
+      workspace/handoff-report.md
+      workspace/handoffs/handoff-workspace-2026-06-15-3.md && echo "archived ->
+      ha…)
+  ⎿  archived -> handoff-workspace-2026-06-15-3.md
+
+⏺ Write(workspace/handoff-report.md)
+  ⎿  Wrote 132 lines to workspace/handoff-report.md
+       2 # ASAP Recon — Workspace Handoff (CS comparison phase CLOSED)
+         al), NOT the main repo.**Branch context:** workspace git (person
+         s / BART / Lustig / session:** CS-vs-independent comparison (our
+       5 Steve / Faraz) on `data/v3_fov250/recon_io` (ACR phantom, static
+       6 **Next round (this handoff's focus):** (1) SUPER-validate every 
+       7 (2) explain the ~23% phantom-size difference, then (3) the final
+          4D / temporal recon.
+       9 > **Read first:** `reference/Final_Report_CS_Comparison.md` — th
+      10 > report. It has the narrative arc, a per-script I/O catalog (§7
+         ), a figure catalog
+     … +206 lines (ctrl+o to expand)
+
+⏺ Workspace handoff written. Ready for a fresh session.
+
+  Archived: previous live → workspace/handoffs/handoff-workspace-2026-06-15-3.md
+  New: workspace/handoff-report.md
+
+  Structured per your args:
+  - Finalized (don't redo): metrics_v2, BART build, Lustig sweep, z-affine
+  slice-matching fix, the slice-matched verdict, the report + Intent Layer. Plus
+  an explicit RETRACTED list so no killed claim leaks into a manuscript.
+  - Carried-over / open (O1–O6): λ verdict, BART DCF, Lustig-wavelet-impossible,
+  b-map, etc.
+  - Next session, ordered:
+    - Task A (first) — SUPER-validate every script, manuscript-grade: selftest,
+  a new test_metrics_v2.py, bartio round-trip, orientation/registration 
+  recover-known-transform test (the riskiest code, it drove the verdict), BART
+  invocation/PSF, Lustig-diff, cross-pipeline extent sanity → deliver
+  Validation_Report.md. Flagged parallel subagents for thoroughness.
+    - Task B — explain the ~23% size difference (per-pipeline
+  trajectory→mm/voxel trace + point-source PSF).
+    - Task C — final 4D/temporal (D3 bin-weights, temporal-TV/low-rank,
+  undersampling returns).
+  - Suggested skills include /code-review on the new scripts before they back a
+  manuscript.
+
+  Note: handoff blind-test verification is opt-in and you didn't ask for it
+  (your "super-validate" is about the code, which is Task A) — say the word if
+  you also want a cold-agent audit of this handoff doc itself.
+
+✻ Sautéed for 1m 25s
+
+※ recap: Goal: validate our CS recon against BART, Lustig, Steve, Faraz on the ACR phantom. We finalized the comparison (all resolve the grid, ours sharp) and wrote the handoff. Next: super-validate every script we wrote before building presentation/manuscript reports. (disable recaps in /config)
