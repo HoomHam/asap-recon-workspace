@@ -33,8 +33,11 @@ def load_surrogate(dump_dir, which, npts, ntotalilvs):
             raise SystemExit("no ilvvol_pneumo.npy in dump (rerun dump with --pneumotach)")
         return np.load(p)
     if which == "diaphragm":
+        p = os.path.join(dump_dir, "ilvvol_diaphragm.npy")
+        if os.path.exists(p):
+            return np.load(p)
         import surrogates
-        return surrogates.diaphragm_surrogate(dump_dir)
+        return surrogates.diaphragm_surrogate(dump_dir, metric="edge", win_ilv=20, smooth_win=5)
     raise SystemExit(f"unknown surrogate {which!r}")
 
 
