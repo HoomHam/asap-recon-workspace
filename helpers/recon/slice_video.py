@@ -23,10 +23,11 @@ import matplotlib.animation as animation
 SI_AXIS = 2
 
 
-def slice_grid(vol, axis, slices_per_row, rot_k=0):
+def slice_grid(vol, axis, slices_per_row, rot_k=0, fliplr=False):
     """Return a (rows*H, cols*W) grid image from vol (N,N,N), sliced along axis.
 
-    rot_k : np.rot90 k value applied to each slice (1=90°CCW, -1=90°CW, 0=none).
+    rot_k  : np.rot90 k value applied to each slice (1=90°CCW, -1=90°CW, 0=none).
+    fliplr : mirror left-right after rotation.
     """
     n = vol.shape[axis]
     n_rows = int(np.ceil(n / slices_per_row))
@@ -37,6 +38,8 @@ def slice_grid(vol, axis, slices_per_row, rot_k=0):
     for s in range(n):
         r, c = s // slices_per_row, s % slices_per_row
         sl = np.rot90(np.take(vol, s, axis=axis), k=rot_k)
+        if fliplr:
+            sl = np.fliplr(sl)
         grid[r * H:(r + 1) * H, c * W:(c + 1) * W] = sl
     return grid
 
@@ -51,6 +54,8 @@ def main():
                     help="spatial axis to slice along (0/1/2); default=2 (SI)")
     ap.add_argument("--rotate", type=int, default=0,
                     help="rotation degrees per slice: 90 (CCW), -90 (CW), 0, 180")
+    ap.add_argument("--fliplr", action="store_true",
+                    help="mirror left-right after rotation")
     ap.add_argument("--name", type=str, default=None,
                     help="orientation label for filename (e.g. axial, coronal, sagittal)")
     ap.add_argument("--slices-per-row", type=int, default=10)
@@ -78,7 +83,7 @@ def main():
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
     ax.axis("off")
     orientation = args.name or f"axis{args.axis}"
-    frame0 = slice_grid(cine[0], axis=args.axis, slices_per_row=args.slices_per_row, rot_k=rot_k)
+    frame0 = slice_grid(cine[0], axis=args.axis, slices_per_row=args.slices_per_row, rot_k=rot_k, fliplr=args.fliplr)
     im = ax.imshow(frame0, cmap="gray", vmin=0, vmax=vmax, origin="lower", aspect="equal")
     ttl = ax.set_title(
         f"bin 0/{B-1} — {args.surrogate} {orientation} ({args.use})",
@@ -86,7 +91,7 @@ def main():
     fig.tight_layout(pad=0.3)
 
     def update(b):
-        im.set_data(slice_grid(cine[b], axis=args.axis, slices_per_row=args.slices_per_row, rot_k=rot_k))
+        im.set_data(slice_grid(cine[b], axis=args.axis, slices_per_row=args.slices_per_row, rot_k=rot_k, fliplr=args.fliplr))
         ttl.set_text(f"bin {b}/{B-1} — {args.surrogate} {orientation} ({args.use})")
         return [im, ttl]
 
