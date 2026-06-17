@@ -120,19 +120,21 @@ def diaphragm_surrogate(dump_dir, **kw):
 
 
 def diaphragm_curve(dump_dir, win_ilv=20, nav_N=64, method="cg", metric="edge",
-                    prefer="hi", smooth_win=5, cg_iters=20, nav_max_iter=30, verbose=True):
+                    prefer="auto", smooth_win=5, cg_iters=20, nav_max_iter=30, verbose=True):
     """Diaphragm motion curve via per-window navigator recons (CS Use B).
 
     method : 'cg' (default; fast, iterative -- already sharper than Steve's grid)
              'wavelet' (true CS nav; computes a per-window DCF, slower).
-    metric : 'edge' (default; anatomical diaphragm dome = hi half-max boundary)
+    metric : 'edge' (default; half-max lung boundary -- see prefer for which one)
              'centroid' (S-I signal centre-of-mass: mid-lung, robust at low SNR)
-    prefer : 'hi' (default; inferior/dome edge = the real diaphragm, as confirmed
-             visually from the nav_movie cyan-dashed line on 025JC)
-             'lo' (superior/apex edge)
-             'auto' (pick whichever boundary has higher |corr| with signal surrogate --
-             legacy behavior; on 025JC chose lo 0.83 vs hi 0.63, which was wrong
-             anatomically even though it was "cleaner")
+    prefer : 'auto' (default; pick the boundary with higher |corr| to signal surrogate.
+             On 025JC this is the LO/apex edge, corr 0.83 vs hi 0.63. LO tracks
+             breathing cleanly and stays in-FOV. This is the binning surrogate.)
+             'hi'  (inferior/dome edge = anatomical diaphragm dome -- this is what
+             the nav_movie cyan-dashed line displays. Clips out of FOV at deep
+             inspiration on 025JC -> only 40% valid windows, 2x-harmonic period.
+             Good for DISPLAY, not for binning surrogate.)
+             'lo'  (superior/apex edge -- force lo regardless of corr)
     win_ilv : interleaves per nav window. Smaller = more windows/breath (finer
              temporal sampling) but lower nav SNR. 20 -> ~10 windows/breath here.
     smooth_win : savgol window (samples) for the displayed/binning curve. MUST be

@@ -36,9 +36,11 @@ def main():
     ap.add_argument("dump_dir")
     ap.add_argument("--method", choices=["cg", "wavelet"], default="cg")
     ap.add_argument("--metric", choices=["centroid", "edge"], default="edge")
-    ap.add_argument("--prefer", choices=["hi", "lo", "auto"], default="hi",
-                    help="which lung boundary to use: hi=dome (anatomical diaphragm, "
-                         "confirmed on 025JC nav movie), lo=apex, auto=corr-based")
+    ap.add_argument("--prefer", choices=["hi", "lo", "auto"], default="auto",
+                    help="which lung boundary to use as binning surrogate: "
+                         "auto=corr-based (default, lo wins on 025JC, period 3.52s clean); "
+                         "hi=dome (nav_movie display line -- clips FOV at inspiration); "
+                         "lo=apex (force)")
     ap.add_argument("--win-ilv", type=int, default=20)
     ap.add_argument("--smooth-win", type=int, default=5)
     ap.add_argument("--nav-n", type=int, default=64)
