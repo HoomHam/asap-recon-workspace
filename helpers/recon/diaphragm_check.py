@@ -35,7 +35,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dump_dir")
     ap.add_argument("--method", choices=["cg", "wavelet"], default="cg")
-    ap.add_argument("--metric", choices=["centroid", "edge"], default="centroid")
+    ap.add_argument("--metric", choices=["centroid", "edge"], default="edge")
+    ap.add_argument("--prefer", choices=["hi", "lo", "auto"], default="hi",
+                    help="which lung boundary to use: hi=dome (anatomical diaphragm, "
+                         "confirmed on 025JC nav movie), lo=apex, auto=corr-based")
     ap.add_argument("--win-ilv", type=int, default=20)
     ap.add_argument("--smooth-win", type=int, default=5)
     ap.add_argument("--nav-n", type=int, default=64)
@@ -43,7 +46,8 @@ def main():
 
     d = surrogates.diaphragm_curve(args.dump_dir, win_ilv=args.win_ilv,
                                    nav_N=args.nav_n, method=args.method,
-                                   metric=args.metric, smooth_win=args.smooth_win)
+                                   metric=args.metric, prefer=args.prefer,
+                                   smooth_win=args.smooth_win)
     np.save(os.path.join(args.dump_dir, "diaphragm_times.npy"), d["times"])
     np.save(os.path.join(args.dump_dir, "diaphragm_pos_raw.npy"), d["pos_raw"])
     np.save(os.path.join(args.dump_dir, "diaphragm_pos_smooth.npy"), d["pos_smooth"])

@@ -119,16 +119,20 @@ def diaphragm_surrogate(dump_dir, **kw):
     return diaphragm_curve(dump_dir, **kw)["ilvvol"]
 
 
-def diaphragm_curve(dump_dir, win_ilv=20, nav_N=64, method="cg", metric="centroid",
-                    smooth_win=5, cg_iters=20, nav_max_iter=30, verbose=True):
+def diaphragm_curve(dump_dir, win_ilv=20, nav_N=64, method="cg", metric="edge",
+                    prefer="hi", smooth_win=5, cg_iters=20, nav_max_iter=30, verbose=True):
     """Diaphragm motion curve via per-window navigator recons (CS Use B).
 
     method : 'cg' (default; fast, iterative -- already sharper than Steve's grid)
              'wavelet' (true CS nav; computes a per-window DCF, slower).
-    metric : 'edge' (the actual diaphragm: half-max lung boundary that moves most
-             with breathing -- auto-picks the higher-variance side)
-             'centroid' (S-I signal centre-of-mass: sits mid-lung, smooth breathing
-             surrogate but NOT the diaphragm edge -- good for binning, robust at low SNR)
+    metric : 'edge' (default; anatomical diaphragm dome = hi half-max boundary)
+             'centroid' (S-I signal centre-of-mass: mid-lung, robust at low SNR)
+    prefer : 'hi' (default; inferior/dome edge = the real diaphragm, as confirmed
+             visually from the nav_movie cyan-dashed line on 025JC)
+             'lo' (superior/apex edge)
+             'auto' (pick whichever boundary has higher |corr| with signal surrogate --
+             legacy behavior; on 025JC chose lo 0.83 vs hi 0.63, which was wrong
+             anatomically even though it was "cleaner")
     win_ilv : interleaves per nav window. Smaller = more windows/breath (finer
              temporal sampling) but lower nav SNR. 20 -> ~10 windows/breath here.
     smooth_win : savgol window (samples) for the displayed/binning curve. MUST be
@@ -196,29 +200,33 @@ def diaphragm_curve(dump_dir, win_ilv=20, nav_N=64, method="cg", metric="centroi
         pos = cen
     elif metric == "edge_quad":
         pos = cen  # legacy quad fit unused now; centroid fallback
-    else:  # 'edge': pick the half-max boundary that best TRACKS the signal surrogate.
-        # This is the "beautiful" curve condition: the clean, breathing-tracking
-        # boundary wins (on 025JC that is the LO edge, corr 0.83 vs hi 0.63). The HI
-        # edge is anatomically the diaphragm dome but clips out of FOV at inspiration
-        # -> noisy. The nav_movie still DISPLAYS the hi edge as the dome line; this
-        # selection is only for the surrogate CURVE / binning input.
-        sig = None
-        sp_ = os.path.join(dump_dir, "ilvvol_signal.npy")
-        if os.path.exists(sp_):
-            sig = np.interp(times, ilvtime, np.load(sp_))
-        def corr_to_sig(e):
-            if sig is None:
-                return np.nanstd(e)
-            m = np.isfinite(e) & np.isfinite(sig)
-            if m.sum() < 6:
-                return -1.0
-            a, b = e[m] - e[m].mean(), sig[m] - sig[m].mean()
-            return abs(float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-30)))
-        clo, chi = corr_to_sig(elo), corr_to_sig(ehi)
-        pos = elo if clo > chi else ehi
-        if verbose:
-            print(f"edge curve: |corr w/ signal| lo {clo:.2f} vs hi {chi:.2f} -> "
-                  f"using {'lo' if clo > chi else 'hi'} boundary")
+    else:  # 'edge'
+        if prefer == "hi":
+            pos = ehi
+            if verbose:
+                print("edge curve: using hi (inferior/dome) boundary [anatomical diaphragm]")
+        elif prefer == "lo":
+            pos = elo
+            if verbose:
+                print("edge curve: using lo (superior/apex) boundary")
+        else:  # 'auto': legacy corr-based selection
+            sig = None
+            sp_ = os.path.join(dump_dir, "ilvvol_signal.npy")
+            if os.path.exists(sp_):
+                sig = np.interp(times, ilvtime, np.load(sp_))
+            def corr_to_sig(e):
+                if sig is None:
+                    return np.nanstd(e)
+                m = np.isfinite(e) & np.isfinite(sig)
+                if m.sum() < 6:
+                    return -1.0
+                a, b = e[m] - e[m].mean(), sig[m] - sig[m].mean()
+                return abs(float(a @ b / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-30)))
+            clo, chi = corr_to_sig(elo), corr_to_sig(ehi)
+            pos = elo if clo > chi else ehi
+            if verbose:
+                print(f"edge curve: |corr w/ signal| lo {clo:.2f} vs hi {chi:.2f} -> "
+                      f"using {'lo' if clo > chi else 'hi'} boundary")
     ok = np.isfinite(pos)
     times, pos = times[ok], pos[ok]
     if len(pos) < 6:
