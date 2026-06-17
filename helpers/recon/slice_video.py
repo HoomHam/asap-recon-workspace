@@ -50,6 +50,8 @@ def main():
     ap.add_argument("--surrogate", default="diaphragm",
                     choices=["signal", "pneumo", "diaphragm"])
     ap.add_argument("--use", default="joint", choices=["baseline", "joint"])
+    ap.add_argument("--cine-dir", default=None,
+                    help="override cine dir (default: dump_dir/cine_<surrogate>)")
     ap.add_argument("--axis", type=int, default=SI_AXIS,
                     help="spatial axis to slice along (0/1/2); default=2 (SI)")
     ap.add_argument("--rotate", type=int, default=0,
@@ -63,7 +65,7 @@ def main():
     args = ap.parse_args()
     rot_k = {0: 0, 90: 1, -90: -1, 180: 2}.get(args.rotate, 0)
 
-    cine_dir = os.path.join(args.dump_dir, f"cine_{args.surrogate}")
+    cine_dir = args.cine_dir or os.path.join(args.dump_dir, f"cine_{args.surrogate}")
     cine_path = os.path.join(cine_dir, f"cine_{args.use}.npy")
     if not os.path.exists(cine_path):
         raise SystemExit(f"not found: {cine_path}")
