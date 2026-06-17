@@ -23,17 +23,20 @@ import matplotlib.animation as animation
 SI_AXIS = 2
 
 
-def slice_grid(vol, axis, slices_per_row):
-    """Return a (rows*H, cols*W) grid image from vol (N,N,N), sliced along axis."""
+def slice_grid(vol, axis, slices_per_row, rot_k=0):
+    """Return a (rows*H, cols*W) grid image from vol (N,N,N), sliced along axis.
+
+    rot_k : np.rot90 k value applied to each slice (1=90°CCW, -1=90°CW, 0=none).
+    """
     n = vol.shape[axis]
     n_rows = int(np.ceil(n / slices_per_row))
-    # per-slice shape after taking along axis
     other = [vol.shape[a] for a in range(3) if a != axis]
-    H, W = other[0], other[1]
+    sl0 = np.rot90(np.zeros((other[0], other[1])), k=rot_k)
+    H, W = sl0.shape
     grid = np.zeros((n_rows * H, slices_per_row * W))
     for s in range(n):
         r, c = s // slices_per_row, s % slices_per_row
-        sl = np.take(vol, s, axis=axis)   # shape (H, W)
+        sl = np.rot90(np.take(vol, s, axis=axis), k=rot_k)
         grid[r * H:(r + 1) * H, c * W:(c + 1) * W] = sl
     return grid
 
@@ -46,9 +49,14 @@ def main():
     ap.add_argument("--use", default="joint", choices=["baseline", "joint"])
     ap.add_argument("--axis", type=int, default=SI_AXIS,
                     help="spatial axis to slice along (0/1/2); default=2 (SI)")
+    ap.add_argument("--rotate", type=int, default=0,
+                    help="rotation degrees per slice: 90 (CCW), -90 (CW), 0, 180")
+    ap.add_argument("--name", type=str, default=None,
+                    help="orientation label for filename (e.g. axial, coronal, sagittal)")
     ap.add_argument("--slices-per-row", type=int, default=10)
     ap.add_argument("--fps", type=int, default=4)
     args = ap.parse_args()
+    rot_k = {0: 0, 90: 1, -90: -1, 180: 2}.get(args.rotate, 0)
 
     cine_dir = os.path.join(args.dump_dir, f"cine_{args.surrogate}")
     cine_path = os.path.join(cine_dir, f"cine_{args.use}.npy")
@@ -69,21 +77,22 @@ def main():
 
     fig, ax = plt.subplots(figsize=(fig_w, fig_h))
     ax.axis("off")
-    frame0 = slice_grid(cine[0], axis=args.axis, slices_per_row=args.slices_per_row)
+    orientation = args.name or f"axis{args.axis}"
+    frame0 = slice_grid(cine[0], axis=args.axis, slices_per_row=args.slices_per_row, rot_k=rot_k)
     im = ax.imshow(frame0, cmap="gray", vmin=0, vmax=vmax, origin="lower", aspect="equal")
     ttl = ax.set_title(
-        f"bin 0/{B-1} — {args.surrogate} surrogate, axis {args.axis} ({args.use})",
+        f"bin 0/{B-1} — {args.surrogate} {orientation} ({args.use})",
         fontsize=8)
     fig.tight_layout(pad=0.3)
 
     def update(b):
-        im.set_data(slice_grid(cine[b], axis=args.axis, slices_per_row=args.slices_per_row))
-        ttl.set_text(f"bin {b}/{B-1} — {args.surrogate} surrogate, axis {args.axis} ({args.use})")
+        im.set_data(slice_grid(cine[b], axis=args.axis, slices_per_row=args.slices_per_row, rot_k=rot_k))
+        ttl.set_text(f"bin {b}/{B-1} — {args.surrogate} {orientation} ({args.use})")
         return [im, ttl]
 
     ani = animation.FuncAnimation(fig, update, frames=B, blit=False, interval=1000 // args.fps)
 
-    stem = f"all_slices_{args.use}_axis{args.axis}"
+    stem = f"{orientation}_{args.use}"
     mp4 = os.path.join(cine_dir, f"{stem}.mp4")
     ani.save(mp4, writer="ffmpeg", fps=args.fps, dpi=100)
     print(f"wrote {mp4}")
