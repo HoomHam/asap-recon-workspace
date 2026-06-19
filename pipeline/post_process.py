@@ -259,13 +259,9 @@ def make_navigator_video(nav, out_path, duration=120):
         return
     lines = np.asarray(nav.get('nav_diaphragm_z', np.full(imgs.shape[0], np.nan)))
     times = np.asarray(nav.get('nav_time', np.arange(imgs.shape[0])))
-    # The navigator GPDYN is z-flipped vs the final recon (results.py: dyn_usimg_recon
-    # does np.flip(axis=0), dyn_recon does not). Flip the image so the projection
-    # matches the montages/diaphragm.gif (apex up, diaphragm down). The tracked z is
-    # the diaphragm (high-z) edge of the *flipped* image, so after flipping the array
-    # the line is drawn at the same raw z index (no coordinate transform) — that lands
-    # on the inferior lung edge in the displayed frame.
-    imgs = imgs[:, ::-1, :]
+    # nav_coronal is exported already oriented apex-up / diaphragm-down (tyger_recon
+    # flips the navigator GPDYN before the edge-finder), and nav_diaphragm_z is the
+    # diaphragm (high-z) edge in that frame — so no flip or coordinate transform here.
     # fixed contrast across frames (robust percentiles)
     vmin, vmax = np.percentile(imgs, 1), np.percentile(imgs, 99.5)
     frames = []
