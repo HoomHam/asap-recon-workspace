@@ -1,6 +1,6 @@
 job:
   codespec:
-    image: ghcr.io/hoomham/xe-tyger-recon:75c6231c540558e5ad130fa684d75a993643654a
+    image: ghcr.io/hoomham/xe-tyger-recon:726b616edd511cc9d35911228bdcc6c3a2008cff
     buffers:
       inputs: ["input"]
       outputs: ["output"]

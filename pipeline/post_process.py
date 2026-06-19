@@ -8,8 +8,10 @@ Post-process an ASAP output directory after Tyger recon:
       coronal.gif          all lung Y slices, 10-wide montage, 1 frame/bin (rev order)
       sagittal.gif         all lung X slices, 10-wide montage, 1 frame/bin (rot90 ccw)
       diaphragm.gif        coronal mid-slice per bin + estimated diaphragm line
-      resp_traces.png      FID signal + pneumotach + diaphragm pos on one graph
+      navigator.gif        low-res navigator coronal projection + tracked z line
+      resp_traces.png      FID + pneumotach + navigator/image-derived diaphragm
     Slice montages share a fixed color axis (vmin=EE bin, vmax=EI bin).
+    navigator.gif + the navigator traces appear only for DIAPHRAGM-binned recons.
     (gas_montage.png disabled per request)
 
 gas_phase in .mat: shape (nbins, Z, Y, X) → in MATLAB: gas_phase(bin, z, y, x)
@@ -37,18 +39,30 @@ from PIL import Image
 # ---------------------------------------------------------------------------
 # MRD readers
 
+NAV_KEYS = ('nav_coronal', 'nav_diaphragm_z', 'nav_time',
+            'nav_volume', 'nav_ilvtime', 'nav_volmeastime')
+
+
 def read_output_mrd(mrd_path):
+    """Returns (gas, dissolved, nav) where nav is a dict of navigator arrays
+    (empty if the recon was not DIAPHRAGM-binned)."""
     gas = dissolved = None
+    nav = {}
     with mrd.BinaryMrdReader(str(mrd_path)) as reader:
         reader.read_header()
         for item in reader.read_data():
             if isinstance(item, mrd.StreamItem.NdArrayFloat):
                 if item.value.meta.get('gas_phase_image'):
                     gas = item.value.data
+                else:
+                    for k in NAV_KEYS:
+                        if item.value.meta.get(k):
+                            nav[k] = item.value.data
+                            break
             elif isinstance(item, mrd.StreamItem.NdArrayComplexFloat):
                 if item.value.meta.get('dissolved_phase_image'):
                     dissolved = item.value.data
-    return gas, dissolved
+    return gas, dissolved, nav
 
 
 def read_input_mrd(mrd_path):
@@ -235,9 +249,44 @@ def make_diaphragm_gif(gas, diaphragm_pos, out_path, duration=150):
     print(f'[post_process] saved {out_path}')
 
 
+def make_navigator_video(nav, out_path, duration=120):
+    """Video of the low-res navigator coronal projection with the tracked
+    diaphragm line overlaid, one frame per undersampled interleave group.
+    nav['nav_coronal']: (nframes, z, x); nav['nav_diaphragm_z']: (nframes,)."""
+    imgs = np.asarray(nav.get('nav_coronal'))
+    if imgs.ndim != 3 or imgs.shape[0] == 0:
+        print('[post_process] no nav_coronal frames — skipping navigator video')
+        return
+    lines = np.asarray(nav.get('nav_diaphragm_z', np.full(imgs.shape[0], np.nan)))
+    times = np.asarray(nav.get('nav_time', np.arange(imgs.shape[0])))
+    # fixed contrast across frames (robust percentiles)
+    vmin, vmax = np.percentile(imgs, 1), np.percentile(imgs, 99.5)
+    frames = []
+    for i in range(imgs.shape[0]):
+        fig, ax = plt.subplots(figsize=(3.2, 3.2), dpi=110)
+        ax.imshow(imgs[i], cmap='gray', origin='upper', aspect='auto',
+                  vmin=vmin, vmax=vmax)
+        z = lines[i]
+        if np.isfinite(z):
+            ax.axhline(z, color='cyan', linewidth=1.5)
+        t = times[i] if i < len(times) else i
+        ax.set_title(f'navigator {i}  t={t:.2f}s  z={z:.1f}' if np.isfinite(z)
+                     else f'navigator {i}  t={t:.2f}s  (no fit)', fontsize=8)
+        ax.axis('off')
+        frames.append(_fig_to_pil(fig))
+    _save_gif(frames, out_path, duration)
+    print(f'[post_process] saved {out_path}  ({imgs.shape[0]} nav frames)')
+
+
+def _tnorm(t):
+    return (t - t[0]) / (t[-1] - t[0] + 1e-9)
+
+
 def make_resp_traces(diaphragm_pos, fid_signal, pneumo_time, pneumo_vol,
-                     nbins, out_path):
-    """Plot FID signal, pneumotach, and diaphragm position on one figure."""
+                     nbins, out_path, nav=None):
+    """Plot FID signal, pneumotach, and diaphragm position on one figure.
+    If `nav` holds the real navigator waveform, plot that (and the raw tracked
+    measurements); otherwise fall back to the image-derived per-bin estimate."""
     fig, ax = plt.subplots(figsize=(10, 4), dpi=120)
 
     if fid_signal is not None:
@@ -246,16 +295,34 @@ def make_resp_traces(diaphragm_pos, fid_signal, pneumo_time, pneumo_vol,
                 label='FID signal (k=0 envelope)')
 
     if pneumo_vol is not None and pneumo_time is not None:
-        t_norm = (pneumo_time - pneumo_time[0]) / (pneumo_time[-1] - pneumo_time[0] + 1e-9)
-        ax.plot(t_norm, pneumo_vol, color='tomato', lw=0.8, alpha=0.85,
+        ax.plot(_tnorm(pneumo_time), pneumo_vol, color='tomato', lw=0.8, alpha=0.85,
                 label='Pneumotach volume')
 
-    # diaphragm_pos normalized to [0,1] and plotted at bin midpoints
+    nav_vol = None if nav is None else np.asarray(nav.get('nav_volume', []))
+    nav_ilvt = None if nav is None else np.asarray(nav.get('nav_ilvtime', []))
+    nav_z = None if nav is None else np.asarray(nav.get('nav_diaphragm_z', []))
+    nav_t = None if nav is None else np.asarray(nav.get('nav_time', []))
+    have_nav = nav_vol is not None and nav_vol.size and nav_ilvt is not None and nav_ilvt.size
+
+    if have_nav:
+        # navigator respiratory waveform (interpolated, normalized) vs time
+        m = np.isfinite(nav_vol)
+        ax.plot(_tnorm(nav_ilvt)[m], nav_vol[m], color='green', lw=1.3,
+                label='Navigator volume (tracked)')
+        # raw tracked diaphragm-z measurements
+        if nav_z is not None and nav_z.size and nav_t is not None and nav_t.size:
+            zf = np.isfinite(nav_z)
+            if zf.any():
+                z_norm = _norm01(nav_z[zf])
+                ax.scatter(_tnorm(nav_t)[zf], z_norm, color='limegreen', s=12,
+                           zorder=5, alpha=0.7, label='Diaphragm z (navigator meas.)')
+    # image-derived per-bin estimate (faint when navigator present)
+    a = 0.3 if have_nav else 1.0
     diaphragm_norm = _norm01(diaphragm_pos)
     bin_centers = (np.arange(nbins) + 0.5) / nbins
-    ax.scatter(bin_centers, diaphragm_norm, color='cyan', s=50, zorder=5,
+    ax.scatter(bin_centers, diaphragm_norm, color='cyan', s=50, zorder=4, alpha=a,
                label='Diaphragm pos (image-derived, per bin)')
-    ax.step(bin_centers, diaphragm_norm, color='cyan', lw=1.2, alpha=0.6, where='mid')
+    ax.step(bin_centers, diaphragm_norm, color='cyan', lw=1.2, alpha=a * 0.6, where='mid')
 
     ax.set_xlim(0, 1)
     ax.set_ylim(-0.05, 1.05)
@@ -280,10 +347,13 @@ def run(out_dir, input_mrd_path=None):
         sys.exit(f'[post_process] ERROR: {mrd_path} not found')
 
     print(f'[post_process] reading {mrd_path} ...')
-    gas, dissolved = read_output_mrd(mrd_path)
+    gas, dissolved, nav = read_output_mrd(mrd_path)
     if gas is None:
         sys.exit('[post_process] ERROR: no gas_phase_image in output.mrd')
     print(f'[post_process] gas shape {gas.shape} dtype {gas.dtype}')
+    if nav:
+        print(f'[post_process] navigator arrays: '
+              + ', '.join(f'{k}{np.asarray(v).shape}' for k, v in nav.items()))
 
     # signal / pneumotach from input.mrd (if available)
     fid_signal = pneumo_time = pneumo_vol = None
@@ -318,6 +388,8 @@ def run(out_dir, input_mrd_path=None):
     if pneumo_vol is not None:
         mat_vars['pneumo_time'] = pneumo_time.astype(np.float32)
         mat_vars['pneumo_vol']  = pneumo_vol.astype(np.float32)
+    for k, v in (nav or {}).items():     # real navigator arrays, if present
+        mat_vars[k] = np.asarray(v).astype(np.float32)
     mat_path = out_dir / 'recon.mat'
     scipy.io.savemat(str(mat_path), mat_vars)
     print(f'[post_process] saved {mat_path}')
@@ -340,9 +412,14 @@ def run(out_dir, input_mrd_path=None):
     # Diaphragm image GIF (coronal, per bin, with diaphragm line)
     make_diaphragm_gif(gas, diaphragm_pos, fig_dir / 'diaphragm.gif')
 
-    # Respiratory traces graph
+    # Navigator coronal-projection video with the tracked diaphragm line
+    if nav and np.asarray(nav.get('nav_coronal', [])).ndim == 3:
+        make_navigator_video(nav, fig_dir / 'navigator.gif')
+
+    # Respiratory traces graph (uses real navigator waveform when available)
     make_resp_traces(diaphragm_pos, fid_signal, pneumo_time, pneumo_vol,
-                     nbins=gas.shape[0], out_path=fig_dir / 'resp_traces.png')
+                     nbins=gas.shape[0], out_path=fig_dir / 'resp_traces.png',
+                     nav=nav)
 
     print(f'[post_process] DONE -> {fig_dir}')
     return fig_dir
