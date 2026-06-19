@@ -1,6 +1,6 @@
 job:
   codespec:
-    image: ghcr.io/hoomham/xe-tyger-recon:diaphragm-recon
+    image: ghcr.io/hoomham/xe-tyger-recon:75c6231c540558e5ad130fa684d75a993643654a
     buffers:
       inputs: ["input"]
       outputs: ["output"]
