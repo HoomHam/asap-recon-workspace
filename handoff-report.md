@@ -9,6 +9,55 @@
 
 ---
 
+## ⭐ 2026-06-19 — DIAPHRAGM navigator on Tyger (Steve side) + CS follow-ups it raised
+
+This session worked the **root/Tyger** side (Steve's cloud recon) but it touches our
+CS work, so the cross-cutting items are recorded here. Full root detail:
+`../handoff-report.md` (root live handoff, "STATUS UPDATE 2026-06-19").
+
+**What was done (root side, all on fork `HoomHam/asap_recon` branch `diaphragm-recon`):**
+- Ported Steve's DIAPHRAGM navigator into the Tyger entrypoint `tyger_recon.py`,
+  exported the navigator arrays into `output.mrd`/`recon.mat`
+  (`nav_coronal`, `nav_diaphragm_z`, `nav_time`, `nav_volume`, `nav_ilvtime`,
+  `nav_volmeastime`).
+- Fixed a **diaphragm-vs-apex tracking bug**: the navigator GPDYN is z-flipped
+  (`dyn_usimg_recon` does `np.flip(axis=0)`, `dyn_recon` does not); for our
+  Siemens-via-MRD data that put the diaphragm at low z so Steve's edge-finder
+  locked the apex. Flipped the navigator GPDYN z back so it tracks the diaphragm.
+- Reworked `pipeline/post_process.py` figures: per-bin slice **videos**
+  (axial/coronal/sagittal, lung-trimmed, fixed EE→EI color axis), `navigator.gif`
+  (coronal projection + tracker), real-navigator `resp_traces.png`. Latest output:
+  `outputs/25JC/20260619-053136/`. Image: `ghcr.io/hoomham/xe-tyger-recon:db80f16…`.
+
+### ⚠️ NEW CS TODO — apply the (correct-resolution) B0 in CS
+Ties to **O4** below (`calcb`/b-map port). Steve's navigator builds the b-matrix at
+**low res** (`g.MS = g.IS + 4`, MS=104) and recomputes at full res before the binned
+recon; `self.b` carries the **B0/off-resonance + coil-phase** correction. **Check, when
+continuing CS (`helpers/recon/`), whether our CS forward/adjoint applies the correct
+B0** — did we ever use a low-res B0 where full-res was needed, or skip B0 entirely?
+Not yet investigated — this is the first thing to verify in the CS phase.
+
+### 🔬 NEW FUTURE TEST — clean up `resp_traces.png`
+The navigator `resp_traces.png` (see `outputs/25JC/20260619-053136/fig/`) is good but
+needs work next sessions:
+- Green **navigator volume (tracked)** waveform is solid (breath-by-breath, follows
+  FID envelope).
+- But the green **diaphragm-z navigator measurements** scatter is **noisy and
+  spreads out badly in the last ~15%** of the acquisition (signal decay region) — see
+  the wide cloud of points after t≈0.85. Want to filter/reject those, and/or sign-
+  align nav-z with pneumotach volume so up=inspiration consistently.
+- Image-derived per-bin cyan is intentionally faint now; decide if it stays.
+
+### 📓 Instruction docs — pattern to replicate
+Wrote `instructions/Auto_Steve_Recon.md` (build map + call graph + MRD provenance +
+bash run guide + CS-comparison lookup playbook). **We want the same style of
+instruction doc for our other pipelines** — BART comparison, Lustig CS, the 4D/static
+CS — so any agent can locate "what is where / what calls what / where the numbers
+come from" fast. (Recommendation in that doc: curated instruction docs are the
+primary fast-lookup tool; graphify only for broad exploratory cross-repo sweeps.)
+
+---
+
 ## ⭐ 3D+t Dynamic CS — IMPLEMENTATION FINAL
 
 The wavelet_xyz + TV_t pipeline is **locked**. Do not re-architect it without reason.
