@@ -4,11 +4,12 @@ Post-process an ASAP output directory after Tyger recon:
   - saves recon.mat        (gas_phase, dissolved_phase_*, diaphragm_pos)
   - saves signal_pneumo.npz (fid_signal, pneumo_time, pneumo_vol — from input.mrd)
   - creates fig/
-      axial.png            all lung Z slices, mean across bins, 10-wide montage
-      coronal.png          all lung Y slices, mean across bins, 10-wide montage
-      sagittal.png         all lung X slices, mean across bins, 10-wide montage
+      axial.gif            all lung Z slices, 10-wide montage, 1 frame/bin (flipud)
+      coronal.gif          all lung Y slices, 10-wide montage, 1 frame/bin (rev order)
+      sagittal.gif         all lung X slices, 10-wide montage, 1 frame/bin (rot90 ccw)
       diaphragm.gif        coronal mid-slice per bin + estimated diaphragm line
       resp_traces.png      FID signal + pneumotach + diaphragm pos on one graph
+    Slice montages share a fixed color axis (vmin=EE bin, vmax=EI bin).
     (gas_montage.png disabled per request)
 
 gas_phase in .mat: shape (nbins, Z, Y, X) → in MATLAB: gas_phase(bin, z, y, x)
@@ -126,62 +127,94 @@ def _save_gif(frames, out_path, duration=80):
                    loop=0, duration=duration, format='GIF')
 
 
-def make_allslices_montage(gas, axis, out_path, ncols=10, thresh=0.10, pad=2):
-    """Static montage: every lung-bearing slice on `axis`, mean across bins,
-    tiled ncols-wide. Background (slices/FOV with no lung) is trimmed:
-      - drop slices whose mask is empty
-      - crop the in-plane FOV to the lung bounding box (shared across slices)
+def _ee_ei_bins(gas):
+    """End-expiration / end-inspiration bin indices by total gas signal.
+    EI (inspiration) = most HP gas in lung = brightest; EE = dimmest."""
+    bin_sig = gas.reshape(gas.shape[0], -1).sum(axis=1)
+    return int(np.argmin(bin_sig)), int(np.argmax(bin_sig))   # EE, EI
+
+
+def make_allslices_video(gas, axis, out_path, ncols=10, thresh=0.10, pad=2,
+                         duration=200):
+    """Animated montage: every lung-bearing slice on `axis`, tiled ncols-wide,
+    one frame per respiratory bin. Slice set + FOV bbox are fixed across bins
+    (computed from the bin-mean), so the video shows ventilation change at a
+    constant color axis.
+
+    Color axis fixed: vmin from the EE (end-expiration) bin, vmax from the EI
+    (end-inspiration) bin. Last row dropped if it holds < 4 tiles.
+    Orientation: axial flipud, coronal slice-order reversed, sagittal rot90 ccw.
     axis: 1=Z(axial), 2=Y(coronal), 3=X(sagittal). gas: (bins,Z,Y,X).
     """
-    mean_vol = gas.mean(axis=0)                       # (Z, Y, X)
-    gmax = mean_vol.max() + 1e-9
-    mask = mean_vol > thresh * gmax
-
-    # bring slice axis to front: (n_slices, A, B)
+    nbins = gas.shape[0]
     ax0 = axis - 1
-    vol = np.moveaxis(mean_vol, ax0, 0)
-    msk = np.moveaxis(mask, ax0, 0)
+    mean_vol = gas.mean(axis=0)
+    mask = mean_vol > thresh * (mean_vol.max() + 1e-9)
+    msk = np.moveaxis(mask, ax0, 0)                   # (n_slice, A, B)
 
-    # slices that contain lung
     idx = np.where(msk.any(axis=(1, 2)))[0]
     if len(idx) == 0:
-        idx = np.arange(vol.shape[0])
+        idx = np.arange(msk.shape[0])
 
-    # in-plane lung bounding box (union over kept slices), padded
+    # shared in-plane lung bbox (union over kept slices), padded
     plane = msk[idx].any(axis=0)
     rows = np.where(plane.any(axis=1))[0]
     cols = np.where(plane.any(axis=0))[0]
-    r0, r1 = max(rows[0] - pad, 0), min(rows[-1] + pad + 1, vol.shape[1])
-    c0, c1 = max(cols[0] - pad, 0), min(cols[-1] + pad + 1, vol.shape[2])
+    r0, r1 = max(rows[0] - pad, 0), min(rows[-1] + pad + 1, msk.shape[1])
+    c0, c1 = max(cols[0] - pad, 0), min(cols[-1] + pad + 1, msk.shape[2])
 
-    tiles = [_norm01(vol[i, r0:r1, c0:c1]) for i in idx]
-    th, tw = tiles[0].shape
-    n = len(tiles)
+    if axis == 2:                                     # coronal: reverse order
+        idx = idx[::-1]
+
+    # drop the final row if it would hold fewer than 4 tiles
+    rem = len(idx) % ncols
+    if 0 < rem < 4:
+        idx = idx[:len(idx) - rem]
+    n = len(idx)
     nrows = int(np.ceil(n / ncols))
 
-    # tile into a grid, 1-px white gutters between cells
-    g = 1
-    grid = np.zeros((nrows * th + (nrows - 1) * g,
-                     ncols * tw + (ncols - 1) * g), dtype=float)
-    for k, t in enumerate(tiles):
-        rr, cc = divmod(k, ncols)
-        y0 = rr * (th + g)
-        x0 = cc * (tw + g)
-        grid[y0:y0 + th, x0:x0 + tw] = t
+    def orient(t):
+        if axis == 1:
+            return np.flipud(t)
+        if axis == 3:
+            return np.rot90(t, 1)                     # ccw
+        return t
 
+    # fixed color axis from EE / EI bins
+    ee, ei = _ee_ei_bins(gas)
+    vmin = float(gas[ee].min())
+    vmax = float(gas[ei].max())
+
+    th, tw = orient(np.empty((r1 - r0, c1 - c0))).shape
+    g = 1
     axis_labels = {1: ('Axial', 'z'), 2: ('Coronal', 'y'), 3: ('Sagittal', 'x')}
     title, ax_name = axis_labels[axis]
     fig_w = ncols * 0.9
     fig_h = nrows * 0.9 * (th / tw) + 0.4
-    fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=130)
-    ax.imshow(grid, cmap='gray', origin='upper', aspect='equal', vmin=0, vmax=1)
-    ax.set_title(f'{title} — {n} lung slices ({ax_name}={idx[0]}..{idx[-1]}), '
-                 f'{nrows}×{ncols}', fontsize=9)
-    ax.axis('off')
-    fig.tight_layout()
-    fig.savefig(str(out_path), dpi=130, bbox_inches='tight')
-    plt.close(fig)
-    print(f'[post_process] saved {out_path}  ({n} slices, {nrows}x{ncols})')
+
+    frames = []
+    for b in range(nbins):
+        volb = np.moveaxis(gas[b], ax0, 0)
+        grid = np.full((nrows * th + (nrows - 1) * g,
+                        ncols * tw + (ncols - 1) * g), vmin, dtype=float)
+        for k, i in enumerate(idx):
+            t = orient(volb[i, r0:r1, c0:c1])
+            rr, cc = divmod(k, ncols)
+            y0 = rr * (th + g)
+            x0 = cc * (tw + g)
+            grid[y0:y0 + th, x0:x0 + tw] = t
+        fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=110)
+        ax.imshow(grid, cmap='gray', origin='upper', aspect='equal',
+                  vmin=vmin, vmax=vmax)
+        tag = '  [EE]' if b == ee else ('  [EI]' if b == ei else '')
+        ax.set_title(f'{title} — {n} lung slices, {nrows}×{ncols} — bin {b}{tag}',
+                     fontsize=9)
+        ax.axis('off')
+        fig.tight_layout()
+        frames.append(_fig_to_pil(fig))
+    _save_gif(frames, out_path, duration)
+    print(f'[post_process] saved {out_path}  ({n} slices, {nrows}x{ncols}, '
+          f'{nbins} bins, EE={ee} EI={ei}, vmin={vmin:.3g} vmax={vmax:.3g})')
 
 
 def make_diaphragm_gif(gas, diaphragm_pos, out_path, duration=150):
@@ -293,10 +326,10 @@ def run(out_dir, input_mrd_path=None):
     fig_dir = out_dir / 'fig'
     fig_dir.mkdir(exist_ok=True)
 
-    # All-lung-slice montages (mean across bins, background trimmed), 10-wide
-    make_allslices_montage(gas, axis=1, out_path=fig_dir / 'axial.png')
-    make_allslices_montage(gas, axis=2, out_path=fig_dir / 'coronal.png')
-    make_allslices_montage(gas, axis=3, out_path=fig_dir / 'sagittal.png')
+    # All-lung-slice montage videos (one frame per respiratory bin), 10-wide
+    make_allslices_video(gas, axis=1, out_path=fig_dir / 'axial.gif')
+    make_allslices_video(gas, axis=2, out_path=fig_dir / 'coronal.gif')
+    make_allslices_video(gas, axis=3, out_path=fig_dir / 'sagittal.gif')
 
     # Static all-bin gas montage — disabled per request (was gas_montage.png)
     # gp_png = out_dir / 'output_gp.png'
