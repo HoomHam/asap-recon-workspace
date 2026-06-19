@@ -1,0 +1,329 @@
+#!/usr/bin/env python3
+"""
+Post-process an ASAP output directory after Tyger recon:
+  - saves recon.mat        (gas_phase, dissolved_phase_*, diaphragm_pos)
+  - saves signal_pneumo.npz (fid_signal, pneumo_time, pneumo_vol — from input.mrd)
+  - creates fig/
+      axial.png            all lung Z slices, mean across bins, 10-wide montage
+      coronal.png          all lung Y slices, mean across bins, 10-wide montage
+      sagittal.png         all lung X slices, mean across bins, 10-wide montage
+      diaphragm.gif        coronal mid-slice per bin + estimated diaphragm line
+      resp_traces.png      FID signal + pneumotach + diaphragm pos on one graph
+    (gas_montage.png disabled per request)
+
+gas_phase in .mat: shape (nbins, Z, Y, X) → in MATLAB: gas_phase(bin, z, y, x)
+diaphragm_pos: (nbins,) z-index of estimated inferior lung edge per bin.
+
+Usage:
+    python post_process.py <output_dir> [--input-mrd <input.mrd>]
+    python post_process.py <output.mrd> [--input-mrd <input.mrd>]
+"""
+import argparse
+import io
+import shutil
+import sys
+from pathlib import Path
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.io
+import mrd
+from PIL import Image
+
+
+# ---------------------------------------------------------------------------
+# MRD readers
+
+def read_output_mrd(mrd_path):
+    gas = dissolved = None
+    with mrd.BinaryMrdReader(str(mrd_path)) as reader:
+        reader.read_header()
+        for item in reader.read_data():
+            if isinstance(item, mrd.StreamItem.NdArrayFloat):
+                if item.value.meta.get('gas_phase_image'):
+                    gas = item.value.data
+            elif isinstance(item, mrd.StreamItem.NdArrayComplexFloat):
+                if item.value.meta.get('dissolved_phase_image'):
+                    dissolved = item.value.data
+    return gas, dissolved
+
+
+def read_input_mrd(mrd_path):
+    """Extract FID signal and pneumotach from input.mrd.
+    Returns (fid_signal, pneumo_time, pneumo_vol) — any may be None.
+    fid_signal: (N_interleaves,) normalized [0,1]
+    pneumo_time: (M,) seconds
+    pneumo_vol:  (M,) integrated volume, normalized [0,1]
+    """
+    dyn_acq = None
+    pneumo = None
+    with mrd.BinaryMrdReader(str(mrd_path)) as reader:
+        reader.read_header()
+        for item in reader.read_data():
+            if isinstance(item, mrd.StreamItem.NdArrayComplexFloat):
+                if item.value.meta.get('dynamic_acquisition'):
+                    dyn_acq = item.value.data  # (channels, samples, lines)
+            elif isinstance(item, (mrd.StreamItem.NdArrayFloat, mrd.StreamItem.NdArrayDouble)):
+                if item.value.meta.get('pneumotach'):
+                    pneumo = item.value.data   # (2, N): row0=time, row1=pressure
+
+    fid_signal = pneumo_time = pneumo_vol = None
+
+    if dyn_acq is not None:
+        # FID signal = sum of first 8 k-space point magnitudes across channels,
+        # per interleave — matches raw.py:429
+        sig = np.sum(np.abs(dyn_acq[:, :8, :]), axis=(0, 1)).astype(float)
+        mn, mx = sig.min(), sig.max()
+        fid_signal = (sig - mn) / (mx - mn + 1e-9)
+
+    if pneumo is not None:
+        t = pneumo[0].astype(float)
+        P = pneumo[1].astype(float)
+        vol = np.cumsum(P)   # integrate pressure → volume (unnormalized)
+        mn, mx = vol.min(), vol.max()
+        pneumo_vol = (vol - mn) / (mx - mn + 1e-9)
+        pneumo_time = t
+
+    return fid_signal, pneumo_time, pneumo_vol
+
+
+# ---------------------------------------------------------------------------
+# Diaphragm estimator
+
+def estimate_diaphragm_pos(gas):
+    """Inferior-most z with signal > 15 % of max, per bin.
+    gas shape: (nbins, Z, Y, X). Returns (nbins,) float."""
+    nbins = gas.shape[0]
+    pos = np.zeros(nbins)
+    for b in range(nbins):
+        profile = gas[b].mean(axis=(1, 2))   # (Z,)
+        thresh = profile.max() * 0.15
+        above = np.where(profile > thresh)[0]
+        pos[b] = float(above[-1]) if len(above) else gas.shape[1] / 2.0
+    return pos
+
+
+# ---------------------------------------------------------------------------
+# GIF helpers
+
+def _norm01(arr):
+    mn, mx = arr.min(), arr.max()
+    return (arr - mn) / (mx - mn + 1e-9)
+
+
+def _fig_to_pil(fig):
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', bbox_inches='tight', dpi=100)
+    plt.close(fig)
+    buf.seek(0)
+    return Image.open(buf).copy().convert('RGB')
+
+
+def _save_gif(frames, out_path, duration=80):
+    frames[0].save(str(out_path), save_all=True, append_images=frames[1:],
+                   loop=0, duration=duration, format='GIF')
+
+
+def make_allslices_montage(gas, axis, out_path, ncols=10, thresh=0.10, pad=2):
+    """Static montage: every lung-bearing slice on `axis`, mean across bins,
+    tiled ncols-wide. Background (slices/FOV with no lung) is trimmed:
+      - drop slices whose mask is empty
+      - crop the in-plane FOV to the lung bounding box (shared across slices)
+    axis: 1=Z(axial), 2=Y(coronal), 3=X(sagittal). gas: (bins,Z,Y,X).
+    """
+    mean_vol = gas.mean(axis=0)                       # (Z, Y, X)
+    gmax = mean_vol.max() + 1e-9
+    mask = mean_vol > thresh * gmax
+
+    # bring slice axis to front: (n_slices, A, B)
+    ax0 = axis - 1
+    vol = np.moveaxis(mean_vol, ax0, 0)
+    msk = np.moveaxis(mask, ax0, 0)
+
+    # slices that contain lung
+    idx = np.where(msk.any(axis=(1, 2)))[0]
+    if len(idx) == 0:
+        idx = np.arange(vol.shape[0])
+
+    # in-plane lung bounding box (union over kept slices), padded
+    plane = msk[idx].any(axis=0)
+    rows = np.where(plane.any(axis=1))[0]
+    cols = np.where(plane.any(axis=0))[0]
+    r0, r1 = max(rows[0] - pad, 0), min(rows[-1] + pad + 1, vol.shape[1])
+    c0, c1 = max(cols[0] - pad, 0), min(cols[-1] + pad + 1, vol.shape[2])
+
+    tiles = [_norm01(vol[i, r0:r1, c0:c1]) for i in idx]
+    th, tw = tiles[0].shape
+    n = len(tiles)
+    nrows = int(np.ceil(n / ncols))
+
+    # tile into a grid, 1-px white gutters between cells
+    g = 1
+    grid = np.zeros((nrows * th + (nrows - 1) * g,
+                     ncols * tw + (ncols - 1) * g), dtype=float)
+    for k, t in enumerate(tiles):
+        rr, cc = divmod(k, ncols)
+        y0 = rr * (th + g)
+        x0 = cc * (tw + g)
+        grid[y0:y0 + th, x0:x0 + tw] = t
+
+    axis_labels = {1: ('Axial', 'z'), 2: ('Coronal', 'y'), 3: ('Sagittal', 'x')}
+    title, ax_name = axis_labels[axis]
+    fig_w = ncols * 0.9
+    fig_h = nrows * 0.9 * (th / tw) + 0.4
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=130)
+    ax.imshow(grid, cmap='gray', origin='upper', aspect='equal', vmin=0, vmax=1)
+    ax.set_title(f'{title} — {n} lung slices ({ax_name}={idx[0]}..{idx[-1]}), '
+                 f'{nrows}×{ncols}', fontsize=9)
+    ax.axis('off')
+    fig.tight_layout()
+    fig.savefig(str(out_path), dpi=130, bbox_inches='tight')
+    plt.close(fig)
+    print(f'[post_process] saved {out_path}  ({n} slices, {nrows}x{ncols})')
+
+
+def make_diaphragm_gif(gas, diaphragm_pos, out_path, duration=150):
+    """Coronal mid-slice per respiratory bin with estimated diaphragm line."""
+    nbins, nz, ny, nx = gas.shape
+    mid_y = ny // 2
+    vmax = gas.max() + 1e-9
+    frames = []
+    for b in range(nbins):
+        slc = gas[b, :, mid_y, :] / vmax
+        fig, ax = plt.subplots(figsize=(3, 3), dpi=100)
+        ax.imshow(slc, cmap='gray', origin='upper', aspect='equal')
+        ax.axhline(diaphragm_pos[b], color='cyan', linewidth=1.5, linestyle='--')
+        ax.set_title(f'bin {b}  diaphragm z={diaphragm_pos[b]:.0f}', fontsize=8)
+        ax.axis('off')
+        frames.append(_fig_to_pil(fig))
+    _save_gif(frames, out_path, duration)
+    print(f'[post_process] saved {out_path}')
+
+
+def make_resp_traces(diaphragm_pos, fid_signal, pneumo_time, pneumo_vol,
+                     nbins, out_path):
+    """Plot FID signal, pneumotach, and diaphragm position on one figure."""
+    fig, ax = plt.subplots(figsize=(10, 4), dpi=120)
+
+    if fid_signal is not None:
+        x_sig = np.linspace(0, 1, len(fid_signal))
+        ax.plot(x_sig, fid_signal, color='steelblue', lw=0.6, alpha=0.85,
+                label='FID signal (k=0 envelope)')
+
+    if pneumo_vol is not None and pneumo_time is not None:
+        t_norm = (pneumo_time - pneumo_time[0]) / (pneumo_time[-1] - pneumo_time[0] + 1e-9)
+        ax.plot(t_norm, pneumo_vol, color='tomato', lw=0.8, alpha=0.85,
+                label='Pneumotach volume')
+
+    # diaphragm_pos normalized to [0,1] and plotted at bin midpoints
+    diaphragm_norm = _norm01(diaphragm_pos)
+    bin_centers = (np.arange(nbins) + 0.5) / nbins
+    ax.scatter(bin_centers, diaphragm_norm, color='cyan', s=50, zorder=5,
+               label='Diaphragm pos (image-derived, per bin)')
+    ax.step(bin_centers, diaphragm_norm, color='cyan', lw=1.2, alpha=0.6, where='mid')
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(-0.05, 1.05)
+    ax.set_xlabel('Normalized time (acquisition fraction)', fontsize=10)
+    ax.set_ylabel('Normalized value', fontsize=10)
+    ax.set_title('Respiratory Traces', fontsize=11)
+    ax.legend(fontsize=8, loc='upper right')
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(str(out_path), dpi=120)
+    plt.close(fig)
+    print(f'[post_process] saved {out_path}')
+
+
+# ---------------------------------------------------------------------------
+# Main
+
+def run(out_dir, input_mrd_path=None):
+    out_dir = Path(out_dir)
+    mrd_path = out_dir / 'output.mrd'
+    if not mrd_path.is_file():
+        sys.exit(f'[post_process] ERROR: {mrd_path} not found')
+
+    print(f'[post_process] reading {mrd_path} ...')
+    gas, dissolved = read_output_mrd(mrd_path)
+    if gas is None:
+        sys.exit('[post_process] ERROR: no gas_phase_image in output.mrd')
+    print(f'[post_process] gas shape {gas.shape} dtype {gas.dtype}')
+
+    # signal / pneumotach from input.mrd (if available)
+    fid_signal = pneumo_time = pneumo_vol = None
+    npz_path = out_dir / 'signal_pneumo.npz'
+    if npz_path.is_file():
+        d = np.load(npz_path, allow_pickle=True)
+        fid_signal  = d['fid_signal']  if 'fid_signal'  in d else None
+        pneumo_time = d['pneumo_time'] if 'pneumo_time' in d else None
+        pneumo_vol  = d['pneumo_vol']  if 'pneumo_vol'  in d else None
+        print('[post_process] loaded signal_pneumo.npz')
+    elif input_mrd_path and Path(input_mrd_path).is_file():
+        print(f'[post_process] extracting signal/pneumo from {input_mrd_path} ...')
+        fid_signal, pneumo_time, pneumo_vol = read_input_mrd(input_mrd_path)
+        np.savez(str(npz_path),
+                 fid_signal=fid_signal if fid_signal is not None else np.array([]),
+                 pneumo_time=pneumo_time if pneumo_time is not None else np.array([]),
+                 pneumo_vol=pneumo_vol if pneumo_vol is not None else np.array([]))
+        print(f'[post_process] saved {npz_path}')
+    else:
+        print('[post_process] WARNING: no input.mrd — signal/pneumotach unavailable for graph')
+
+    # --- .mat ---------------------------------------------------------------
+    mat_vars = {'gas_phase': gas.astype(np.float32)}
+    if dissolved is not None:
+        mat_vars['dissolved_phase_magnitude'] = np.abs(dissolved).astype(np.float32)
+        mat_vars['dissolved_phase_real'] = dissolved.real.astype(np.float32)
+        mat_vars['dissolved_phase_imag'] = dissolved.imag.astype(np.float32)
+    diaphragm_pos = estimate_diaphragm_pos(gas)
+    mat_vars['diaphragm_pos'] = diaphragm_pos
+    if fid_signal is not None:
+        mat_vars['fid_signal'] = fid_signal.astype(np.float32)
+    if pneumo_vol is not None:
+        mat_vars['pneumo_time'] = pneumo_time.astype(np.float32)
+        mat_vars['pneumo_vol']  = pneumo_vol.astype(np.float32)
+    mat_path = out_dir / 'recon.mat'
+    scipy.io.savemat(str(mat_path), mat_vars)
+    print(f'[post_process] saved {mat_path}')
+
+    # --- fig/ ---------------------------------------------------------------
+    fig_dir = out_dir / 'fig'
+    fig_dir.mkdir(exist_ok=True)
+
+    # All-lung-slice montages (mean across bins, background trimmed), 10-wide
+    make_allslices_montage(gas, axis=1, out_path=fig_dir / 'axial.png')
+    make_allslices_montage(gas, axis=2, out_path=fig_dir / 'coronal.png')
+    make_allslices_montage(gas, axis=3, out_path=fig_dir / 'sagittal.png')
+
+    # Static all-bin gas montage — disabled per request (was gas_montage.png)
+    # gp_png = out_dir / 'output_gp.png'
+    # if gp_png.is_file():
+    #     shutil.copy2(gp_png, fig_dir / 'gas_montage.png')
+    #     print(f'[post_process] copied gas_montage.png to {fig_dir}')
+
+    # Diaphragm image GIF (coronal, per bin, with diaphragm line)
+    make_diaphragm_gif(gas, diaphragm_pos, fig_dir / 'diaphragm.gif')
+
+    # Respiratory traces graph
+    make_resp_traces(diaphragm_pos, fid_signal, pneumo_time, pneumo_vol,
+                     nbins=gas.shape[0], out_path=fig_dir / 'resp_traces.png')
+
+    print(f'[post_process] DONE -> {fig_dir}')
+    return fig_dir
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('output', help='output dir or output.mrd path')
+    ap.add_argument('--input-mrd', default=None, metavar='FILE',
+                    help='input.mrd from runs/ dir (for signal + pneumotach)')
+    args = ap.parse_args()
+    p = Path(args.output)
+    run(p if p.is_dir() else p.parent, input_mrd_path=args.input_mrd)
+
+
+if __name__ == '__main__':
+    main()
