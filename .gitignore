@@ -4,4 +4,8 @@
 *.nii.gz
 data/
 helpers/lustig_oneshot/.venv_lustig/
+**/.venv_lustig/
+**/.venv/
+helpers/_delete/**/__pycache__/
 outputs/archive/
+pipeline/runs/

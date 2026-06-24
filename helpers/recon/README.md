@@ -1,5 +1,10 @@
 # FINUFFT Recon Baseline
 
+> **Restructure 2026-06-24:** the CS operator library moved to `2026_XeCS_Recon`.
+> `asap_recon.py`, `cg_tune.py`, `selftest.py` (+ the CS/4D/comparison code) now live
+> there; the ASAP scripts below import them via the `xecs_recon.pth` in `../.venv`.
+> Originals preserved in `../_delete/`. See `AGENTS.md`.
+
 Own thin pipeline + library NUFFT operator (handoff D1/D3). Native arm64 —
 run with this project's `.venv`. (Historical note: the old Intel anaconda base
 was x86_64 under Rosetta, which is why this venv exists; since 2026-06-11 the
@@ -16,14 +21,28 @@ cd workspace/helpers
 
 ## Files
 
+Stayers (here):
+
 | File | Role |
 |------|------|
-| `asap_recon.py` | Module: `recon(traj, data, sample_weights=None, method='cg'\|'adjoint')`; FINUFFT type1+type2; Steve-grid-units → radians conversion. CG = method of record (iters=20, lam=0 per sweep); DCF variant deleted 2026-06-11 |
-| `cg_tune.py` | λ×iters sweep (2026-06-11). Verdict: Tikhonov λ is a no-op on fully-sampled data; gplb filter accounts for ~2 SNR pts of Steve's lead; the rest is bias–variance (his gridder smooths) → smoothing regularizer (CS layer) is the real knob |
-| `selftest.py` | Synthetic validation: adjointness dot-product test (machine precision), quality ordering adjoint < +DCF < CG. No scanner data needed |
 | `dump_inputs.py` | **No-GPU input production**: runs Steve's own `raw.py`/`traj` loaders on a `.dat` + trajectory `.npy`, writes his exact `trajx/y/z.npy`, `acq.npy`, `bins.npy` + `meta.json`. Needs `pymapvbvd` (installed) |
+| `dump_inputs_dyn.py` | dynamic-recon variant of the input dump |
 | `steve_kernel_numpy.py` | Faithful CPU reimplementation of `cudarecon`/`cudarenorm` (single bin/channel): same filter, box, Gaussian, knorm kluge, F-order reshape, FFT, crop. ~1.6 s / 120k samples on 153³. Validated corr 0.95 vs synthetic truth |
-| `compare_baseline.py` | The arbiter experiment: our recons vs Steve — uses GPU `savedbin0.npy` if present, else computes Steve-equivalent via the numpy kernel. Flip-search alignment, slice figure |
+| `compare_baseline.py` | The arbiter experiment: our recons vs Steve — uses GPU `savedbin0.npy` if present, else computes Steve-equivalent via the numpy kernel. Flip-search alignment, slice figure. Imports `asap_recon` from XeCS |
+| `cs_montage.py` | CS vs Steve vs Faraz montage (cross-repo). Imports `asap_recon`/`cs_recon` from XeCS |
+| `faraz_montage.py`, `faraz_zoom_check.py` | Faraz figure tools + ×1.205 zoom-bug doc |
+| `convert_calib.py` | calibration format converter |
+
+Moved to `2026_XeCS_Recon` (originals in `../_delete/recon/`):
+
+| File | New home |
+|------|----------|
+| `asap_recon.py` | XeCS `recon/` — `recon(traj, data, sample_weights=None, method='cg'\|'adjoint')`; FINUFFT type1+type2; Steve-grid-units → radians. CG = method of record (iters=20, lam=0); DCF variant deleted 2026-06-11 |
+| `cg_tune.py` | XeCS `recon/` — λ×iters sweep + legacy `metrics()` (in `cs_recon` import chain) |
+| `selftest.py`, `selftest_4d.py` | XeCS `recon/` — adjointness + quality-ordering self-tests |
+| `cs_recon.py`, `cs_recon_4d.py`, `binning.py`, `surrogates.py` | XeCS `recon/` |
+| `cine_4d.py`, `export_4d.py`, `slice_video.py`, `nav_movie.py`, `surrogate_compare.py`, `diaphragm_check.py`, `kernel_check.py` | XeCS `pipeline/` |
+| `bart_compare.py`, `bartio.py`, `lustig_compare.py`, `wavelet_twoway.py`, `tv_threeway.py`, `slice_matched_compare.py`, `z_register_compare.py`, `zreg_sixway_montage.py`, `resolution_sweep.py`, `metrics_v2.py` | XeCS `workspace/compare/` |
 
 ## Conventions (read before touching)
 

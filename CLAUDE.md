@@ -15,6 +15,15 @@ Personal working space alongside Steve/Kento's ASAP recon code.
 - Build toward CS (compressed sensing) integration
 - Raw data reconstruction experiments
 
+## Restructure note (2026-06-24)
+The CS work split out into its own repo: **`2026_XeCS_Recon`** (operators in
+`recon/`, 4D pipeline in `pipeline/`, comparison in `workspace/compare/`, Lustig in
+`workspace/lustig/`). This workspace is now the non-CS / Steve-anchored side. The
+ASAP scripts that still need CS operators import them from XeCS via an
+`xecs_recon.pth` in `helpers/.venv`. The old CS originals are preserved (not deleted)
+in `helpers/_delete/` — safe to remove once XeCS is in daily use. CS theory docs are
+mirrored into `2026_XeCS_Recon/workspace/reference/` (XeCS is canonical for CS now).
+
 ## Token Efficiency Rules for Agents
 - Read files on demand — never preload entire codebase
 - Reference `../CLAUDE.md` for project identity and main code map
@@ -27,12 +36,15 @@ Personal working space alongside Steve/Kento's ASAP recon code.
 |--------|---------------|-------------|
 | `handoffs/` | End-of-session state | `ASAP_Handoff_YYYY-MM-DD.md` |
 | `reference/` | Notes on live code, concepts, comparisons | `Domain_Description.md` |
-| `archive/` | Old notes, superseded analysis | `Domain_Description_YYYY-MM.md` |
-| `helpers/` | Hooman's scripts — loaders, plotters, CS tools | subfolder by type |
+| `archive/` | Old notes, superseded analysis (+ `archive/codes/` old code) | `Domain_Description_YYYY-MM.md` |
+| `helpers/` | Hooman's non-CS scripts — Steve loaders, baseline, Faraz figures | subfolder by type |
+| `faraz/` | Faraz's MATLAB fork reference (was `codes/2023_Faraz_Recon_HH/`) | — |
+| `codes/` | `kasap.c` (Kento's C kernel) only — rest archived/moved | — |
 
-`helpers/recon/` has its own node: `helpers/recon/AGENTS.md` (entry points,
-contracts, pitfalls for the FINUFFT/CS pipeline). `helpers/lustig_oneshot/` has
-its own node too: one-command Lustig MATLAB CS on recon_io data (`run_lustig.py`).
+`helpers/recon/` has its own node: `helpers/recon/AGENTS.md` (the ASAP-side stayers —
+Steve data prep, FINUFFT-vs-Steve baseline, Faraz figures, cross-repo CS montage).
+The CS operator library + 4D pipeline + Lustig one-shot moved to `2026_XeCS_Recon`
+(see `2026_XeCS_Recon/recon/AGENTS.md`, `workspace/compare/AGENTS.md`).
 
 ## Active Reference Docs
 
