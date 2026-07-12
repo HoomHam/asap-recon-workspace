@@ -1,8 +1,13 @@
 # Workspace — ASAP Recon (Hooman's)
 
-> Project nature: benign MRI recon **code comparison** (phantom data, signal
-> processing). Hooman's model preference for this project: **Fable 5**.
-> See root `CLAUDE.md` → Session Notes.
+**Canon** (adopted 2026-07-12): ledger/facts/cards/tree in `canon/` — end sessions
+with `/leave`. Cross-project retractions: `~/Hooman/Work/BELIEFS.md`.
+(Root `CLAUDE.md` is Kento-repo-tracked — canon note lives here, not there.)
+
+> Project nature: benign MRI recon **code comparison + dynamic recon** (phantom data:
+> ACR phantom, piston-cylinder with HP gas). No PHI. Current focus: dynamic imaging
+> of piston cylinder filled/evacuated with hyperpolarized gas. Hooman's model
+> preference: **Fable 5**. See root `CLAUDE.md` → Session Notes.
 
 ## Git: ALLOWED HERE
 Commit, push, pull freely. This `.git` is independent of the main repo.
@@ -34,7 +39,7 @@ mirrored into `2026_XeCS_Recon/workspace/reference/` (XeCS is canonical for CS n
 
 | Folder | What goes here | File naming |
 |--------|---------------|-------------|
-| `handoffs/` | End-of-session state | `ASAP_Handoff_YYYY-MM-DD.md` |
+| `handoffs/` | End-of-session state | `handoff-YYYY-MM-DD[-N].md` (workspace) / root kept as `handoff-2026-*.md` |
 | `reference/` | Notes on live code, concepts, comparisons | `Domain_Description.md` |
 | `archive/` | Old notes, superseded analysis (+ `archive/codes/` old code) | `Domain_Description_YYYY-MM.md` |
 | `helpers/` | Hooman's non-CS scripts — Steve loaders, baseline, Faraz figures | subfolder by type |
