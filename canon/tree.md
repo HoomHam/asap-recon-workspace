@@ -19,10 +19,12 @@ flowchart TD
   B7["● auto-Steve pipeline (06-18)<br/>asap_run.py 6-stage orchestrator"]
   B8["✅ DIAPHRAGM navigator on Tyger (06-19→24)<br/>fork branch diaphragm-recon · apex→diaphragm fix"]
   B9["✅ ASAP→XeCS restructure (06-24)<br/>CS ops via xecs_recon.pth · originals in _delete/"]
-  B10["★ batch cohort recon (Jul 2026)<br/>84/144 done · pipeline DOWN (F1) · Bug A/B fixes"]
+  B10["● batch cohort recon (Jul 2026)<br/>84/144 done · pipeline DOWN (F1) · Bug A/B fixes"]
+  B11["★ diaphragm-binning study (07-17)<br/>bin() = amplitude rank (F38) · nav window MEASURED 26 (F37)<br/>bin_time recipe parked · tyger nav 26-guard added (local)"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
+  B8 --> B11
   B9 -.xecs_recon.pth.-> B10
 ```
 

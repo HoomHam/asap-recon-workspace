@@ -1,0 +1,19 @@
+{"t":"2026-07-12T20:10:33","ev":"ran","cmd":"SP=/private/tmp/claude-501/-Users-hoomham-Hooman-System/bf5c14ae-265c-4fbe-83ce-b499c9fc05dd/scratchpad; python3 $SP/scan_work.py \"/Users/hoomham/Hooman/Action\" laptop_action $SP"}
+{"t":"2026-07-12T20:10:35","ev":"ran","cmd":"SP=/private/tmp/claude-501/-Users-hoomham-Hooman-System/bf5c14ae-265c-4fbe-83ce-b499c9fc05dd/scratchpad; python3 $SP/scan_work.py \"/Volumes/HooMain/LeBigMac HD2/Action\" hoomain_hd2_action $SP"}
+{"t":"2026-07-12T20:10:37","ev":"ran","cmd":"SP=/private/tmp/claude-501/-Users-hoomham-Hooman-System/bf5c14ae-265c-4fbe-83ce-b499c9fc05dd/scratchpad; python3 $SP/scan_work.py \"/Volumes/HoomHam/Action\" hoomham_action $SP"}
+{"t":"2026-07-12T20:10:38","ev":"ran","cmd":"SP=/private/tmp/claude-501/-Users-hoomham-Hooman-System/bf5c14ae-265c-4fbe-83ce-b499c9fc05dd/scratchpad; python3 $SP/scan_work.py \"/Volumes/HoomHamExt/Action\" hoomhamext_action $SP"}
+{"t":"2026-07-17T16:26:21","ev":"created","file":"/private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bin_demo.py"}
+{"t":"2026-07-17T16:26:27","ev":"ran","cmd":"cd /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad && python3 diaphragm_bin_demo.py"}
+{"t":"2026-07-17T16:46:29","ev":"created","file":"/private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:46:37","ev":"ran","cmd":"cd /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad && python3 diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:47:15","ev":"edited","file":"/private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:47:24","ev":"edited","file":"/private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:47:29","ev":"edited","file":"/private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:47:35","ev":"ran","cmd":"cd /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad && python3 diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:47:49","ev":"edited","file":"/private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T16:47:58","ev":"ran","cmd":"cd /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad && python3 diaphragm_bintime_demo.py && show /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/711aa7bc-b6e1-4da5-8221-0a34ede74953/scratchpad/diaphragm_bintime.png 2>/dev/null"}
+{"t":"2026-07-17T17:02:52","ev":"edited","file":"workspace/helpers/recon/diaphragm_bin_demo.py"}
+{"t":"2026-07-17T17:02:57","ev":"edited","file":"workspace/helpers/recon/diaphragm_bintime_demo.py"}
+{"t":"2026-07-17T17:03:20","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon && python3 diaphragm_bin_demo.py && python3 diaphragm_bintime_demo.py && echo \"---\" && ls -la ../../outputs/diaphragm_binning/"}
+{"t":"2026-07-17T23:08:06","ev":"edited","file":"tyger_recon.py"}
+{"t":"2026-07-17T23:08:22","ev":"edited","file":"tyger_recon.py"}

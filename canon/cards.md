@@ -13,7 +13,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C4 | results.py (root) | stem | WORKS |
 | C5 | gtypes.py (root) | stem | WORKS |
 | C6 | convert_siemens_to_mrd.py (root) | tyger | WORKS (F16 caveat) |
-| C7 | tyger_recon.py (root) | diaphragm | WORKS (fork image, cloud GPU only) |
+| C7 | tyger_recon.py (root) | diaphragm | WORKS (fork image, cloud GPU only) · +nav 26-guard (F37, local) |
 | C8 | pipeline/batch_recon.py | batch | WORKS, blocked by F1 |
 | C9 | pipeline/dyn_recon.py | batch | WORKS, blocked by F1 |
 | C10 | pipeline/asap_run.py | auto-steve | WORKS |
@@ -30,6 +30,8 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C21 | helpers/recon/convert_calib.py | arbiter | WORKS |
 | C22 | helpers/recon/faraz_montage.py + faraz_zoom_check.py | faraz | WORKS |
 | C23 | helpers/recon/cs_montage.py | xecs-bridge | WORKS (coupled to XeCS sweep json) |
+| C24 | helpers/recon/diaphragm_bin_demo.py | diaphragm-binning | WORKS (synthetic demo) |
+| C25 | helpers/recon/diaphragm_bintime_demo.py | diaphragm-binning | WORKS (synthetic demo) |
 
 ## Cards
 
@@ -163,3 +165,21 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 `read_mapvbvd.py` (root, standalone loader, UNKNOWN) · `workspace/codes/kasap.c` (Kento reference, F20) · `asap/asap.c` (Steve reference, F20) · `helpers/_delete/` (byte-verified CS originals, moved to XeCS 2026-06-24) · `helpers/calib/` (duplicate .npy pair) · `pipeline/runs/`, `batch_recon.log`, `__pycache__/`.
 
 Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/recon — STALE, they moved to 2026_XeCS_Recon in the 2026-06-24 decouple.
+
+### C24 · helpers/recon/diaphragm_bin_demo.py
+- why: reproduce Steve's `raw.py:153 bin()` verbatim on a synthetic navigator curve; 4-panel
+  figure showing amplitude-rank → representative breath/stroke cycle (limb split, fold, equal-count)
+- origin: A · branch: diaphragm-binning · facts: F37, F38
+- in: none (self-contained synthetic navigator)
+- out: workspace/outputs/diaphragm_binning/diaphragm_binning.png (A: z(t) colored by slope;
+  B: the fold; C: representative cycle bin-vs-amplitude; D: equal-count + breath pooling)
+- see: bin_time_PLAN.md (same dir)
+
+### C25 · helpers/recon/diaphragm_bintime_demo.py
+- why: derive the REAL per-bin time vector for the position-rank 4D stack — EE-detect →
+  within-cycle τ → soft-weighted CIRCULAR mean per bin (matches recon.py gridder weights)
+- origin: A · branch: diaphragm-binning · facts: F37, F38
+- in: none (synthetic; swap real nav_volume/ilvtime to use)
+- out: workspace/outputs/diaphragm_binning/diaphragm_bintime.png (C: bin→time monotonic but
+  non-uniform; D: real time gaps vs uniform — clusters at turns). Console prints per-bin phase+sec.
+- note: plan + recipe in workspace/helpers/recon/bin_time_PLAN.md; bin_time.py NOT yet built
