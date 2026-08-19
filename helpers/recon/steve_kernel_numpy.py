@@ -25,11 +25,16 @@ KNORM_FLOOR = 1e-5
 
 
 def steve_recon(traj_grid, data, npts, MS=240, IS=100, smoothing=0.0,
-                axes="steve"):
+                axes="steve", sample_weight=None):
     """traj_grid: (Nuniq,3) grid units. data: (M,) complex. npts: samples per
     interleave (for the readout filter). smoothing: Steve's gplb (0 = off).
     axes='steve' returns his (z,y,x) layout (comparable to savedbin*.npy);
-    axes='xyz' transposes to match asap_recon/finufft images."""
+    axes='xyz' transposes to match asap_recon/finufft images.
+    sample_weight: optional (M,) float multiplying BOTH k and knorm
+    accumulations per sample — replicates cudarecon's soft-bin binwt
+    (recon.py:104-110: binwt = exp(-bindist^2/bindist0sq), applied inside
+    thiswt so it hits k_acc and knorm alike). weight 0 = sample skipped,
+    matching the kernel's binctr<0 `continue`. Default None = old behavior."""
     data = np.asarray(data, dtype=np.complex128)
     M = len(data)
     idx = np.arange(M)
@@ -39,6 +44,9 @@ def steve_recon(traj_grid, data, npts, MS=240, IS=100, smoothing=0.0,
         rawval = rawval * np.exp(-(((idx % npts) / smoothing) ** 2))
 
     keep = np.abs(rawval) >= EPS
+    if sample_weight is not None:
+        keep &= np.asarray(sample_weight) > 0
+        sw = np.asarray(sample_weight, dtype=np.float64)[keep]
     rawval = rawval[keep]
     kidx = idx[keep] % traj_grid.shape[0]
     kx, ky, kz = (traj_grid[kidx, i] for i in range(3))
@@ -66,6 +74,8 @@ def steve_recon(traj_grid, data, npts, MS=240, IS=100, smoothing=0.0,
                     continue
                 dsq = (kx[v] - ix[v]) ** 2 + (ky[v] - iy[v]) ** 2 + (kz[v] - iz[v]) ** 2
                 wt = np.exp(-dsq / KDIST0SQ)
+                if sample_weight is not None:
+                    wt = wt * sw[v]
                 flat = ix[v] * MS2 + iy[v] * MS + iz[v]
                 k_acc += np.bincount(flat, weights=wt * rawval[v].real, minlength=MS ** 3) \
                     + 1j * np.bincount(flat, weights=wt * rawval[v].imag, minlength=MS ** 3)
