@@ -46,3 +46,29 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
 - DECIDED: root tyger_recon.py change stays local; Hooman commits/pushes the fork himself.
 - BRANCH: diaphragm-binning, parent: B8 (DIAPHRAGM navigator). Investigation of the binning
   algorithm + nav window + 4D time vector. Parked (bin_time.py unbuilt).
+
+## 2026-08-27 · session 3
+
+- Confirmed the batch recon cohort on Ext: 84 session folders in
+  /Volumes/HoomHamExt/AIkill_Dynamic (renamed from Dynamic), all with complete s+d Tyger
+  outputs; 78/84 also have p (5 subjects missing proton entirely); 3 sessions' d skipped
+  dissolved (RBC/TP params absent: 2024-01-18_001JM, 01-22_007RA, 01-31_008CR).
+- Built helpers/atlas/dis_atlas.py (C26): per-subject QC atlas — 60 IDs, dates sorted;
+  per ID a gp panel page + dp panel page (orientation-major blocks, per date one 10-slice
+  row) then per date 6 full all-slice pages (cor/sag/ax × gp/dp); one mp4 per ID×kind
+  cycling the 16 bins ×5. Iterated 4 layout rounds with Hooman on 043AS sample.
+- Cross-date column alignment solved deterministically (no registration): per-session
+  slice picking at shared apex→base fractions of each session's OWN gas extent + fixed-size
+  in-plane crop centered on each session's lung bbox. Verified visually (heart notch /
+  mediastinum land in same column across 4 repeats of 043AS).
+- Slice extent from GAS mask only (≥30 voxels above 0.15·max of bin-mean) — dp too noisy
+  to self-select; extent genuinely reaches Z=99 (basal signal), not artifact.
+- Output: workspace/outputs/aikill_atlas/dissolved_atlas.pdf (614 pages, 188 MB, NOT in
+  git) + 119 videos (1.0 GB) moved to /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/
+  aikill_atlas/videos/ per big-output law, symlinked back at outputs/aikill_atlas/videos.
+
+- DECIDED: atlas slice/crop selection always derives from gas_phase, never dp.
+- DECIDED: sessions whose d lacks dissolved fall back to s-folder gas; dp rows/pages skipped.
+- DECIDED: atlas videos live on Ext (regenerable — acceptable single-copy risk).
+- BRANCH: aikill-atlas, parent: B10 (batch cohort). Cohort QC visualization. Delivered;
+  open for per-ID audit findings.

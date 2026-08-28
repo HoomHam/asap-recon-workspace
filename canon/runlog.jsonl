@@ -17,3 +17,23 @@
 {"t":"2026-07-17T17:03:20","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/recon && python3 diaphragm_bin_demo.py && python3 diaphragm_bintime_demo.py && echo \"---\" && ls -la ../../outputs/diaphragm_binning/"}
 {"t":"2026-07-17T23:08:06","ev":"edited","file":"tyger_recon.py"}
 {"t":"2026-07-17T23:08:22","ev":"edited","file":"tyger_recon.py"}
+{"t":"2026-07-20T13:37:41","ev":"ran","cmd":"python3 ~/Hooman/System/scripts/archive_path.py 2>/dev/null; echo \"---HoomHam human root---\"; ls -d /Volumes/HoomHam/Images/human 2>/dev/null && echo MOUNTED || echo \"NOT MOUNTED\""}
+{"t":"2026-08-27T18:05:15","ev":"created","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:06:31","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:06:33","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:06:53","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && rm -f ../../outputs/aikill_atlas/smoke.pdf ../../outputs/aikill_atlas/smokepg*.png ../../outputs/aikill_atlas/zcheck.png ../../outputs/aikill_atlas/videos/030DN.mp4 && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py"}
+{"t":"2026-08-27T18:09:09","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:09:21","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py --only 043AS"}
+{"t":"2026-08-27T18:20:36","ev":"created","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:20:57","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py --only 043AS && cd ../../outputs/aikill_atlas && rm -f aud-*.png && pdftoppm -png -r 60 -f 1 -l 3 sample_043AS.pdf aud && pdfinfo sample_043AS.pdf | grep Pages"}
+{"t":"2026-08-27T18:30:08","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:30:10","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:30:13","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:30:15","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:30:16","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:30:20","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:30:42","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py --only 043AS && cd ../../outputs/aikill_atlas && rm -f aud-*.png videos/043AS.mp4 && pdftoppm -png -r 50 -f 1 -l 2 sample_043AS.pdf aud && pdfinfo sample_043AS.pdf | grep Pages"}
+{"t":"2026-08-27T18:36:12","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:36:19","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
+{"t":"2026-08-27T18:36:38","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py --only 043AS && cd ../../outputs/aikill_atlas && rm -f aud-*.png && pdftoppm -png -r 60 -f 1 -l 2 sample_043AS.pdf aud"}
+{"t":"2026-08-27T18:37:04","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py"}

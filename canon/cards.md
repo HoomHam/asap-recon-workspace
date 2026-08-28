@@ -32,6 +32,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C23 | helpers/recon/cs_montage.py | xecs-bridge | WORKS (coupled to XeCS sweep json) |
 | C24 | helpers/recon/diaphragm_bin_demo.py | diaphragm-binning | WORKS (synthetic demo) |
 | C25 | helpers/recon/diaphragm_bintime_demo.py | diaphragm-binning | WORKS (synthetic demo) |
+| C26 | helpers/atlas/dis_atlas.py | aikill-atlas | WORKS (atlas delivered 2026-08-27) |
 
 ## Cards
 
@@ -183,3 +184,18 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - out: workspace/outputs/diaphragm_binning/diaphragm_bintime.png (C: bin→time monotonic but
   non-uniform; D: real time gaps vs uniform — clusters at turns). Console prints per-bin phase+sec.
 - note: plan + recipe in workspace/helpers/recon/bin_time_PLAN.md; bin_time.py NOT yet built
+
+### C26 · helpers/atlas/dis_atlas.py
+- why: subject-level QC atlas of the AIkill_Dynamic batch recons — group 84 sessions by
+  subject ID (dates sorted), gas (gp) + dissolved (dp) at the highest gas-signal bin
+- origin: H · branch: main · facts: —
+- in: /Volumes/HoomHamExt/AIkill_Dynamic/*/d/recon.mat (gas_phase +
+  dissolved_phase_magnitude, (16,Z,Y,X)); s/recon.mat gas fallback for the 3 sessions
+  whose d skipped dissolved (2024-01-18_001JM, 01-22_007RA, 01-31_008CR)
+- out: workspace/outputs/aikill_atlas/dissolved_atlas.pdf (per ID: gp panel page + dp panel
+  page [orientation-major blocks cor/sag/ax, per date one 10-slice row], then per date 6
+  full all-slice pages cor/sag/ax × gp/dp) + videos/<ID>_{gp,dp}.mp4 (16 bins ×5, 5 fps)
+- note: orientation follows pipeline/post_process.py (axial flipud, coronal reversed,
+  sagittal rot90 ccw); slice extent from GAS mask (≥30 voxels above 0.15·max, bin-mean);
+  cross-date column alignment = per-session slices at shared apex→base fractions + fixed-size
+  crop centered on each session's lung bbox (shift+scale, no registration); black bg, no gaps
