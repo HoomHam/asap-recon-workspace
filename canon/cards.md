@@ -15,11 +15,11 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C6 | convert_siemens_to_mrd.py (root) | tyger | WORKS (F16 caveat) |
 | C7 | tyger_recon.py (root) | diaphragm | WORKS (fork image, cloud GPU only) · +nav 26-guard (F37, local) |
 | C8 | pipeline/batch_recon.py | batch | WORKS, blocked by F1 |
-| C9 | pipeline/dyn_recon.py | batch | WORKS, blocked by F1 |
+| C9 | pipeline/dyn_recon.py | batch | WORKS for nch=1 on db80f16 (F41); submit() download fragile (F40) — switch to buffer read -p 4 |
 | C10 | pipeline/asap_run.py | auto-steve | WORKS |
 | C11 | pipeline/post_process.py | auto-steve | WORKS |
 | C12 | pipeline/param_gui.py | auto-steve | WORKS |
-| C13 | pipeline/recon_codespec.yml | tyger | CONFIG (sha bump pending, F1) |
+| C13 | pipeline/recon_codespec.yml | tyger | CONFIG (points at broken d136eb1; use db80f16 for nch=1 — F1 F41) |
 | C14 | helpers/build_status_tab.py | batch | WORKS |
 | C15 | helpers/probe_nch.py | batch | WORKS (nch=8 only, F8) |
 | C16 | helpers/check_frbc.py | batch | WORKS (F8 caveat) |
@@ -33,6 +33,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C24 | helpers/recon/diaphragm_bin_demo.py | diaphragm-binning | WORKS (synthetic demo) |
 | C25 | helpers/recon/diaphragm_bintime_demo.py | diaphragm-binning | WORKS (synthetic demo) |
 | C26 | helpers/atlas/dis_atlas.py | aikill-atlas | WORKS (atlas delivered 2026-08-27) |
+| C27 | helpers/rt_prepost_fig.py | main | WORKS (RT pre/post figs 2026-08-31) |
 
 ## Cards
 
@@ -199,3 +200,17 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   sagittal rot90 ccw); slice extent from GAS mask (≥30 voxels above 0.15·max, bin-mean);
   cross-date column alignment = per-session slices at shared apex→base fractions + fixed-size
   crop centered on each session's lung bbox (shift+scale, no registration); black bg, no gaps
+
+### C27 · helpers/rt_prepost_fig.py
+- why: RT-study figure — per subject, 10 coronal lung slices per visit, pre-RT row over
+  post-RT row, for the 9 RT subjects in SNR_Table_All (Hooman ask 2026-08-31)
+- origin: H · branch: main · facts: —
+- in: /Volumes/HoomHamExt/AIkill_Dynamic/<date>_<id>/s/recon.mat (gas_phase (16,Z,Y,X));
+  visit list + SNR hardcoded from workspace/data/SNR_Table_All.xlsx Study=RT rows
+- out: workspace/outputs/rt_prepost/rt_<ID>.png (per subject), rt_all_pairs.png
+  (002ZS/003PM/004DS stacked), rt_all_singles.png (001BB/005JJ/006MM/008TP/009ML)
+- note: EI bin (brightest = end-inspiration), per-visit norm to 99.5 pct of lung voxels,
+  slice picks = 10 even fractions over lung Y-extent trimmed 8% each end, union Z-X crop
+  across a subject's visits; coronal orientation matches post_process.py. Excluded: 007IT
+  (container curve_fit fail, no recon), 001BB pre 2023-03-27 (not on drive; its post
+  folder is named 002BB — ID mismatch vs Excel 001BB)

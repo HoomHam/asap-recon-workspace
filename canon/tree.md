@@ -21,12 +21,14 @@ flowchart TD
   B9["✅ ASAP→XeCS restructure (06-24)<br/>CS ops via xecs_recon.pth · originals in _delete/"]
   B10["● batch cohort recon (Jul 2026)<br/>84/144 done · pipeline DOWN (F1) · Bug A/B fixes"]
   B11["● diaphragm-binning study (07-17)<br/>bin() = amplitude rank (F38) · nav window MEASURED 26 (F37)<br/>bin_time recipe parked · tyger nav 26-guard added (local)"]
-  B12["★ aikill-atlas cohort QC (08-27)<br/>dis_atlas.py · 60 IDs / 84 sessions · 614-pg PDF + 119 mp4<br/>gas-picked slices · fraction-aligned columns"]
+  B12["✅ aikill-atlas cohort QC (08-27)<br/>dis_atlas.py · 60 IDs / 84 sessions · 614-pg PDF + 119 mp4<br/>gas-picked slices · fraction-aligned columns"]
+  B13["★ tyger-access-check (09-03)<br/>cert renewed → 2028-08 (F39) · 005JJ run 558 on db80f16 (F41)<br/>download recipe buffer read -p 4 (F40)"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
   B8 --> B11
   B10 --> B12
+  B6 --> B13
   B9 -.xecs_recon.pth.-> B10
 ```
 
@@ -40,12 +42,13 @@ flowchart TD
 | B7 auto-steve | C10 asap_run.py, C11 post_process.py, C12 param_gui.py |
 | B8 diaphragm | C7 tyger_recon.py, fork branch `diaphragm-recon` (F30) |
 | B10 batch | C8 batch_recon.py, C9 dyn_recon.py, C14–C17 helpers, SNR_Table_All.xlsx Recon Status tab (F1 F4–F16) |
-| B12 aikill-atlas ★ | C26 dis_atlas.py, outputs/aikill_atlas/dissolved_atlas.pdf (614 pg), Ext videos/ (119 mp4) |
+| B12 aikill-atlas | C26 dis_atlas.py, outputs/aikill_atlas/dissolved_atlas.pdf (614 pg), Ext videos/ (119 mp4) |
 
-## Current position (★ B12, 2026-08-27)
+| B13 tyger-access ★ | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558 output.mrd + montages), memory tyger_setup.md |
 
-Cohort QC atlas delivered: 60 IDs / 84 sessions from /Volumes/HoomHamExt/AIkill_Dynamic
-(renamed from Dynamic) → dissolved_atlas.pdf (614 pages) + 119 per-ID bin-cycling mp4s
-on Ext. Next: Hooman audits atlas → per-ID findings; or resume batch (B10, pipeline
-still DOWN per F1 — pin numba, rebuild, bump codespec sha; Faraz traj .npy still the
-highest-value unlock). Root-repo commits forbidden; all code fixes on the fork branch.
+## Current position (★ B13, 2026-09-03)
+
+Tyger access restored (new cert to 2028-08-04) and proven: 005JJ SIGNAL recon ran on GPU
+(run 558, image db80f16). Single-coil subjects are runnable NOW; F1 still blocks nch=8.
+Next: either resume batch B10 for the runnable set (first harden dyn_recon.submit() download
+per F40), or atlas audit follow-ups (B12), or bin_time.py (B11). Root-repo commits forbidden.

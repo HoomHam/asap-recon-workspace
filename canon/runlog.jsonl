@@ -37,3 +37,26 @@
 {"t":"2026-08-27T18:36:19","ev":"edited","file":"workspace/helpers/atlas/dis_atlas.py"}
 {"t":"2026-08-27T18:36:38","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py --only 043AS && cd ../../outputs/aikill_atlas && rm -f aud-*.png && pdftoppm -png -r 60 -f 1 -l 2 sample_043AS.pdf aud"}
 {"t":"2026-08-27T18:37:04","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas && /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/.venv/bin/python dis_atlas.py"}
+{"t":"2026-08-31T13:12:08","ev":"created","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:12:14","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:12:32","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:12:36","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:12:41","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:15:44","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:15:46","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:15:52","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:38:13","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:38:20","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:38:23","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:38:24","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:38:28","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py 2>&1 | tail -3"}
+{"t":"2026-08-31T13:38:39","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:38:46","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py 2>&1 | tail -3"}
+{"t":"2026-08-31T13:42:17","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:42:36","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:42:48","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py 2>&1 | grep -E 'shift|pairs|Error' "}
+{"t":"2026-08-31T13:45:40","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:45:48","ev":"edited","file":"workspace/helpers/rt_prepost_fig.py"}
+{"t":"2026-08-31T13:45:55","ev":"ran","cmd":"workspace/helpers/.venv/bin/python workspace/helpers/rt_prepost_fig.py 2>&1 | grep -E 'shift|Error|Trace'"}
+{"t":"2026-09-03T16:43:38","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon; cat tyger_deploy/requirements.txt 2>/dev/null || find . -maxdepth 2 -name requirements.txt -not -path \"*/workspace/*\" | xargs -I{} sh -c 'echo {}; cat {}'; echo ---; git log --oneline -3; echo ---; python workspace/pipeline/dyn_recon.py --help 2>&1 | head -40; echo ---; grep -n \"numba\\|F1\\|pin\" workspace/canon/ledger.md | tail -15"}
+{"t":"2026-09-03T16:45:09","ev":"ran","cmd":"cd /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon; RUN=workspace/pipeline/runs/2024-05-13_005JJ_s_$(date +%Y%m%d_%H%M%S); mkdir -p $RUN; echo $RUN > /private/tmp/claude-501/-Users-hoomham-Hooman-Work-Codes-2026-ASAP-Recon/1e579289-e668-4301-903a-d3243840c809/scratchpad/rundir.txt; sed 's/d136eb172e55a7f439eeaaa5362b1ccb18facdbd/db80f16ecc5f53a2af6a44f834c571d619ff09a5/' workspace/pipeline/recon_codespec.yml > $RUN/codespec_db80f16.yml; grep image $RUN/codespec_db80f16.yml; which python; python -c \"import mrd, numpy; print('mrd ok', numpy.__version__)\"; D=/Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-05-13/005JJ; T=workspace/data/xe/human/traj; ls $T/fa_spiral_dyn_fancy_v3_20240130_*; time python convert_siemens_to_mrd.py -i $D -o $RUN/input.mrd --seqname fa_spiral_dyn_fancy_v3_20240130 --gp-traj $T/fa_spiral_dyn_fancy_v3_20240130_gp.npy --dp-traj $T/fa_spiral_dyn_fancy_v3_20240130_dp.npy --binning SIGNAL --pneumotach $D/pneumotach_005JJ_2024-05-13_17_16_08 2>&1 | tail -15; ls -la $RUN"}

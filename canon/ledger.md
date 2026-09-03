@@ -72,3 +72,32 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
 - DECIDED: atlas videos live on Ext (regenerable — acceptable single-copy risk).
 - BRANCH: aikill-atlas, parent: B10 (batch cohort). Cohort QC visualization. Delivered;
   open for per-ID audit findings.
+- session 2026-08-31: C27 rt_prepost_fig.py — RT pre/post coronal figures (workspace/outputs/rt_prepost/). No new branch.
+
+## 2026-09-03 · session 4
+
+- Tyger access check for 005JJ. Service-principal cert `tyger-sp.pem` had expired 2026-08-01
+  (AADSTS700027); device-code login attempted, never claimed. Kento emailed a new pem
+  (CN=TygerTEP-CLIlogin, valid to 2028-08-04) → installed, old kept as
+  `tyger-sp.pem.expired-2026-08-01`, `tyger login -f LOGIN_FILE.yml` → role owner.
+- 005JJ (2024-05-13, single-coil 67 MB dat, source `/Volumes/HoomHamExt/_5t_images_roundtrip/
+  Images/2024-05-13/005JJ`) converted with SIGNAL binning and run on Tyger gpunp as run 558
+  using the OLD image `db80f16` (numba-working; guard not needed for nch=1). Succeeded, GPU
+  wall 92 s, log clean (16 bins gp+dp, RBC/TP phase solved every bin).
+- Download is the weak link: ~1 Mbps effective. `run exec --logs` streaming blew the 10-min
+  Bash cap at 52 MiB; `tyger buffer read <id> > file` (dop 32) died at 44 MiB with
+  "context deadline exceeded"; `tyger buffer read <id> -o output.mrd -p 4` in background got
+  the full 192 MB in ~10 min. plot_recon montage OK (lungs in all 16 bins, expiration dip
+  bins 5–8). Output byte-size equals the July run; content differs from byte 30289 (header,
+  not inspected).
+- Results on Ext (mirror law): /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/
+  tyger_check_2026-09-03/2024-05-13_005JJ_s/ (output.mrd, input.mrd, tyger.log, pngs,
+  codespec_db80f16.yml). No p/d, no post_process, by request ("nothing else").
+- Left untouched: pipeline/recon_codespec.yml still points at broken d136eb1 (F1 unchanged);
+  the July pipeline/post_process.py + codespec + June/July untracked backlog remain
+  uncommitted (not this session's). 2026-08-31 session (C27) had appended ledger/cards but
+  never committed — included in this commit.
+
+- DECIDED: single-coil subjects can run TODAY on image db80f16; F1 only blocks nch=8 (guard) subjects.
+- DECIDED: dyn_recon.submit() must stop relying on `run exec --logs` streaming for the output; switch to run + `buffer read -o -p 4` with retry before the batch resumes.
+- BRANCH: tyger-access-check, parent: B6 (tyger). Closed same session (delivered).
