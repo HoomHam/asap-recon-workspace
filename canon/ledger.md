@@ -101,3 +101,6 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
 - DECIDED: single-coil subjects can run TODAY on image db80f16; F1 only blocks nch=8 (guard) subjects.
 - DECIDED: dyn_recon.submit() must stop relying on `run exec --logs` streaming for the output; switch to run + `buffer read -o -p 4` with retry before the batch resumes.
 - BRANCH: tyger-access-check, parent: B6 (tyger). Closed same session (delivered).
+
+## 2026-09-06 · misplaced session (no ASAP work)
+- A session opened in this folder for a Mac clock question and then did ~/Hooman/System work (Jon Snow, vault sweep, Brain/Canon mirrors). Nothing ASAP changed. Record lives in System's ledger session 29. The transcript the exit hook drops into workspace/archive/ (cff52ba0) is a duplicate of System's copy — safe to delete.
