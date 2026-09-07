@@ -14,6 +14,13 @@ Replicates recon.py line-for-line in vectorized form (single bin, one channel):
 
 Differences vs GPU run: float64 numpy vs float32 atomics; summation order.
 Expect agreement to ~1e-6 relative, not bit-exact.
+
+deapod (2026-09-06, XeCS bgfloor1, PRIME switch P5, default OFF = Tyger): Steve never divides out the
+gridding kernel's image-domain rolloff. The per-cell weighted average with exp(-d^2/0.2) is a normalized
+convolution of k-space with a Gaussian of sigma^2 = 0.1 grid cells, so the image is multiplied by
+A(r) = exp(-2 pi^2 sigma^2 |r|^2 / MS^2), r in MS-grid pixels from the centre: 0.918 at the face centre of
+the IS=100 crop (r=50), 0.77 at its corner. deapod=True divides the cropped image by A (steve_rolloff).
+Noise is divided too, so SNR maps are unchanged; only intensity uniformity (centre vs periphery) moves.
 """
 
 import numpy as np
@@ -24,8 +31,20 @@ BXSZ = 2
 KNORM_FLOOR = 1e-5
 
 
+def steve_rolloff(MS=240, IS=100, kdist0sq=KDIST0SQ):
+    """Image-domain transfer function of the gridding kernel exp(-d^2/kdist0sq) on the MS grid, evaluated on
+    the central IS^3 crop (Steve layout is symmetric so axis order is irrelevant). Peak 1 at the centre.
+    Analytic FT of the normalized Gaussian: sigma^2 = kdist0sq/2 (cells) -> A(r) = exp(-2 pi^2 sigma^2 r^2 / MS^2)."""
+    sig2 = kdist0sq / 2.0
+    MSc = int(MS / 2 + 0.1)
+    ll = int(MSc - IS / 2 + 0.1)
+    r = np.arange(ll, ll + IS) - MSc                    # pixel offsets of the crop from the grid centre
+    r2 = r[:, None, None] ** 2 + r[None, :, None] ** 2 + r[None, None, :] ** 2
+    return np.exp(-2 * np.pi ** 2 * sig2 * r2 / MS ** 2)
+
+
 def steve_recon(traj_grid, data, npts, MS=240, IS=100, smoothing=0.0,
-                axes="steve", sample_weight=None):
+                axes="steve", sample_weight=None, deapod=False):
     """traj_grid: (Nuniq,3) grid units. data: (M,) complex. npts: samples per
     interleave (for the readout filter). smoothing: Steve's gplb (0 = off).
     axes='steve' returns his (z,y,x) layout (comparable to savedbin*.npy);
@@ -34,7 +53,9 @@ def steve_recon(traj_grid, data, npts, MS=240, IS=100, smoothing=0.0,
     accumulations per sample — replicates cudarecon's soft-bin binwt
     (recon.py:104-110: binwt = exp(-bindist^2/bindist0sq), applied inside
     thiswt so it hits k_acc and knorm alike). weight 0 = sample skipped,
-    matching the kernel's binctr<0 `continue`. Default None = old behavior."""
+    matching the kernel's binctr<0 `continue`. Default None = old behavior.
+    deapod: divide the cropped image by the gridding kernel's rolloff (steve_rolloff). Default False =
+    Tyger-exact; True = PRIME switch P5 (see XeCS SteveEquivalent_Prime.md)."""
     data = np.asarray(data, dtype=np.complex128)
     M = len(data)
     idx = np.arange(M)
@@ -92,4 +113,6 @@ def steve_recon(traj_grid, data, npts, MS=240, IS=100, smoothing=0.0,
     MSc = int(MS / 2 + 0.1)
     ll = int(MSc - IS / 2 + 0.1)
     img = rspace[ll:ll + IS, ll:ll + IS, ll:ll + IS]
+    if deapod:
+        img = img / steve_rolloff(MS, IS)
     return img if axes == "steve" else np.transpose(img, (2, 1, 0))
