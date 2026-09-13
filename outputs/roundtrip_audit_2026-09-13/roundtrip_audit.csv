@@ -1,0 +1,137 @@
+status,folder,key,layout,n_dat,n_dyn,seqs,dyn_mb,pneumotach,snr_rows,outputs,dissolved,last_batch,note,big_dat
+DONE,2023-01-31/000LL,2023-01-31_000LL,ok,1,1,v2_20230131,122,no,,s-d,dissolved-split,,,meas_MID00210_FID01574_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-03-08/017AK,2023-03-08_017AK,ok,4,2,v2_20230131,998,no,57,s-d,dissolved-unsplit,rc=0 outputs=s-d,,meas_MID00220_FID02378_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-03-09/023DB,2023-03-09_023DB,ok,8,2,v2_20230131,995,no,37,s-d,dissolved-unsplit,rc=0 outputs=s-d,,meas_MID00246_FID02404_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-03-10/004LR,2023-03-10_004LR,ok,6,2,v2_20230131,1317,yes,53,spd,dissolved-unsplit,rc=0 outputs=spd,,meas_MID00124_FID02516_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-03-24/029CK,2023-03-24_029CK,ok,5,2,v2_20230131,1535,yes,77,spd,dissolved-unsplit,rc=0 outputs=spd,,meas_MID00349_FID02942_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-03-27/02BB,2023-03-27_02BB,ok,7,2,v2_20230131,1180,yes,,spd,dissolved-unsplit,rc=0 outputs=spd,,meas_MID00429_FID03022_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-03-31/032WS,2023-03-31_032WS,ok,5,2,v2_20230131,2068,no,144,s-d,dissolved-unsplit,rc=0 outputs=s-d,,meas_MID00584_FID03177_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-04-07/030DN,2023-04-07_030DN,ok,3,2,v2_20230131,152,yes,69,spd,dissolved-split,,,meas_MID00071_FID03249_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-04-11/000KR,2023-04-11_000KR,ok,6,1,v2_20230131,139,yes,,spd,gas-only-acq,rc=0 outputs=spd,,meas_MID00156_FID03334_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-04-14/000KR,2023-04-14_000KR,ok,3,2,v2_20230131,118,yes,,spd,gas-only-acq,rc=0 outputs=spd,,meas_MID00238_FID03416_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-04-18/021JM,2023-04-18_021JM,ok,9,2,v2_20230131,114,yes,142,spd,dissolved-split,,,meas_MID00272_FID03450_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-04-26/023DB,2023-04-26_023DB,ok,6,2,v2_20230131,128,yes,75,spd,dissolved-split,,,meas_MID00305_FID03483_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-05-02/011BA,2023-05-02_011BA,ok,7,2,v2_20230131,145,yes,79,spd,dissolved-split,,,meas_MID00045_FID03628_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-05-02/012SR,2023-05-02_012SR,ok,7,2,v2_20230131,138,yes,99,spd,dissolved-split,,,meas_MID00127_FID03710_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-05-04/034LR,2023-05-04_034LR,ok,5,1,v2_20230131,136,yes,18,spd,dissolved-split,,,meas_MID00231_FID03814_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-05-15/000SK,2023-05-15_000SK,ok,4,2,v2_20230131,118,yes,,spd,dissolved-split,rc=0 outputs=spd,,meas_MID00114_FID04348_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-05-15/035EK,2023-05-15_035EK,ok,3,2,v2_20230131,128,no,115,s-d,dissolved-split,,,meas_MID00133_FID04367_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-05-18/000SV,2023-05-18_000SV,ok,6,1,v2_20230131,122,yes,,spd,dissolved-split,rc=0 outputs=spd,,meas_MID00119_FID04499_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-08-24/030DN,2023-08-24_030DN,ok,10,2,v2_20230131,117,yes,40,spd,dissolved-split,,,meas_MID00043_FID00959_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-09-25/032WS,2023-09-25_032WS,ok,6,1,v2_20230131,108,yes,96,spd,dissolved-split,,,meas_MID00095_FID02346_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-10-10/002BB,2023-10-10_002BB,ok,2,1,v2_20230131,86,yes,,spd,dissolved-split,,,meas_MID00355_FID02606_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-10-20/001JM,2023-10-20_001JM,ok,3,1,v2_20230131,159,yes,90,spd,dissolved-split,,,meas_MID01637_FID03882_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-10-25/002JM,2023-10-25_002JM,ok,3,2,v2_20230131,28,no,106,s-d,dissolved-split,,,meas_MID02659_FID04904_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-10-27/000LL,2023-10-27_000LL,ok,2,1,v2_20230131,50,yes,,spd,dissolved-split,,,meas_MID02670_FID04915_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-10-31/003KH,2023-10-31_003KH,ok,4,2,v2_20230131,135,yes,124,spd,dissolved-split,,,meas_MID02713_FID04958_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-02/025VP,2023-11-02_025VP,ok,5,2,v2_20230131,42,yes,126,spd,dissolved-unsplit,rc=0 outputs=spd,,meas_MID02743_FID04988_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-02/036RL,2023-11-02_036RL,ok,5,2,v2_20230131,50,yes,123,spd,dissolved-split,,,meas_MID02779_FID05024_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-03/000LL,2023-11-03_000LL,ok,6,2,v3_20230821,90,yes,,spd,gas-only-acq,rc=0 outputs=spd,also identical to bigmac_2023-11-02_000LL,meas_MID02798_FID05043_fa_spiral_dyn_fancy_v3_20230821.dat
+DONE,2023-11-06/002ZS,2023-11-06_002ZS,ok,3,2,v2_20230131,95,yes,78,spd,dissolved-split,,,meas_MID02832_FID05077_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-13/037GD,2023-11-13_037GD,ok,3,2,v2_20230131,91,yes,137,spd,dissolved-split,,,meas_MID03140_FID05385_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-16/038RL,2023-11-16_038RL,ok,3,2,v2_20230131,100,yes,132,spd,dissolved-split,,,meas_MID03634_FID05876_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-17/005DS,2023-11-17_005DS,ok,3,2,v2_20230131,77,yes,95,spd,dissolved-split,,,meas_MID03672_FID05914_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-11-21/039CP,2023-11-21_039CP,ok,7,2,v2_20230131,110,yes,32,spd,dissolved-split,,,meas_MID00041_FID06046_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-12-06/003PM,2023-12-06_003PM,ok,3,2,v2_20230131,86,yes,8,spd,dissolved-split,,,meas_MID00034_FID06218_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-12-11/040RP,2023-12-11_040RP,ok,3,2,v2_20230131,112,yes,62,spd,dissolved-split,,,meas_MID00173_FID06357_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-12-15/003KH,2023-12-15_003KH,ok,3,2,v2_20230131,98,yes,121,spd,dissolved-split,,,meas_MID00345_FID06538_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2023-12-19/041WF,2023-12-19_041WF,ok,3,2,v2_20230131,64,yes,108,spd,dissolved-split,,,meas_MID00458_FID06651_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2024-01-16/004DS,2024-01-16_004DS,ok,3,2,v2_20230131,25,yes,120,spd,dissolved-split,,,meas_MID00057_FID06797_fa_spiral_dyn_fancy_v2_20230131.dat
+DONE,2024-01-17/042DR,2024-01-17_042DR,ok,1,1,v3_20230821,688,no,128,s-d,gas-only-acq,rc=0 outputs=s-d,also identical to 2024-01-17/000LL,meas_MID00171_FID06911_fa_spiral_dyn_fancy_v3_20230821.dat
+DONE,2024-01-18/001JM,2024-01-18_001JM,ok,3,2,v3_20240130,867,yes,12,spd,gas-only-acq,,also identical to 2024-01-18_001JM/001JM,meas_MID00218_FID06958_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-01-18_001JM/001JM,2024-01-18_001JM,"odd top folder ""2024-01-18_001JM""",3,2,v3_20230821,867,yes,12,spd,gas-only-acq,,also identical to 2024-01-18/001JM,meas_MID00218_FID06958_fa_spiral_dyn_fancy_v3_20230821.dat
+DONE,2024-01-22/007RA,2024-01-22_007RA,ok,2,1,v3_20240130,864,yes,94,spd,gas-only-acq,,,meas_MID00269_FID07009_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-01-31/008CR,2024-01-31_008CR,ok,8,7,v3_20230821+v3_20240130,440,yes,87,spd,gas-only-acq,,,meas_MID00199_FID07351_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-02-02/000LL,2024-02-02_000LL,ok,1,1,v3_20240130,439,no,,s-d,dissolved-unsplit,rc=0 outputs=s-d,,meas_MID00140_FID07573_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-02-02/005DS,2024-02-02_005DS,ok,2,2,v3_20240130,570,yes,46,spd,dissolved-unsplit,rc=0 outputs=spd,,meas_MID00058_FID07637_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-02-19/037GD,2024-02-19_037GD,ok,4,2,v3_20240130,110,yes,134,spd,dissolved-split,,,meas_MID00219_FID07911_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-02-21/043AS,2024-02-21_043AS,ok,5,2,v3_20240130,127,yes,43,spd,dissolved-split,,,meas_MID00121_FID08048_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-02-26/029CK,2024-02-26_029CK,ok,5,2,v3_20240130,70,yes,58,spd,dissolved-split,,,meas_MID00268_FID08195_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-02-27/009JT,2024-02-27_009JT,ok,4,2,v3_20240130,94,yes,131,spd,dissolved-split,,,meas_MID00336_FID08263_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-06/030DN,2024-03-06_030DN,ok,7,4,v3_20240130,73,yes,,spd,dissolved-split,rc=0 outputs=spd,,meas_MID00543_FID08467_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-11/039CP,2024-03-11_039CP,ok,5,2,v3_20240130,74,yes,67,spd,dissolved-split,,,meas_MID00086_FID08582_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-12/006KL,2024-03-12_006KL,ok,3,2,v3_20240130,60,yes,35,spd,dissolved-split,,,meas_MID00175_FID08671_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-12/044DY,2024-03-12_044DY,ok,4,1,v3_20240130,57,yes,104,spd,dissolved-split,,,meas_MID00123_FID08619_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-14/038RL,2024-03-14_038RL,ok,5,2,v3_20240130,84,yes,80,spd,dissolved-split,,,meas_MID00232_FID08728_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-21/032WS,2024-03-21_032WS,ok,5,2,v3_20240130,100,yes,61,spd,dissolved-split,,,meas_MID00438_FID08934_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-21/036RL,2024-03-21_036RL,ok,5,2,v3_20240130,83,yes,74,spd,dissolved-split,,,meas_MID00384_FID08880_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-03-28/010AJ,2024-03-28_010AJ,ok,3,2,v3_20240130,53,yes,64,spd,dissolved-split,,,meas_MID00062_FID09013_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-04-01/008CR,2024-04-01_008CR,ok,3,2,v3_20240130,91,yes,60,spd,dissolved-split,,,meas_MID00134_FID09085_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-04-03/040RP,2024-04-03_040RP,ok,5,2,v3_20240130,43,yes,140,spd,dissolved-split,,,meas_MID00197_FID09148_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-04-09/019WR,2024-04-09_019WR,ok,5,2,v3_20240130,71,yes,97,spd,dissolved-split,,,meas_MID00321_FID09267_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-04-22/025VP,2024-04-22_025VP,ok,5,2,v3_20240130,71,yes,73,spd,dissolved-split,,,meas_MID00090_FID09468_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-04-25/042DR,2024-04-25_042DR,ok,6,2,v3_20240130,67,yes,112,spd,dissolved-split,,,meas_MID00181_FID09559_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-04-29/011CN,2024-04-29_011CN,ok,4,1,v3_20240130,19,yes,,spd,dissolved-unsplit,rc=0 outputs=spd,,meas_MID00219_FID09597_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-05-02/023DB,2024-05-02_023DB,ok,5,2,v3_20240130,75,yes,48,spd,dissolved-split,,,meas_MID00330_FID09708_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-05-06/043AS,2024-05-06_043AS,ok,5,2,v3_20240130,128,yes,68,spd,dissolved-split,,,meas_MID00383_FID09761_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-05-08/012EB,2024-05-08_012EB,ok,2,1,v3_20240130,85,yes,101,spd,dissolved-split,,,meas_MID00480_FID00049_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-05-13/002ZS,2024-05-13_002ZS,ok,3,2,v3_20240130,49,yes,143,spd,dissolved-split,,,meas_MID00525_FID00094_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-05-13/005JJ,2024-05-13_005JJ,ok,2,2,v3_20240130,67,yes,139,spd,dissolved-split,,,meas_MID00564_FID00133_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-06-18/003PM,2024-06-18_003PM,ok,3,2,v3_20240130,55,yes,22,spd,dissolved-split,,,meas_MID00481_FID00951_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-07-03/044DY,2024-07-03_044DY,ok,5,2,v3_20240130,65,no,72,s-d,dissolved-split,,,meas_MID00646_FID01116_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-07-29/004DS,2024-07-29_004DS,ok,3,2,v3_20240130,48,yes,83,spd,dissolved-split,,,meas_MID00239_FID01436_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-12/013VM,2024-08-12_013VM,ok,3,2,v3_20240130,52,yes,56,spd,dissolved-split,,,meas_MID00410_FID01607_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-15/006MM,2024-08-15_006MM,ok,3,2,v3_20240130,79,yes,44,spd,dissolved-split,,,meas_MID00065_FID01674_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-19/015HK,2024-08-19_015HK,ok,5,2,v3_20240130,67,yes,31,spd,dissolved-split,,,meas_MID00113_FID01722_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-21/044DY,2024-08-21_044DY,ok,5,2,v3_20240130,54,no,85,s-d,dissolved-split,,,meas_MID00211_FID01820_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-23/016PG,2024-08-23_016PG,ok,5,2,v3_20240130,108,yes,92,spd,dissolved-split,,,meas_MID00298_FID01907_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-28/007IT,2024-08-28_007IT,ok,3,2,v3_20240130,80,yes,17,spd,dissolved-unsplit,rc=0 outputs=spd,also identical to 2023-07-06/SD03,meas_MID00040_FID02081_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-08-30/014KS,2024-08-30_014KS,ok,5,2,v3_20240130,84,yes,24,spd,dissolved-split,,,meas_MID00119_FID02160_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-03/041WF,2024-09-03_041WF,ok,5,2,v3_20240130,55,yes,91,spd,dissolved-split,,,meas_MID00176_FID02217_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-09/043AS,2024-09-09_043AS,ok,5,2,v3_20240130,79,yes,50,spd,dissolved-split,,,meas_MID00420_FID02461_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-10/008TP,2024-09-10_008TP,ok,3,2,v3_20240130,60,yes,9,spd,dissolved-split,,,meas_MID00465_FID02506_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-10/045VS,2024-09-10_045VS,ok,5,2,v3_20240130,74,yes,19,spd,dissolved-split,,,meas_MID00525_FID02566_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-24/039CP,2024-09-24_039CP,ok,5,2,v3_20240130,83,yes,39,spd,dissolved-split,,,meas_MID00042_FID03146_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-24/046AA,2024-09-24_046AA,ok,5,2,v3_20240130,89,yes,110,spd,dissolved-split,,,meas_MID00257_FID03109_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-25/017ED,2024-09-25_017ED,ok,5,2,v3_20240130,60,yes,145,spd,dissolved-split,,,meas_MID00054_FID03277_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-26/009ML,2024-09-26_009ML,ok,3,2,v3_20240130,50,yes,20,spd,dissolved-split,,,meas_MID00123_FID03346_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-09-27/036RL,2024-09-27_036RL,ok,5,2,v3_20240130,77,yes,84,spd,dissolved-split,,,meas_MID00165_FID03383_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-02/011CN,2024-10-02_011CN,ok,5,2,v3_20240130,64,yes,88,spd,dissolved-split,,,meas_MID00121_FID03586_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-02/018CS,2024-10-02_018CS,ok,3,2,v3_20240130,84,yes,119,spd,dissolved-split,,,meas_MID00150_FID03615_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-08/009JT,2024-10-08_009JT,ok,5,2,v3_20240130,59,yes,111,spd,dissolved-split,,,meas_MID00280_FID03745_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-10/019LR,2024-10-10_019LR,ok,5,2,v3_20240130,89,yes,59,spd,dissolved-split,,,meas_MID00057_FID03813_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-16/020JS,2024-10-16_020JS,ok,5,2,v3_20240130,30,yes,102,spd,dissolved-split,,,meas_MID00285_FID04041_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-16/047SS,2024-10-16_047SS,ok,5,2,v3_20240130,56,yes,116,spd,dissolved-split,,,meas_MID00253_FID04009_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-17/048JJ,2024-10-17_048JJ,ok,5,2,v3_20240130,73,yes,86,spd,dissolved-split,,,meas_MID00375_FID04131_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-22/021CH,2024-10-22_021CH,ok,5,2,v3_20240130,63,yes,93,spd,dissolved-split,,,meas_MID01092_FID04848_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-23/047SS,2024-10-23_047SS,ok,5,2,v3_20240130,54,yes,105,spd,dissolved-split,,,meas_MID01296_FID05052_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-28/022VT,2024-10-28_022VT,ok,5,2,v3_20240130,72,yes,114,spd,dissolved-split,,,meas_MID01688_FID05444_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-10-29/049WG,2024-10-29_049WG,ok,5,2,v3_20240130,63,yes,135,spd,dissolved-split,,,meas_MID01795_FID05551_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-11-05/023LL,2024-11-05_023LL,ok,5,2,v3_20240130,59,yes,11,spd,dissolved-split,,,meas_MID00201_FID05776_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-11-13/025JC,2024-11-13_025JC,ok,5,2,v3_20240130,66,yes,41,spd,dissolved-split,,,meas_MID00064_FID06018_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-11-18/026CH,2024-11-18_026CH,ok,5,2,v3_20240130,53,yes,54,spd,dissolved-split,,,meas_MID00118_FID06072_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-11-26/050EH,2024-11-26_050EH,ok,5,2,v3_20240130,67,no,129,s-d,dissolved-split,,,meas_MID00377_FID06331_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-12-05/043AS,2024-12-05_043AS,ok,5,2,v3_20240130,77,yes,130,spd,dissolved-split,,,meas_MID00560_FID06938_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-12-06/051VM,2024-12-06_051VM,ok,5,2,v3_20240130,55,yes,141,spd,dissolved-split,,,meas_MID00015_FID07035_fa_spiral_dyn_fancy_v3_20240130.dat
+DONE,2024-12-09/027JC,2024-12-09_027JC,ok,5,2,v3_20240130,69,yes,113,spd,dissolved-split,,,meas_MID00046_FID07066_fa_spiral_dyn_fancy_v3_20240130.dat
+DUPLICATE,2023-07-06/SD03,2023-07-06_SD03,ok,3,2,v3_20240130,80,yes,,,,,identical dyn .dat to 2024-08-28/007IT,meas_MID00040_FID02081_fa_spiral_dyn_fancy_v3_20240130.dat
+DUPLICATE,2024-01-17/000LL,2024-01-17_000LL,ok,1,1,v3_20230821,688,yes,,,,,identical dyn .dat to 2024-01-17/042DR,meas_MID00171_FID06911_fa_spiral_dyn_fancy_v3_20230821.dat
+DUPLICATE,bigmac_2023-11-02_000LL,2023-11-02_(date-level),5 loose .dat at date level,5,2,v3_20230821,90,no,,,,,identical dyn .dat to 2023-11-03/000LL,meas_MID02798_FID05043_fa_spiral_dyn_fancy_v3_20230821.dat
+EMPTY,traj,,,,,,,,,,,,no session subfolder,
+FAILED,2024-06-18/000LL,2024-06-18_000LL,ok,4,3,v3_20240130,4,no,,,,rc=1 outputs=---,[main] ValueError: `ydata` must not be empty!,meas_MID00526_FID00996_fa_spiral_dyn_fancy_v3_20240130.dat
+FAILED,2024-09-09/000LL,2024-09-09_000LL,ok,4,4,v3_20240130,1,no,,,,rc=1 outputs=---,[main] ValueError: Invalid number of FFT data points (0) specified.,meas_MID00372_FID02413_fa_spiral_dyn_fancy_v3_20240130.dat
+FAILED,2024-09-20/000LL,2024-09-20_000LL,ok,8,7,v3_20240130,3,no,,,,rc=1 outputs=---,[main] ValueError: Invalid number of FFT data points (0) specified.,meas_MID00189_FID03041_fa_spiral_dyn_fancy_v3_20240130.dat
+NOT_DYNAMIC,2023-04-13/000FA,2023-04-13_000FA,ok,5,0,,0,no,,,,,,
+NOT_DYNAMIC,2024-01-18/temp,2024-01-18_temp,ok,0,0,,0,no,,,,,,
+NOT_DYNAMIC,2024-04-09/2024-08-15,2024-04-09_2024-08-15,ok,0,0,,0,no,,,,,,
+NOT_RUN,2023-07-24,2023-07-24_(date-level),4 loose .dat at date level,4,2,v2_20230131,81,no,,,,,,meas_MID00439_FID00326_fa_spiral_dyn_fancy_v2_20230131.dat
+NO_TRAJ,2022-04-21/000HH,2022-04-21_000HH,ok,2,1,20220421,759,no,,,,,no gp trajectory for 20220421,meas_MID00295_FID24454_fa_spiral_dyn_fancy_20220421.dat
+NO_TRAJ,2022-04-22/000HH,2022-04-22_000HH,ok,5,1,20220422,710,no,,,,,no gp trajectory for 20220422,meas_MID00440_FID24599_fa_spiral_dyn_fancy_20220422.dat
+NO_TRAJ,2022-04-29/018BI,2022-04-29_018BI,ok,6,1,20220422,658,no,27,,,,no gp trajectory for 20220422,meas_MID00161_FID24949_fa_spiral_dyn_fancy_20220422.dat
+NO_TRAJ,2022-06-28/019WR,2022-06-28_019WR,ok,6,1,20220602,535,no,,,,,no gp trajectory for 20220602,meas_MID00099_FID27090_fa_spiral_dyn_fancy_20220602.dat
+NO_TRAJ,2022-07-05/021JM,2022-07-05_021JM,ok,7,1,20220602,437,no,82,,,,no gp trajectory for 20220602,meas_MID00228_FID27219_fa_spiral_dyn_fancy_20220602.dat
+NO_TRAJ,2022-08-22/026ED,2022-08-22_026ED,ok,7,1,20220812,997,no,15,,,,no gp trajectory for 20220812,meas_MID00124_FID29529_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-09-21/027GB,2022-09-21_027GB,ok,6,1,20220812,1651,no,5,,,,no gp trajectory for 20220812,meas_MID00117_FID31532_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-09-26/025VP,2022-09-26_025VP,ok,6,1,20220812,1422,no,107,,,,no gp trajectory for 20220812,meas_MID00078_FID31801_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-09-27/021JM,2022-09-27_021JM,ok,6,1,20220812,1297,no,55,,,,no gp trajectory for 20220812,meas_MID00131_FID31849_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-09-28/017AK,2022-09-28_017AK,ok,5,1,20220812,1687,no,49,,,,no gp trajectory for 20220812,meas_MID00029_FID31875_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-09-30/029CK,2022-09-30_029CK,ok,5,1,20220812,1005,no,29,,,,no gp trajectory for 20220812,meas_MID00071_FID32212_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-10-06/019WR,2022-10-06_019WR,ok,7,1,20220812,1036,no,14,,,,no gp trajectory for 20220812,meas_MID00124_FID32987_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-10-10/001SW,2022-10-10_001SW,ok,6,1,20220812,1096,no,10,,,,no gp trajectory for 20220812,meas_MID00064_FID33057_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-10-11/011BA,2022-10-11_011BA,ok,6,1,20220812,1255,no,36,,,,no gp trajectory for 20220812,meas_MID00041_FID33095_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-10-19/023DB,2022-10-19_023DB,ok,7,1,20220812,1230,no,13,,,,no gp trajectory for 20220812,meas_MID00097_FID33381_fa_spiral_dyn_fancy_20220812.dat
+NO_TRAJ,2022-11-08/018BI,2022-11-08_018BI,ok,6,1,20221103,853,no,28,,,,no gp trajectory for 20221103,meas_MID00040_FID00499_fa_spiral_dyn_fancy_20221103.dat
+NO_TRAJ,2022-11-09/030DN,2022-11-09_030DN,ok,6,1,20221103,1044,no,33,,,,no gp trajectory for 20221103,meas_MID00026_FID00522_fa_spiral_dyn_fancy_20221103.dat
+NO_TRAJ,2022-12-02/032WS,2022-12-02_032WS,ok,12,1,20221103,949,no,42,,,,no gp trajectory for 20221103,meas_MID00266_FID00970_fa_spiral_dyn_fancy_20221103.dat
+NO_TRAJ,2022-12-06/019WR,2022-12-06_019WR,ok,9,1,20221103,1138,no,,,,,no gp trajectory for 20221103,meas_MID00403_FID01107_fa_spiral_dyn_fancy_20221103.dat
+NO_TRAJ,2023-11-09/000HH,2023-11-09_000HH,ok,2,1,20221103,41,yes,,,,,no gp trajectory for 20221103,meas_MID02845_FID05090_fa_spiral_dyn_fancy_20221103.dat

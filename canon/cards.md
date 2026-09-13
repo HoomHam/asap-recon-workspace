@@ -8,18 +8,18 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | ID | Script | Branch | Status |
 |----|--------|--------|--------|
 | C1 | main.py (root) | stem | WORKS (local, 2 uncommitted fixes) |
-| C2 | raw.py (root) | stem | BROKEN (Bug A, Bug B, 042DR crash) |
-| C3 | recon.py (root) | stem | WORKS on old numba only (F1) |
-| C4 | results.py (root) | stem | WORKS |
+| C2 | raw.py (root) | stem | FIXED in fork 472fbc9 (fit fallback, dp optional); Bug B (unbounded LM) open |
+| C3 | recon.py (root) | stem | WORKS (numba pinned 0.65.1, F42) |
+| C4 | results.py (root) | stem | WORKS · ⚠ RBC/TP split unreliable (F47) · 40d23a4 keeps unsplit dissolved |
 | C5 | gtypes.py (root) | stem | WORKS |
 | C6 | convert_siemens_to_mrd.py (root) | tyger | WORKS (F16 caveat) |
-| C7 | tyger_recon.py (root) | diaphragm | WORKS (fork image, cloud GPU only) · +nav 26-guard (F37, local) |
-| C8 | pipeline/batch_recon.py | batch | WORKS, blocked by F1 |
-| C9 | pipeline/dyn_recon.py | batch | WORKS for nch=1 on db80f16 (F41); submit() download fragile (F40) — switch to buffer read -p 4 |
+| C7 | tyger_recon.py (root) | diaphragm | WORKS (fork image 40d23a4, cloud GPU) · z-flip = deviation from Steve (F49) · nav 26-guard local |
+| C8 | pipeline/batch_recon.py | batch | SUPERSEDED by C29 todo_batch.sh (F1 retracted) |
+| C9 | pipeline/dyn_recon.py | batch | WORKS all nch on 40d23a4 (F42); robust submit (F43 F44), MPLBACKEND=Agg (F45) |
 | C10 | pipeline/asap_run.py | auto-steve | WORKS |
-| C11 | pipeline/post_process.py | auto-steve | WORKS |
+| C11 | pipeline/post_process.py | auto-steve | WORKS · writes rbc_tp_separated to recon.mat |
 | C12 | pipeline/param_gui.py | auto-steve | WORKS |
-| C13 | pipeline/recon_codespec.yml | tyger | CONFIG (points at broken d136eb1; use db80f16 for nch=1 — F1 F41) |
+| C13 | pipeline/recon_codespec*.yml | tyger | CONFIG — use recon_codespec_40d23a4.yml (F42); base file still d136eb1 |
 | C14 | helpers/build_status_tab.py | batch | WORKS |
 | C15 | helpers/probe_nch.py | batch | WORKS (nch=8 only, F8) |
 | C16 | helpers/check_frbc.py | batch | WORKS (F8 caveat) |
@@ -32,8 +32,10 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C23 | helpers/recon/cs_montage.py | xecs-bridge | WORKS (coupled to XeCS sweep json) |
 | C24 | helpers/recon/diaphragm_bin_demo.py | diaphragm-binning | WORKS (synthetic demo) |
 | C25 | helpers/recon/diaphragm_bintime_demo.py | diaphragm-binning | WORKS (synthetic demo) |
-| C26 | helpers/atlas/dis_atlas.py | aikill-atlas | WORKS (atlas delivered 2026-08-27) |
+| C26 | helpers/atlas/dis_atlas.py | aikill-atlas | ⚠ dp pages SUSPECT (F47) — regenerate with whitened \|z\| |
 | C27 | helpers/rt_prepost_fig.py | main | WORKS (RT pre/post figs 2026-08-31) |
+| C28 | helpers/snr_calc.py | snr-table | WORKS (gas + whitened DP SNR, 104 sessions, F48) |
+| C29 | pipeline/todo_batch.sh | leftover-recon | WORKS (25-session worklist, FORCE=1) |
 
 ## Cards
 
@@ -46,21 +48,21 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 
 ### C2 · raw.py (root)
 - why: TWIX load, traj load, binning, two-Lorentzian spectral fit (lorfit :13, loop :313-380)
-- origin: R · branch: stem · facts: F4 F5 F9 F13 F18
+- origin: R · branch: stem · facts: F4 F5 F9 F13 F18 F42 F46
 - in: .dat/MRD arrays, trajectory
 - out: k-space, ilvbin, fRBC/fTP ratios
-- status: BROKEN — Bug A (multi-coil fit failure aborts run), Bug B (unbounded warm-start LM escapes to non-physical params), 042DR `dp_array is None` crash
+- status: fork 472fbc9 (2026-09-12): non-converged Lorentzian curve_fit → clear fit lists (gas-only / unsplit dissolved) instead of abort; dp trajectory optional (gas-only v3_20230821). Bug B (unbounded warm-start LM, non-physical params) still open. FFT pattern classifier correctly labels 2024-01 8-ch scans gas-only (F46).
 
 ### C3 · recon.py (root)
 - why: CUDA gridding kernels (cudarecon/cudarenorm) via numba.cuda
-- origin: R · branch: stem · facts: F1 F17
+- origin: R · branch: stem · facts: F1(retracted) F17 F42
 - in: k-space samples, traj, b-matrix → out: gridded volume
-- status: WORKS on older numba; image d136eb1's numba rejects kernels
+- status: WORKS — numba 0.65.1/llvmlite 0.47.0 pinned in requirements.txt (F42); identical to Steve's original
 
 ### C4 · results.py (root)
-- why: image recon, calcb (B0/coil-phase b-matrix), dyn_recon/dyn_usimg_recon, dissolved-phase guard
-- origin: R · branch: stem · facts: F4 F5
-- status: WORKS
+- why: image recon, calcb (B0/coil-phase b-matrix), dyn_recon/dyn_usimg_recon, RBC/TP split (:298-327 Steve original)
+- origin: R · branch: stem · facts: F4 F5 F47 F48
+- status: WORKS for gas. ⚠ Steve's RBC/TP phase sweep stops at the ΣaTP=0 discontinuity and the one-point Dixon is ill-conditioned (F47) — stored aRBC/aTP invalid in 60/86 split sessions. Fork 40d23a4: when fRBC empty, dissolved kept as unsplit complex + `rbc_tp_separated` attribute (was: July guard dropped DPDYN). Suggested Steve fix: `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`
 
 ### C5 · gtypes.py (root)
 - why: global enums (bintype, imgtype) + gvar defaults; basefolder :27 Hooman-specific, intentionally uncommitted
@@ -69,27 +71,29 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 
 ### C6 · convert_siemens_to_mrd.py (root)
 - why: local .dat → MRD; bakes recon params into MRD header (only channel to headless cloud job)
-- origin: R · branch: tyger · facts: F16
+- origin: R · branch: tyger · facts: F16 F49
 - in: Siemens .dat, --binning → out: input.mrd
-- status: WORKS (breaks on `._*.dat` shadows)
+- status: WORKS (breaks on `._*.dat` shadows; dyn_recon stages symlinks). Dynamic array bit-identical to Steve's mapVBVD read (030DN, F49)
 
 ### C7 · tyger_recon.py (root)
 - why: Tyger cloud-GPU Docker entrypoint; hosts ported _diaphragm_navigator + MRD nav-array export
-- origin: R · branch: diaphragm · facts: F2 F30
-- in: input.mrd (params :66-83) → out: output.mrd
-- status: WORKS on fork image; NVIDIA GPU (cloud) only
+- origin: R · branch: diaphragm · facts: F2 F30 F42 F49
+- in: input.mrd (params :66-83) → out: output.mrd (dissolved tagged `rbc_tp_separated` since 40d23a4)
+- status: WORKS on fork image 40d23a4; NVIDIA GPU (cloud) only. dp trajectory optional (472fbc9). DIAPHRAGM z-flip (db80f16) is a real deviation from Steve's GUI navigator (F49). Hooman's Thomson-26 diagnostic still uncommitted (local).
 
 ### C8 · workspace/pipeline/batch_recon.py
 - why: batch driver — iterate subjects, call dyn_recon.py --methods s,p,d, green-mark Excel row, save incrementally
-- origin: R · branch: batch · facts: F1 F10 F15
+- origin: R · branch: batch · facts: F1(retracted) F10 F15
 - in: SNR_Table_All.xlsx, source/archive drives
-- out: /Volumes/HoomHamExt/Dynamic/<date>_<id>/{s,p,d}/, updated Excel
-- status: WORKS (uncommitted done_already()/pneumotach edits); blocked by F1
+- out: /Volumes/HoomHamExt/Dynamic/<date>_<id>/{s,p,d}/ (now AIkill_Dynamic), updated Excel
+- status: SUPERSEDED for the leftover set by C29 todo_batch.sh; default drive paths stale (HoomHam dead)
 
 ### C9 · workspace/pipeline/dyn_recon.py
-- why: per-subject driver — resolve, _clean_datadir (symlinks around ._*), convert, submit to Tyger, post-process
-- origin: R · branch: batch · facts: F1 F16
-- status: WORKS; blocked by F1 for guarded subjects
+- why: per-subject driver — resolve, _clean_datadir (symlinks around ._*), convert, submit to Tyger, publish, post-process
+- origin: R→C (reworked 2026-09-12) · branch: batch · facts: F16 F42 F43 F44 F45
+- in: `/Volumes/HoomHamExt/_5t_images_roundtrip/Images/<date>/<id>/` (+ `--data-root`), `--codespec`
+- out: `/Volumes/HoomHamExt/AIkill_Dynamic/<date>_<id>/{s,p,d}/` (output.mrd, input.mrd, tyger.log with run/buffer ids, codespec.yml, pngs, recon.mat, fig/); scratch run dirs on Ext `.../2026_ASAP_Recon/pipeline_runs/`
+- status: WORKS for nch=1 and nch=8 on image 40d23a4. submit = buffer create (NO --ttl) → buffer write → run create → poll → run logs → buffer read -o -p 4, retried; plot/post under MPLBACKEND=Agg
 
 ### C10 · workspace/pipeline/asap_run.py
 - why: single-dataset orchestrator, 6 stages resolve→param GUI→convert→submit→publish→post_process ("analyze 25JC with Steve")
@@ -99,23 +103,24 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 
 ### C11 · workspace/pipeline/post_process.py
 - why: output.mrd → recon.mat, signal_pneumo.npz, per-bin slice videos, navigator.gif, resp_traces.png
-- origin: R · branch: auto-steve
-- status: WORKS (resp_traces nav-z scatter in last ~15% un-cleaned)
+- origin: R→C · branch: auto-steve · facts: F47
+- out: recon.mat now also carries `rbc_tp_separated` (1 split, 0 unsplit, -1 untagged pre-40d23a4)
+- status: WORKS (resp_traces nav-z scatter in last ~15% un-cleaned; July pneumotach drift fix included). `dissolved_phase_real/imag/magnitude` are Steve's aRBC/aTP — not trustworthy for split sessions (F47)
 
 ### C12 · workspace/pipeline/param_gui.py
 - why: standalone tkinter param picker (mirrors main.py fields incl. DIAPHRAGM) → params.json
 - origin: R · branch: auto-steve
 - status: WORKS
 
-### C13 · workspace/pipeline/recon_codespec.yml
-- why: Tyger job spec (image tag); pinned to d136eb1
-- origin: R · branch: tyger · facts: F1 F2
-- status: CONFIG — needs sha bump after numba repin
+### C13 · workspace/pipeline/recon_codespec*.yml
+- why: Tyger job spec (image sha); variants `recon_codespec_db80f16.yml`, `_472fbc9.yml`, `_40d23a4.yml`
+- origin: R→C · branch: tyger · facts: F2 F42
+- status: CONFIG — current = `recon_codespec_40d23a4.yml`; base `recon_codespec.yml` still points at d136eb1 (July flip, uncommitted, not this session's)
 
 ### C14 · workspace/helpers/build_status_tab.py
 - why: regenerate Excel "Recon Status" tab from drives (blocker + HYPERLINK per ungreened subject)
 - origin: R · branch: batch · facts: F15
-- status: WORKS (conda base python, PYTHONPATH=.)
+- status: WORKS (conda base python, PYTHONPATH=.) — tab now stale vs 2026-09-13 greens
 
 ### C15 · workspace/helpers/probe_nch.py
 - why: CPU-convert each subject to MRD, report nch/numspec/fRBC, predict guard; submits nothing
@@ -164,7 +169,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 - status: WORKS but coupled — rerunning XeCS sweep silently changes later montages
 
 ## Scratch / reference (uncarded)
-`read_mapvbvd.py` (root, standalone loader, UNKNOWN) · `workspace/codes/kasap.c` (Kento reference, F20) · `asap/asap.c` (Steve reference, F20) · `helpers/_delete/` (byte-verified CS originals, moved to XeCS 2026-06-24) · `helpers/calib/` (duplicate .npy pair) · `pipeline/runs/`, `batch_recon.log`, `__pycache__/`.
+`read_mapvbvd.py` (root, standalone loader, UNKNOWN) · `workspace/codes/kasap.c` (Kento reference, F20) · `asap/asap.c` (Steve reference, F20) · `helpers/_delete/` (byte-verified CS originals, moved to XeCS 2026-06-24) · `helpers/calib/` (duplicate .npy pair) · `pipeline/runs/`, `batch_recon.log`, `__pycache__/` · 2026-09 scratch tier: `helpers/_roundtrip_audit.py` (roundtrip image-tree audit → outputs/roundtrip_audit_2026-09-13/), `helpers/_zorder_check.py` (F49 check → outputs/zorder_check_2026-09-12/), `helpers/_rbctp_fig.py` (F47 evidence figure → outputs/snr_2026-09-13/04_rbctp_split_evidence.png) · `Codes/2026_Steve_Recon/` (plain snapshot of Steve main 3303276, diff reference only).
 
 Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/recon — STALE, they moved to 2026_XeCS_Recon in the 2026-06-24 decouple.
 
@@ -189,10 +194,10 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 ### C26 · helpers/atlas/dis_atlas.py
 - why: subject-level QC atlas of the AIkill_Dynamic batch recons — group 84 sessions by
   subject ID (dates sorted), gas (gp) + dissolved (dp) at the highest gas-signal bin
-- origin: H · branch: main · facts: —
+- origin: H · branch: main · facts: F46 F47
 - in: /Volumes/HoomHamExt/AIkill_Dynamic/*/d/recon.mat (gas_phase +
-  dissolved_phase_magnitude, (16,Z,Y,X)); s/recon.mat gas fallback for the 3 sessions
-  whose d skipped dissolved (2024-01-18_001JM, 01-22_007RA, 01-31_008CR)
+  dissolved_phase_magnitude, (16,Z,Y,X)); s/recon.mat gas fallback for the 3 gas-only sessions
+  (2024-01-18_001JM, 01-22_007RA, 01-31_008CR — gas-only ACQUISITIONS, F46, not skipped dissolved)
 - out: workspace/outputs/aikill_atlas/dissolved_atlas.pdf (per ID: gp panel page + dp panel
   page [orientation-major blocks cor/sag/ax, per date one 10-slice row], then per date 6
   full all-slice pages cor/sag/ax × gp/dp) + videos/<ID>_{gp,dp}.mp4 (16 bins ×5, 5 fps)
@@ -200,6 +205,7 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   sagittal rot90 ccw); slice extent from GAS mask (≥30 voxels above 0.15·max, bin-mean);
   cross-date column alignment = per-session slices at shared apex→base fractions + fixed-size
   crop centered on each session's lung bbox (shift+scale, no registration); black bg, no gaps
+- status: ⚠ dp pages/videos SUSPECT (F47): `dissolved_phase_magnitude` = |aRBC+i·aTP| is noise-amplified by Steve's split for split sessions. Header stamped; marker `outputs/aikill_atlas/SUSPECT_F47.md`. Gas pages fine. Covers 84 sessions (pre-2026-09-12 cohort).
 
 ### C27 · helpers/rt_prepost_fig.py
 - why: RT-study figure — per subject, 10 coronal lung slices per visit, pre-RT row over
@@ -212,5 +218,40 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - note: EI bin (brightest = end-inspiration), per-visit norm to 99.5 pct of lung voxels,
   slice picks = 10 even fractions over lung Y-extent trimmed 8% each end, union Z-X crop
   across a subject's visits; coronal orientation matches post_process.py. Excluded: 007IT
-  (container curve_fit fail, no recon), 001BB pre 2023-03-27 (not on drive; its post
-  folder is named 002BB — ID mismatch vs Excel 001BB)
+  (container curve_fit fail, no recon — now reconstructed 2026-09-12), 001BB pre 2023-03-27
+  (not on drive; its post folder is named 002BB — ID mismatch vs Excel 001BB)
+
+### C28 · helpers/snr_calc.py
+- why: own image-domain SNR for every AIkill_Dynamic session — gas + total dissolved, per bin,
+  with max / min / end-inspiration summaries for SNR_Table_All.xlsx (Hooman ask 2026-09-13)
+- origin: C (method approved by H) · branch: snr-table · facts: F47 F48 F50 F52
+- in: `/Volumes/HoomHamExt/AIkill_Dynamic/<date>_<id>/<binning>/recon.mat` (default `d`: gas_phase,
+  dissolved_phase_real/imag, rbc_tp_separated); `--only`, `--binning`, `--out`
+- out: `workspace/outputs/snr_2026-09-13/snr_table.csv` — one row per session: EI/exp bins
+  (max/min lung-mask volume), gas/DP SNR at EI/exp/max/min + bins, per-bin SNR and lung-voxel
+  strings, σ, DP method; diagnostic RBC/TP per-part SNR (unreliable). Excel cols I–S written from it.
+- method: σ = std in 8 corner 10³ cubes minus 3-voxel-dilated lung; per-bin mask gas>5σ,
+  blobs ≥500 vox; DP = √max(vᵀC⁻¹v − 2, 0) mean over mask (C = background covariance of
+  real/imag; E[q]=2 verified)
+- status: WORKS (104 sessions, 0 errors, ~1 s/session)
+
+### C29 · pipeline/todo_batch.sh
+- why: detached worklist driver for the 25 leftover v2/v3 sessions (inventory 2026-09-12)
+- origin: C · branch: leftover-recon · facts: F42 F45
+- in: `<codespec.yml> [filter-regex]`, env `FORCE=1`; roundtrip Images + Ext `staged_src/` symlink dirs
+- out: per-session logs + `SUMMARY.txt` in `/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/logs/`; outputs via C9
+- status: WORKS (run with nohup; bigmac 2023-11-02 000LL commented out — duplicate)
+
+## Outputs index
+
+| Output dir (workspace/outputs/) | From | Facts | Status |
+|---|---|---|---|
+| snr_2026-09-13/ | C28, _rbctp_fig.py | F47 F48 F52 | VALID (snr_table.csv, rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png, test CSVs) |
+| roundtrip_audit_2026-09-13/ | _roundtrip_audit.py | F51 | VALID (roundtrip_audit.csv, 136 folders) |
+| steve_vs_fork_diff/ | git diff main/dev/diaphragm-recon | F49 | VALID (4 .diff files) |
+| zorder_check_2026-09-12/ | _zorder_check.py | F49 | VALID (030DN edge-finder figure) |
+| leftover_recon_2026-09-12/ | copies of AIkill_Dynamic montages | F47 | VALID gas; dp montages magnitude-of-split caveat |
+| aikill_atlas/ | C26 | F47 | ⚠ dp pages SUSPECT (SUSPECT_F47.md) |
+| rt_prepost/ | C27 | — | VALID |
+| diaphragm_binning/ | C24 C25 | F37 F38 | VALID |
+| 016PG/ · 023LL/ · 025JC/ · 25JC/ · 025JC_sweep_lt/ · piston/ | ? (June backlog, pre-canon) | ? | untagged — verify before trust (reconciled 2026-09-13) |

@@ -104,3 +104,39 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
 
 ## 2026-09-06 · misplaced session (no ASAP work)
 - A session opened in this folder for a Mac clock question and then did ~/Hooman/System work (Jon Snow, vault sweep, Brain/Canon mirrors). Nothing ASAP changed. Record lives in System's ledger session 29. The transcript the exit hook drops into workspace/archive/ (cff52ba0) is a duplicate of System's copy — safe to delete.
+
+## 2026-09-12/13 · session 5
+- Inventory of v2/v3 dynamics on Ext roundtrip: 27 not reconstructed → fixed the three blockers
+  in the fork (Hooman-approved push to `hooman/diaphragm-recon`): `472fbc9` numba/scipy/numpy
+  pins (F42), curve_fit-failure fallback, optional dp trajectory; `40d23a4` keeps dissolved as
+  unsplit complex + `rbc_tp_separated` tag. Hooman's nav diagnostic + gtypes.py left uncommitted.
+- Reworked `pipeline/dyn_recon.py` submit (buffer write / run create / poll / buffer read -p 4,
+  retries, runs dir on Ext, `--codespec`, MPLBACKEND=Agg) + `todo_batch.sh` (FORCE=1). Hit and fixed
+  `--ttl` HTTP 500 (F44) and a 40-min plt.show() hang (F45). 21 sessions reconstructed on Tyger;
+  unusable (no coil signal): 019WR + three tiny 000LL; duplicates skipped (SD03, 000LL 01-17) and
+  bigmac 000LL output quarantined on Ext.
+- Full audit of `_5t_images_roundtrip/Images` (136 folders): 104 unique sessions done (96 real /
+  64 subjects + 8 000-series), 4 failed, 4 duplicate, 20 no trajectory (2022 seqs, F51), 2 not dynamic.
+- Provenance: Steve original (branch main 3303276) now kept as plain non-git snapshot
+  `Codes/2026_Steve_Recon` (renamed by Hooman, worktree detached); diffs in outputs/steve_vs_fork_diff.
+  DIAPHRAGM z-flip verified as a real deviation from Steve (F49).
+- SNR_Table_All.xlsx: 11 rows greened (94 total); own measured SNR cols I–S (gas/DP max, min, at EI,
+  bins, method, note, split validity) from `helpers/snr_calc.py`; symlinked into XeCS + PCA data/.
+- Found Steve's RBC/TP split unreliable (F47): phase stop at ΣaTP=0 jump, 60/86 sessions off target,
+  noise gain 1/|sinΔφ| with corr −0.99. DP SNR switched to whitened magnitude (F48). Wrote
+  `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md` (not sent) + learning note
+  `reference/DP_RBCTP_Split_Noise_Diagnostics.md`. Flagged atlas dp pages (C26) suspect.
+
+- DECIDED: dissolved SNR = covariance-whitened magnitude for all sessions; never report per-part RBC/TP SNR.
+- DECIDED: new SNR table columns = max / min / at EI (EI = max lung-volume bin, DIAPHRAGM bins); end-exp dropped from table (kept in CSV).
+- DECIDED: 2026_Steve_Recon stays a plain folder (no git) — reference for diffing only.
+- DECIDED: bigmac 2023-11-02 000LL output quarantined (byte-duplicate of 2023-11-03), not deleted.
+- DECIDED: SNR table shared to XeCS/PCA by symlink (source of truth stays ASAP workspace/data).
+- RETRACTION: F1 + F41 → F42 (numba pins fixed the pipeline; db80f16 no longer needed).
+- RETRACTION: F40 → F43 (download speed varies; submit() no longer streams).
+- RETRACTION: ledger 2026-08-27 "d skipped dissolved (RBC/TP params absent: 001JM, 007RA, 008CR)" → F46 (gas-only acquisitions).
+- BRANCH: leftover-recon (B14), parent: B10. Closed (delivered).
+- BRANCH: steve-provenance (B15), parent: B8. Closed (z-flip verified, snapshot + diffs).
+- BRANCH: snr-table (B16), parent: B14. Closed (delivered).
+- BRANCH: rbctp-split-audit (B17), parent: B16. OPEN ★ (note to Steve unsent; atlas dp pages suspect).
+- BRANCH: tyger-access-check (B13) — closed ✅ (superseded by B14).

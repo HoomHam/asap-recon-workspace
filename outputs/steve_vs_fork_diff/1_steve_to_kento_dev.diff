@@ -1,0 +1,2116 @@
+diff --git a/.dockerignore b/.dockerignore
+new file mode 100644
+index 0000000..37f05ee
+--- /dev/null
++++ b/.dockerignore
+@@ -0,0 +1,8 @@
++.git
++__pycache__
++*.pyc
++*.mrd
++*.dat
++*.gif
++*.mat
++.claude
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..b3049fb
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++.claude/
++__pycache__/*
+diff --git a/Dockerfile b/Dockerfile
+new file mode 100644
+index 0000000..2283f5e
+--- /dev/null
++++ b/Dockerfile
+@@ -0,0 +1,36 @@
++# Container for tyger_recon.py: reads a raw MRD file, runs the GPU k-space
++# reconstruction, writes a reconstructed MRD file.
++#
++#   build: docker build -t xe-tyger-recon .
++#   run:   docker run --rm --gpus all -v /path/to/data:/data xe-tyger-recon \
++#              --input /data/xe_dyn_raw.mrd --output /data/xe_dyn_recon.mrd
++#
++# Base image notes:
++# - The -devel image is required: the numba CUDA kernels in recon.py need
++#   libnvvm, which the -runtime images do not ship.
++# - Ubuntu 24.04 provides python3.12, required by the MEDCAP mrd fork.
++# - GPU access at runtime needs the NVIDIA container toolkit (--gpus all).
++FROM nvidia/cuda:12.6.2-devel-ubuntu24.04
++
++LABEL org.opencontainers.image.source=https://github.com/MEDCAP/asap_recon
++
++ENV DEBIAN_FRONTEND=noninteractive \
++    PYTHONUNBUFFERED=1 \
++    MPLBACKEND=Agg
++
++RUN apt-get update && apt-get install -y --no-install-recommends \
++        python3 python3-pip python3-venv git \
++    && rm -rf /var/lib/apt/lists/*
++
++# venv sidesteps Ubuntu 24.04's externally-managed-environment pip restriction
++RUN python3 -m venv /opt/venv
++ENV PATH=/opt/venv/bin:$PATH
++
++WORKDIR /app
++
++COPY requirements.txt .
++RUN pip install --no-cache-dir -r requirements.txt
++
++COPY gtypes.py raw.py recon.py results.py tyger_recon.py ./
++
++ENTRYPOINT ["python", "tyger_recon.py"]
+diff --git a/convert_siemens_to_mrd.py b/convert_siemens_to_mrd.py
+new file mode 100644
+index 0000000..4c22dab
+--- /dev/null
++++ b/convert_siemens_to_mrd.py
+@@ -0,0 +1,258 @@
++import os
++import numpy as np
++import argparse
++
++import mapvbvd
++import mrd
++
++from gtypes import gvar
++
++
++def _classify_dat_files(dat_dir, dat_files=None, seqname=None):
++    """
++    Return (dynraw_path, refraw_path_or_None).
++    Largest file = dynamic acquisition; second-largest = breath-hold reference.
++    dat_files: optional pre-filtered list of .dat paths (e.g. from the GUI);
++    seqname: optional substring filter on filenames.
++    Raises FileNotFoundError if no .dat files are found.
++    """
++    if dat_files:
++        dats = sorted(dat_files, key=os.path.getsize)
++    else:
++        dats = sorted(
++            [os.path.join(dat_dir, f) for f in os.listdir(dat_dir) if f.endswith('.dat')],
++            key=os.path.getsize
++        )
++    if seqname:
++        dats = [f for f in dats if seqname in os.path.basename(f)]
++    if not dats:
++        raise FileNotFoundError(f'No matching .dat files found in {dat_dir}')
++    dynraw  = dats[-1]
++    refraw  = dats[-2] if len(dats) >= 2 else None
++    print(f'dynamic:   {dynraw} ({os.path.getsize(dynraw)} bytes)')
++    if refraw:
++        print(f'reference: {refraw} ({os.path.getsize(refraw)} bytes)')
++    return dynraw, refraw
++
++def _read_twix(dat_file):
++    """
++    Read a single Siemens .dat file.
++
++    Returns:
++        raw   : np.ndarray, complex64, shape (npts_full, nch, nilv)
++        meta  : dict with keys TR_us, TE_us, DPoff, dtdyn_ns, numspec_raw, dtspec_us
++    """
++    twix = mapvbvd.mapVBVD(dat_file)
++    if isinstance(twix, list):
++        twix = twix[-1]
++    twix.image.flagRemoveOS = False
++    twix.image.squeeze = True
++    raw = twix.image.unsorted().astype('complex64')
++    if raw.ndim == 2:
++        raw = raw[:, np.newaxis, :]  # add singleton channel dim → (npts, 1, nilv)
++
++    meta = dict(TR_us=0.0, TE_us=0.0, DPoff=0.0, dtdyn_ns=0.0,
++                numspec_raw=0, dtspec_us=0.0)
++    try:
++        meta['TR_us'] = float(twix.hdr.MeasYaps[('alTR', '0')])
++    except Exception:
++        pass
++    try:
++        meta['TE_us'] = float(twix.hdr.MeasYaps[('alTE', '0')])
++    except Exception:
++        pass
++    try:
++        meta['DPoff'] = float(twix.hdr.MeasYaps[('sWipMemBlock', 'adFree', '2')])
++    except Exception:
++        pass
++    try:
++        meta['dtdyn_ns'] = float(twix.hdr.MeasYaps[('sRXSPEC', 'alDwellTime', '0')])
++    except Exception:
++        pass
++    try:
++        meta['dtdyn_ns'] = float(twix.hdr.MeasYaps[('sRXSPEC', 'alDwellTime', '1')])
++    except Exception:
++        pass
++    try:
++        meta['numspec_raw'] = int(
++            twix.hdr.MeasYaps[('sWipMemBlock', 'alFree', '10')] *
++            twix.hdr.MeasYaps[('sWipMemBlock', 'alFree', '11')] + 0.1
++        )
++    except Exception:
++        pass
++    try:
++        meta['dtspec_us'] = float(twix.hdr.MeasYaps[('sWipMemBlock', 'alFree', '12')])
++    except Exception:
++        pass
++
++    return raw, meta
++
++
++def _parse_pneumotach(pneumo_file):
++    """
++    Parse the vendor pneumotach binary: packets marked by magic bytes 0xA6 0x20,
++    each holding a millisecond timestamp and a pressure reading.
++
++    Returns float32 array of shape (2, N): row 0 = time in seconds (zeroed to
++    the first packet), row 1 = pressure. Smoothing/cropping/volume integration
++    happen recon-side where ilvtime is known.
++    """
++    updatesendsize = 54
++    with open(pneumo_file, mode='rb') as f:
++        a = f.read()
++    idx = [j for j in range(len(a) - updatesendsize) if a[j] == 0xA6 and a[j+1] == 0x20]
++    print(f'found {len(idx)} pressure measurements in {pneumo_file}')
++    t = np.zeros(len(idx), dtype='float64')
++    P = np.zeros(len(idx), dtype='float64')
++    for cnt, j in enumerate(idx):
++        t[cnt] = a[j+5]*2**24 + a[j+4]*2**16 + a[j+3]*2**8 + a[j+2]
++        P[cnt] = -20 + 90 * (a[j+33]*2**8 + a[j+32]) / 65535.0
++    t -= t[0]
++    t /= 1000
++    return np.stack((t, P))
++
++
++def convert_siemens_to_mrd(dat_dir, output_mrd_file,
++                            gp_traj_file=None, dp_traj_file=None,
++                            pneumotach_file=None, killpts=2,
++                            params=None, dat_files=None, seqname=None):
++    """
++    Convert Siemens TWIX .dat file(s) in a directory to MRD binary format.
++
++    The largest .dat file is used as the dynamic acquisition; the
++    second-largest (if present) as the breath-hold reference. Header metadata
++    is taken from the dynamic file. Each acquisition is stored whole as a
++    single 3D NdArray of shape (channels, samples, lines), discriminated by
++    meta key ('reference_acquisition' / 'dynamic_acquisition').
++
++    NOTE: numspec is stored as the raw product alFree[10] * alFree[11].  The
++    scaling kluge (÷20 × nsmpperusimg/npts) is applied recon-side in raw.py
++    where the trajectory is available.
++\
++
++    Args:
++        dat_dir:         Directory containing the Siemens .dat file(s).
++        output_mrd_file: Path to output .mrd file (created or overwritten).
++        gp_traj_file:    Optional path to gas-phase trajectory .npy file.
++        dp_traj_file:    Optional path to dissolved-phase trajectory .npy file.
++        pneumotach_file: Optional path to pneumotach binary file.
++        killpts:         Initial samples to flag as discard_pre (default 2).
++        params:          Optional dict of recon parameters from the GUI/CLI
++                         (MS, IS, nbins, griddx, bindt, gplb, dplb, freqfilter,
++                         binning) stored as MRD header user parameters.
++        dat_files:       Optional pre-filtered list of .dat paths.
++        seqname:         Optional substring filter on .dat filenames.
++    """
++    # --- 1. Identify and read each file independently ---
++    dynraw_file, refraw_file = _classify_dat_files(dat_dir, dat_files, seqname)
++    dynraw, meta = _read_twix(dynraw_file)
++    npts_full, nch, nilv = dynraw.shape
++
++    refraw = None
++    if refraw_file is not None:
++        refraw, _ = _read_twix(refraw_file)
++
++    # --- 2. Build MRD Header (metadata from dynamic file) ---
++    header = mrd.Header()
++
++    seq = mrd.SequenceParametersType()
++    seq.t_r = [meta['TR_us'] * 1e-3]   # µs → ms (informational; recon reads user params)
++    seq.t_e = [meta['TE_us'] * 1e-3]
++    header.sequence_parameters = seq
++
++    sys_info = mrd.AcquisitionSystemInformationType()
++    sys_info.receiver_channels = nch
++    sys_info.system_vendor = 'Siemens'
++    header.acquisition_system_information = sys_info
++
++    if params is None:
++        params = {}
++    g_defaults = gvar()
++    user = mrd.UserParametersType()
++    user.user_parameter_double = [
++        mrd.UserParameterDoubleType(name='TR',     value=meta['TR_us'] * 1e-6),     # s
++        mrd.UserParameterDoubleType(name='TE',     value=meta['TE_us'] * 1e-6),     # s
++        mrd.UserParameterDoubleType(name='DPoff',  value=meta['DPoff']),
++        mrd.UserParameterDoubleType(name='dtdyn',  value=meta['dtdyn_ns'] * 1e-9),  # s
++        mrd.UserParameterDoubleType(name='dtspec', value=meta['dtspec_us'] * 1e-6), # s
++        mrd.UserParameterDoubleType(name='griddx', value=float(params.get('griddx', g_defaults.griddx))),
++        mrd.UserParameterDoubleType(name='bindt',  value=float(params.get('bindt', g_defaults.bindt))),
++    ]
++    user.user_parameter_long = [
++        mrd.UserParameterLongType(name='numspec',    value=meta['numspec_raw']),
++        mrd.UserParameterLongType(name='nusimg',     value=32),
++        mrd.UserParameterLongType(name='killpts',    value=killpts),
++        mrd.UserParameterLongType(name='MS',         value=int(params.get('MS', g_defaults.MS))),
++        mrd.UserParameterLongType(name='IS',         value=int(params.get('IS', g_defaults.IS))),
++        mrd.UserParameterLongType(name='nbins',      value=int(params.get('nbins', g_defaults.nbins))),
++        mrd.UserParameterLongType(name='gplb',       value=int(params.get('gplb', g_defaults.gplb))),
++        mrd.UserParameterLongType(name='dplb',       value=int(params.get('dplb', g_defaults.dplb))),
++        mrd.UserParameterLongType(name='freqfilter', value=int(params.get('freqfilter', g_defaults.freqfilter))),
++    ]
++    user.user_parameter_string = [
++        mrd.UserParameterStringType(name='binning', value=params.get('binning', 'SIGNAL')),
++    ]
++    header.user_parameters = user
++
++    # --- 3. Stream to MRD file ---
++    def stream_items():
++        # float64 throughout so the recon side is bit-identical to reading the
++        # source .npy / pneumotach files directly
++        if gp_traj_file is not None:
++            gp = np.load(gp_traj_file).astype('float64')
++            yield mrd.StreamItem.NdArrayDouble(
++                mrd.NdArray(data=gp, meta={'gas_phase_trajectory': [mrd.ArrayMetaValue.String('1')]}))
++        if dp_traj_file is not None:
++            dp = np.load(dp_traj_file).astype('float64')
++            yield mrd.StreamItem.NdArrayDouble(
++                mrd.NdArray(data=dp, meta={'dissolved_phase_trajectory': [mrd.ArrayMetaValue.String('1')]}))
++        if pneumotach_file is not None:
++            pn = _parse_pneumotach(pneumotach_file)
++            yield mrd.StreamItem.NdArrayDouble(
++                mrd.NdArray(data=pn, meta={'pneumotach': [mrd.ArrayMetaValue.String('1')]}))
++        # mapvbvd unsorted() is (samples, channels, lines); store channels-first
++        if refraw is not None:
++            yield mrd.StreamItem.NdArrayComplexFloat(
++                mrd.NdArray(data=np.ascontiguousarray(refraw.transpose(1, 0, 2)),
++                            meta={'reference_acquisition': [mrd.ArrayMetaValue.String('1')]}))
++        yield mrd.StreamItem.NdArrayComplexFloat(
++            mrd.NdArray(data=np.ascontiguousarray(dynraw.transpose(1, 0, 2)),
++                        meta={'dynamic_acquisition': [mrd.ArrayMetaValue.String('1')]}))
++
++    with mrd.BinaryMrdWriter(output_mrd_file) as writer:
++        writer.write_header(header)
++        writer.write_data(stream_items())
++
++if __name__ == '__main__':
++    parser = argparse.ArgumentParser(
++        description='Convert Siemens .dat file(s) in a directory to MRD binary format')
++    parser.add_argument('-i', '--input',  required=True, metavar='DIR',
++                        help='Directory containing Siemens .dat file(s)')
++    parser.add_argument('-o', '--output', required=True, metavar='FILE',
++                        help='Output .mrd file')
++    parser.add_argument('--gp-traj',      default=None,  metavar='FILE',
++                        help='Gas-phase trajectory .npy file')
++    parser.add_argument('--dp-traj',      default=None,  metavar='FILE',
++                        help='Dissolved-phase trajectory .npy file')
++    parser.add_argument('--pneumotach',   default=None,  metavar='FILE',
++                        help='Pneumotach binary file')
++    parser.add_argument('--seqname',      default=None,  metavar='STR',
++                        help='Substring filter for .dat filenames')
++    parser.add_argument('--ms',         type=int,   default=gvar.MS,         help='Matrix size')
++    parser.add_argument('--is',         type=int,   default=gvar.IS,         help='Image size', dest='IS')
++    parser.add_argument('--nbins',      type=int,   default=gvar.nbins,      help='Number of respiratory bins')
++    parser.add_argument('--griddx',     type=float, default=gvar.griddx,     help='Gridding kernel dx')
++    parser.add_argument('--bindt',      type=float, default=gvar.bindt,      help='Binning kernel dt')
++    parser.add_argument('--gplb',       type=int,   default=gvar.gplb,       help='Gas-phase line broadening')
++    parser.add_argument('--dplb',       type=int,   default=gvar.dplb,       help='Dissolved-phase line broadening')
++    parser.add_argument('--freqfilter', type=int,   default=gvar.freqfilter, help='Frequency filter')
++    parser.add_argument('--binning',    default='SIGNAL', choices=['SIGNAL', 'PNEUMOTACH'],
++                        help='Respiratory binning method')
++    args = parser.parse_args()
++    params = dict(MS=args.ms, IS=args.IS, nbins=args.nbins, griddx=args.griddx,
++                  bindt=args.bindt, gplb=args.gplb, dplb=args.dplb,
++                  freqfilter=args.freqfilter, binning=args.binning)
++    convert_siemens_to_mrd(args.input, args.output,
++                            args.gp_traj, args.dp_traj,
++                            pneumotach_file=args.pneumotach, killpts=2,
++                            params=params, seqname=args.seqname)
+diff --git a/gtypes.py b/gtypes.py
+index 29d7e38..5063451 100644
+--- a/gtypes.py
++++ b/gtypes.py
+@@ -24,7 +24,7 @@ class species(IntEnum):
+     NONE = 3
+ 
+ class gvar:
+-    basefolder = 'C:/users/steph/Desktop/data/dynamic/'
++    basefolder = '/Users/kento/dev/data/'
+     MS = 240
+     IS = 100
+     nbins = 16
+diff --git a/main.py b/main.py
+index a981c5f..dfea640 100644
+--- a/main.py
++++ b/main.py
+@@ -1,3 +1,5 @@
++import subprocess
++import sys
+ from tkinter import * #Tk, StringVar, IntVar, Button, Radiobutton, Label, Entry, OptionMenu, Checkbutton, filedialog, _setit
+ from tkinter import _setit, filedialog
+ from PIL import ImageTk, Image
+@@ -19,171 +21,76 @@ from scipy.io import savemat
+ from enum import IntEnum
+ 
+ 
+-# CREATE GLOBAL VARIABLE CLASSES
++# ---------------------------------------------------------------------------
++# GLOBAL STATE OBJECTS
++# ---------------------------------------------------------------------------
+ g     = gvar()
+ g_raw = raw()
+ g_traj = traj()
+ g_res = results()
+ g_dir = gdir()
+ 
+-# MAIN WINDOW OBJECT
+-root = Tk()
+-root.title('HPX dynamic data analysis')
+-root.geometry('1300x600')
+-# DISPLAYABLE ELEMENTS IN THE MAIN WINDOW
+-dyn_unreg_frames = []
+-
+-# BUTTONS AND CONTROLS
+-# Calc LV button
+-def calcLVcb():
+-    bt = getbintype()
+-    if(bt == bintype.DIAPHRAGM and not len(g_raw.ilvbin[bt])):
+-        print('calculating low-res b')
+-        saveMS = g.MS
+-        g.MS = g.IS + 4
+-        g_res.calcb(g, g_raw, g_traj, True)
+-        nusimg = int(g_raw.ntotalilvs * g_raw.npts / g_traj.nsmpperusimg)
+-        tempvolmeasvol = []
+-        for iusimg in range(0, nusimg):
+-            res = g_res.dyn_usimg_recon(g, g_raw, g_traj, g.usegpu, iusimg)
+-            if(not res):
+-                continue
+-            urfig = np.sum(np.abs(g_res.getimg(imgtype.GPDYN)[:, int(g.IS/4):int(3*g.IS/4), :]), 1)
+-            dropoff = np.sum(np.abs(g_res.getimg(imgtype.GPDYN)[:, int(g.IS/4):int(3*g.IS/4), :]), (1, 2))
+-            # fit from 25% to 75% signal
+-            for p1 in range(g.IS - 1, 0, -1):
+-                if(dropoff[p1] > np.min(dropoff) + 0.25 * (np.max(dropoff) - np.min(dropoff))):
+-                    break
+-            for p2 in range(p1, 0, -1):
+-                if(dropoff[p2] > np.min(dropoff) + 0.75 * (np.max(dropoff) - np.min(dropoff))):
+-                    break
+-            if(p1 - p2 >= 2):
+-                p = np.polyfit(np.array(range(p2, p1)), dropoff[p2:p1], 2)
+-                # fit curve is where y = p[0] x^2 + p[1] x + p[2], need to choose x where y = avg of min and max
+-                # (max - min) / 2 = p[0] x^2 + p[1] x + p[2]
+-                # p[0] x^2 + p[1] x + (p[2] - (max - min) / 2) = 0
+-                det = np.sqrt(p[1]**2 - 4 * p[0] * (p[2] - (np.max(dropoff) + np.min(dropoff)) / 2))
+-                m1 = (-p[1] + det) / (2 * p[0])
+-                m2 = (-p[1] - det) / (2 * p[0])
+-                ilvperusimg = int(g_traj.nsmpperusimg / g_raw.npts + .1)
+-                if(m1 > p2 and m1 < p1):
+-                    tempvolmeasvol.append(m1)
+-                    g_raw.volmeastime[bt].append(np.mean(g_raw.ilvtime[(iusimg * ilvperusimg):((iusimg + 1) * ilvperusimg)]))
+-                    urfigline = m1           
+-                elif(m2 > p2 and m2 < p1):
+-                    tempvolmeasvol.append(m2)
+-                    g_raw.volmeastime[bt].append(np.mean(g_raw.ilvtime[(iusimg * ilvperusimg):((iusimg + 1) * ilvperusimg)]))
+-                    urfigline = m2 
+-            else:
+-                print('p2 - p1 < 2')
+-            if(len(g_raw.volmeastime[bt]) > 5):
+-                ftvol = savgol_filter(tempvolmeasvol, 5, 2)
+-                minftvol = np.min(ftvol)
+-                g_raw.ilvvol[bt] = np.interp(g_raw.ilvtime, g_raw.volmeastime[bt], \
+-                        (ftvol - minftvol) / (max(ftvol) - minftvol), left=np.nan, right=np.nan)
+-                g_raw.rescale(g_raw.ilvvol[bt])
+-                g_raw.ilvbin[bt] = g_raw.bin(g_raw.ilvvol[bt])
+-                binning_plot_update()
+-            ur_fig_update(urimgtype.COLORMAPDIAPHRAGM, [urfig, urfigline, iusimg])
+-            root.update()
+-        ur_fig_update(urimgtype.COLORMAP, g_res.bmag[:, int(g.IS / 2), :])
+-        g.MS = saveMS
+-    binning_plot_update()
+-    buttons_update()
+-    root.update()
+-
+-calcLV_method = StringVar(None, 'Pneumotach')
+-calcLV_pneumo = Radiobutton(root, text = 'Pneumotach', value = 'Pneumotach', variable = calcLV_method, command=calcLVcb)
+-calcLV_pneumo.place(x = 360, y = 185)
+-calcLV_signal = Radiobutton(root, text = 'Signal', value = 'Signal', variable = calcLV_method, command=calcLVcb)
+-calcLV_signal.place(x = 360, y = 203)
+-calcLV_diaphragm = Radiobutton(root, text = 'Diaphragm', value = 'Diaphragm', variable = calcLV_method, command=calcLVcb)
+-calcLV_diaphragm.place(x = 360, y = 221)
+-def getbintype():
+-    bt = bintype.SIGNAL if calcLV_method.get() == 'Signal' else bintype.PNEUMOTACH
+-    return(bintype.DIAPHRAGM if calcLV_method.get() == 'Diaphragm' else bt)
+-
+-# Show Bin or Volume radio buttons
+-def showLVcb(): binning_plot_update()
+-showLV_var = StringVar(None, 'Volume')
+-showLV_volume = Radiobutton(root, text='Volume', value='Volume', variable=showLV_var, command=showLVcb)
+-showLV_volume.place(x = 360, y = 60)
+-showLV_bin = Radiobutton(root, text='Bin', value='Bin', variable=showLV_var, command=showLVcb)
+-showLV_bin.place(x = 360, y = 78)
+-
+-# Matrix size entry
+-Label(root, text = 'Matrix size =').place(x = 10, y = 230)
+-MS_entry = Entry(root, width = 3)
+-MS_entry.insert(0, str(g.MS))
+-MS_entry.place(x = 95, y = 230)
+-
+-# Image size entry
+-Label(root, text = 'Image size  =').place(x = 10, y = 250)
+-IS_entry = Entry(root, width = 3)
+-IS_entry.insert(0, str(g.IS))
+-IS_entry.place(x = 95, y = 250)
+-
+-# Number of bins entry
+-Label(root, text = '# of bins   =').place(x = 10, y = 270)
+-nbins_entry = Entry(root, width = 3)
+-nbins_entry.insert(0, str(g.nbins))
+-nbins_entry.place(x = 95, y = 270)
+-
+-# x,y,z kernel width
+-Label(root, text = 'Kernel dx  =').place(x = 10, y = 290)
+-xyz_kernel_entry = Entry(root, width = 3)
+-xyz_kernel_entry.insert(0, '1')
+-xyz_kernel_entry.place(x = 95, y = 290)
++class urimgtype(IntEnum):
++    NONE = 0
++    COLORMAP = 1
++    BWMAP = 2
++    COLORMAPDIAPHRAGM = 3
++    COMPLEXPLOT = 4
+ 
+-# t kernel width
+-Label(root, text = 'Kernel dt  =').place(x = 10, y = 310)
+-t_kernel_entry = Entry(root, width = 3)
+-t_kernel_entry.insert(0, '1')
+-t_kernel_entry.place(x = 95, y = 310)
++# Widget globals — set by setup_* functions, referenced by callbacks
++root = None
++dyn_unreg_frames = []
+ 
+-# gas phase line broadening
+-Label(root, text = 'GP LB =').place(x = 10, y = 330)
+-gplb_entry = Entry(root, width = 3)
+-gplb_entry.insert(0, '300')
+-gplb_entry.place(x = 95, y = 330)
++calcLV_method    = None
++calcLV_pneumo    = None
++showLV_var       = None
+ 
+-# dissolved phase line broadening
+-Label(root, text = 'DP LB =').place(x = 10, y = 350)
+-dplb_entry = Entry(root, width = 3)
+-dplb_entry.insert(0, '40')
+-dplb_entry.place(x = 95, y = 350)
++MS_entry         = None
++IS_entry         = None
++nbins_entry      = None
++xyz_kernel_entry = None
++t_kernel_entry   = None
++gplb_entry       = None
++dplb_entry       = None
++freqfilter_entry = None
+ 
+-# filter point
+-Label(root, text = 'Freq filter =').place(x = 10, y = 370)
+-freqfilter_entry = Entry(root, width = 3)
+-freqfilter_entry.insert(0, '0')
+-freqfilter_entry.place(x = 95, y = 370)
++excluderanges_cb_disable = False
++excluderanges_str        = None
++excluderanges_entry      = None
++
++dyn_recon_button  = None
++calc_T1RF_button  = None
++
++dataset_figure = None
++dataset_plot   = None
++dataset_canvas = None
++ur_figure      = None
++ur_figuretype  = None
++ur_plot        = None
++ur_canvas      = None
++ur_plot_colors = ['b', 'k', 'r', 'm']
+ 
+-# exclude ranges entry
+-excludranges_cb_disable = False
+-def excluderanges_cb(var, index, mode):
+-    global exclude_ranges_disable
+-    if(excluderanges_cb_disable):
+-        return
+-    global g_raw
+-    g_raw.excluderanges = stringtorangelist(excluderanges_str.get())
+-    binning_plot_update()
+-Label(root, text = 'Exclude ranges').place(x = 320, y = 120)
+-excluderanges_str = StringVar()
+-excluderanges_str.trace_add('write', excluderanges_cb)
+-excluderanges_entry = Entry(root, width = 20, textvariable = excluderanges_str)
+-excluderanges_entry.place(x = 320, y = 140)
++gp_traj_label        = None
++dp_traj_label        = None
++datasets_label       = None
++pneumotach_found_label = None
++rootdir_label        = None
++dyn_image_label      = None
+ 
+-def dyn_recon_cb(): dyn_recon_function()
+-dyn_recon_button = Button(root, text = 'Recon', fg = 'green', command = dyn_recon_cb)
+-dyn_recon_button.place(x = 250, y = 150)
++data_menu_var = None
++date_menu_var = None
++ID_menu_var   = None
++data_menu     = None
++date_menu     = None
++ID_menu       = None
+ 
+-def calc_T1RF_cb(): calc_T1RF_function()
+-calc_T1RF_button = Button(root, text = 'Calc T1RF', fg = 'green', command = calc_T1RF_cb)
+-calc_T1RF_button.place(x = 250, y = 200)
++usegpu = False
+ 
+ 
++# ---------------------------------------------------------------------------
+ # HELPER FUNCTIONS
++# ---------------------------------------------------------------------------
++
+ def rangeoverlap(f1, f2, rg):
+     # returns True if the range from (float) f1 to f2 interesects the range rg
+     return((f1 > rg.start and f1 < rg.stop) or (f2 > rg.start and f2 < rg.stop) or (f1 < rg.start and f2 > rg.stop))
+@@ -207,9 +114,6 @@ def rangelisttostring(rl):
+             s += ', '
+     return(s)
+ 
+-
+-
+-# functions for selecting only date/time compatible entries in a directory list
+ def isdt(x):
+     try:
+         parse(x)
+@@ -220,9 +124,7 @@ def isdt(x):
+ def getdtlist(x):
+     return([i for i in x if isdt(i)])
+ 
+-# reset the choices in a popup menu
+ def refresh_menu(thismenu, selectedstring, newoptions):
+-    # reset var and delete all old options
+     selectedstring.set('')
+     thismenu['menu'].delete(0, 'end')
+     for choice in newoptions:
+@@ -230,32 +132,89 @@ def refresh_menu(thismenu, selectedstring, newoptions):
+     if(len(newoptions) > 0):
+         selectedstring.set(newoptions[0])
+ 
++def getbintype():
++    bt = bintype.SIGNAL if calcLV_method.get() == 'Signal' else bintype.PNEUMOTACH
++    return(bintype.DIAPHRAGM if calcLV_method.get() == 'Diaphragm' else bt)
+ 
+ 
+-# DATA DISPLAY FIGURES
+-# raw data plot figure
+-dataset_figure = Figure(figsize = (6.5, 2), dpi = 100)
+-dataset_figure.tight_layout()
+-dataset_plot = dataset_figure.add_subplot(111)
++# ---------------------------------------------------------------------------
++# UI UPDATE FUNCTIONS
++# ---------------------------------------------------------------------------
++
++def ur_fig_update(type, thing):
++    global ur_plot
++    global ur_canvas
++    ur_plot.cla()
++    match type:
++        case urimgtype.NONE:
++            ur_plot.cla()
++        case urimgtype.BWMAP:
++            ur_plot.imshow(thing, cmap = 'gray')
++        case urimgtype.COLORMAP:
++            ur_plot.imshow(thing)
++        case urimgtype.COLORMAPDIAPHRAGM:
++            ur_plot.imshow(thing[0])
++            ur_plot.plot([0, g.IS - 1], [thing[1], thing[1]], 'r')
++            ur_plot.text(10, 10, '%d' % thing[2], color='w')
++        case urimgtype.COMPLEXPLOT:
++            for pltidx in range(len(thing)):
++                ur_plot.plot(thing[pltidx], ur_plot_colors[pltidx])
++    ur_canvas.draw()
++
++def binning_plot_update():
++    dataset_plot.cla()
++    if(len(g_raw.ilvtime) == 0):
++        return
++    gpdyn_duration = 0.0
++    if(g_raw.hasimg(imgtype.GPDYN)):
++        dataset_plot.plot(g_raw.volmeastime[bintype.SIGNAL], g_raw.volmeasvol[bintype.SIGNAL], ':y')
++        gpdyn_duration = g_raw.volmeastime[bintype.SIGNAL][-1]
++    if(g_raw.hasimg(imgtype.GPREF)):
++         sigref = np.sum(np.abs(g_raw.getimg(imgtype.GPREF)[0:10, :, :]), axis = (0, 1))
++         dataset_plot.plot(np.array(range(len(sigref))) * g_raw.TR + gpdyn_duration, sigref / np.max(sigref), ':y')
++    colors = ['r', 'g', 'b']
++    bt = getbintype()
++    if(showLV_var.get() == 'Bin' and len(g_raw.ilvbin[bt]) == len(g_raw.ilvtime)):
++        dataset_plot.plot(g_raw.ilvtime[g_raw.ilvbin[bt] >= 0], g_raw.ilvbin[bt][g_raw.ilvbin[bt] >= 0], colors[int(bt)])
++        for rg in g_raw.excluderanges:
++            dataset_plot.plot(g_raw.ilvtime[int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], g_raw.ilvbin[bt][int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], '--w')
++    elif(showLV_var.get() == 'Volume' and len(g_raw.ilvbin[bt]) == len(g_raw.ilvtime)):
++        dataset_plot.plot(g_raw.ilvtime, g_raw.ilvvol[bt], colors[int(bt)])
++        for rg in g_raw.excluderanges:
++            dataset_plot.plot(g_raw.ilvtime[int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], g_raw.ilvvol[bt][int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], '--w')
++    for j in range(0, len(g_raw.volmeasEEtime[bt])):
++        dataset_plot.plot([g_raw.volmeasEEtime[bt][j], g_raw.volmeasEEtime[bt][j]], [0, -.1], colors[int(bt)])
++    dataset_plot.plot(g_raw.ilvtime, g_raw.ilvtime * 0, 'k')
+     dataset_plot.set_yticks([])
+-dataset_canvas = FigureCanvasTkAgg(dataset_figure, master = root)  
+-dataset_canvas.get_tk_widget().place(x = 470, y = 0)
++    dataset_plot.set_ylim(-.1, 1)
++    dataset_canvas.draw()
+ 
+-# ur (upper right) plot figure
+-class urimgtype(IntEnum):
+-    NONE = 0
+-    COLORMAP = 1
+-    BWMAP = 2
+-    COLORMAPDIAPHRAGM = 3
+-    COMPLEXPLOT = 4
+-ur_figure = Figure(figsize = (2, 2), dpi = 100)
+-ur_figuretype = urimgtype.NONE
+-ur_figure.tight_layout()
+-ur_plot = ur_figure.add_subplot(111)
+-ur_plot.set_xticks([])
+-ur_plot.set_yticks([])
+-ur_canvas = FigureCanvasTkAgg(ur_figure, master = root)
+-ur_canvas.get_tk_widget().place(x = 1070, y = 0)
++def buttons_update():
++    global excluderanges_str
++    global excluderanges_cb_disable
++    calc_T1RF_button['state'] = 'normal' if g_raw.hasimg(imgtype.GPREF) else 'disabled'
++    dyn_recon_button['state'] = 'normal'# if not type(g_res.b) == list and len(g_raw.ilvbin[getbintype()]) > 0 else 'disabled'
++    if(not calcLV_pneumo['state'] == 'normal' and getbintype() == bintype.PNEUMOTACH):
++        calcLV_method.set('Signal')
++    excluderanges_cb_disable = True
++    excluderanges_entry.delete(0, END)
++    excluderanges_entry.insert(0, rangelisttostring(g_raw.excluderanges))
++    excluderanges_cb_disable = False
++
++def movie_update(ind):
++    global dyn_image_label
++    if(ind >= len(dyn_unreg_frames)):
++        root.after(100, movie_update, 0)
++        return
++    frame = dyn_unreg_frames[ind]
++    dyn_image_label.configure(image = frame)
++    dyn_image_label.image = frame
++    root.after(100, movie_update, (ind + 1) % len(dyn_unreg_frames))
++
++
++# ---------------------------------------------------------------------------
++# PROCESSING FUNCTIONS
++# ---------------------------------------------------------------------------
+ 
+ def check_recon_entries():
+     t = int(IS_entry.get())
+@@ -284,121 +243,93 @@ def check_recon_entries():
+         g.freqfilter = i
+     g.usegpu = cuda.is_available()
+ 
+-def dyn_recon_function():
+-    global g_res
+-    global g_raw
+-    global g_traj
+-    global dyn_unreg_frames
+-    global g
+-
++def convert_and_recon():
++    """Convert the selected Siemens .dat directory to MRD (with GUI parameters
++    as header user parameters), then run tyger_recon.py on it as a subprocess.
++    Both the raw and reconstructed MRD files land in the data directory."""
+     check_recon_entries()
+-
+-    print('calculating full-res b')
+-    g_res.calcb(g, g_raw, g_traj, True)
+-    ur_fig_update(urimgtype.COLORMAP, g_res.bmag[int(g.IS/2), :, :])
+-
+-    bt = getbintype()
+-    if(not len(g_raw.ilvbin[bt]) == len(g_raw.ilvtime)):
+-        print('bin with selected type first')
++    raw_mrd   = path.join(g_dir.datadirname, 'xe_dyn_raw.mrd')
++    recon_mrd = path.join(g_dir.datadirname, 'xe_dyn_recon.mrd')
++    pneumo = g_dir.pneumodatasets[0] if len(g_dir.pneumodatasets) == 1 else None
++    binning = 'PNEUMOTACH' if (getbintype() == bintype.PNEUMOTACH and pneumo) else 'SIGNAL'
++    params = dict(MS=g.MS, IS=g.IS, nbins=g.nbins, griddx=g.griddx, bindt=g.bindt,
++                  gplb=g.gplb, dplb=g.dplb, freqfilter=g.freqfilter, binning=binning)
++    try:
++        from convert_siemens_to_mrd import convert_siemens_to_mrd
++        convert_siemens_to_mrd(g_dir.datadirname, raw_mrd, g_dir.gptrajfilename, g_dir.dptrajfilename,
++                 pneumotach_file=pneumo, params=params, dat_files=g_dir.dyndatasets)
++    except Exception as e:
++        print('conversion FAILED:', e)
++        datasets_label.config(text='conversion FAILED: %s' % e, fg='red')
+         return
+-    # do recon
+-    g_res.dyn_recon(g, g_raw, g_traj, g_raw.ilvbin[bt], True)
+-
+-    if(g_res.hasimg(imgtype.DPDYN)):
+-        print('reconstructed dissolved ratio = ', np.sum(np.real(g_res.getimg(imgtype.DPDYN))) / np.sum(np.imag(g_res.getimg(imgtype.DPDYN))))
+-        print('spectrum dissolved ratio = ', g_raw.RBCTPratio[0])
+-    # save
+-    savemat(g_dir.datadirname + 'gpdyn.mat', {'gpdyn': g_res.getimg(imgtype.GPDYN)})
+-    savemat(g_dir.datadirname + 'dpdyn.mat', {'dpdyn': g_res.getimg(imgtype.DPDYN)})
+-    # make movie
+-    gp_scaling = np.max(g_res.getimg(imgtype.GPDYN)) * .8
+-    gp_noise = np.mean(g_res.getimg(imgtype.GPDYN)[:, 0:5, 0:5, 0:5])
+-    if(g_res.hasimg(imgtype.DPDYN)):
+-        dp_scaling = np.max(np.abs(g_res.getimg(imgtype.DPDYN))) * .9
+-    totalS = np.sum(g_res.getimg(imgtype.GPDYN))
+-    ctridx = [np.sum(np.sum(g_res.getimg(imgtype.GPDYN), axis = (0, 2, 3)) * np.array(range(0, g.IS))) / totalS, \
+-            np.sum(np.sum(g_res.getimg(imgtype.GPDYN), axis = (0, 1, 3)) * np.array(range(0, g.IS))) / totalS, \
+-            np.sum(np.sum(g_res.getimg(imgtype.GPDYN), axis = (0, 1, 2)) * np.array(range(0, g.IS))) / totalS]
+-    ctridx = [x if x > g.IS / 3 else int(g.IS / 3) + 1 for x in ctridx]
+-    ctridx = [x if x < g.IS * 2 / 3 else int(g.IS * 2 / 3) for x in ctridx]
+-    fig = plt.figure(frameon = False)
+-    fig.set_size_inches(16, 6, forward = False)
+-    pic = np.zeros((3 * g.IS, 8 * g.IS))
+-    im = plt.imshow(pic, interpolation = 'none', vmin = 0, vmax = 1, cmap = 'jet', aspect = 1)
+-    im.axes.get_xaxis().set_visible(False)
+-    im.axes.get_yaxis().set_visible(False)
+-    step = int(g.IS / 30)
+-    def animate_func(ibin):
+-        print('in animate ', ibin)
+-        global dyn_unreg_frames
+-        for icol in range(0, 8):
+-            if(ibin < g.nbins):
+-                gpimg = g_res.getimg(imgtype.GPDYN)[ibin, :, int(ctridx[1] + (icol - 3.5) * step), :]
+-                pic[0:g.IS, (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(gpimg / gp_scaling, 0)
+-                gpimg = g_res.getimg(imgtype.GPDYN)[ibin, int(ctridx[0] + (icol - 3.5) * step), :, :]
+-                pic[g.IS:(2*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(gpimg / gp_scaling, 0)
+-                gpimg = g_res.getimg(imgtype.GPDYN)[ibin, :, :, int(ctridx[2] + (icol - 3.5) * step)]
+-                pic[(2*g.IS):(3*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(gpimg / gp_scaling, 0)
+-            elif(ibin < g.nbins * 2):
+-                dpimg = np.real(g_res.getimg(imgtype.DPDYN)[ibin - g.nbins, :, int(ctridx[1] + (icol - 3.5) * step), :])
+-                pic[0:g.IS, (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling, 0)
+-                dpimg = np.real(g_res.getimg(imgtype.DPDYN)[ibin - g.nbins, int(ctridx[0] + (icol - 3.5) * step), :, :])
+-                pic[g.IS:(2*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling, 0)
+-                dpimg = np.real(g_res.getimg(imgtype.DPDYN)[ibin - g.nbins, :, :, int(ctridx[2] + (icol - 3.5) * step)])
+-                pic[(2*g.IS):(3*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling, 0)
+-            else:
+-                if(g.species == species.RABBIT):
+-                    dpimg = np.real(g_res.getimg(imgtype.DPDYN)[ibin - 2 * g.nbins, :, int(ctridx[1] + (icol - 3.5) * step), :]).copy()
+-                    gpimg = np.real(g_res.getimg(imgtype.GPDYN)[ibin - 2 * g.nbins, :, int(ctridx[1] + (icol - 3.5) * step), :]).copy() + 1E-9
+-                    gpimg[gpimg<(gp_scaling / 5)] = 1E+9
+-                    pic[0:g.IS, (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling / gpimg * gp_scaling / 3, 0)
+-                    dpimg = np.real(g_res.getimg(imgtype.DPDYN)[ibin - 2 * g.nbins, int(ctridx[0] + (icol - 3.5) * step), :, :]).copy()
+-                    gpimg = np.real(g_res.getimg(imgtype.GPDYN)[ibin - 2 * g.nbins, int(ctridx[0] + (icol - 3.5) * step), :, :]).copy() + 1E-9
+-                    gpimg[gpimg<(gp_scaling / 5)] = 1E+9
+-                    pic[g.IS:(2*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling / gpimg * gp_scaling / 3, 0)
+-                    dpimg = np.real(g_res.getimg(imgtype.DPDYN)[ibin - 2 * g.nbins, :, :, int(ctridx[2] + (icol - 3.5) * step)]).copy()
+-                    gpimg = np.real(g_res.getimg(imgtype.GPDYN)[ibin - 2 * g.nbins, :, :, int(ctridx[2] + (icol - 3.5) * step)]).copy() + 1E-9
+-                    gpimg[gpimg<(gp_scaling / 5)] = 1E+9
+-                    pic[(2*g.IS):(3*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling / gpimg * gp_scaling / 3, 0)
++    datasets_label.config(text='converted, running recon...', fg='green')
++    root.update()
++    cmd = [sys.executable, path.join(path.dirname(path.abspath(__file__)), 'tyger_recon.py'),
++           '--input', raw_mrd, '--output', recon_mrd]
++    proc = subprocess.run(cmd, cwd=g_dir.datadirname)  # child output streams to terminal
++    if proc.returncode == 0:
++        print('recon done:', recon_mrd)
++        datasets_label.config(text='recon done: ' + recon_mrd, fg='green')
+     else:
+-                    dpimg = np.imag(g_res.getimg(imgtype.DPDYN)[ibin - 2*g.nbins, :, int(ctridx[1] + (icol - 3.5) * step), :]) 
+-                    pic[0:g.IS, (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling, 0)
+-                    dpimg = np.imag(g_res.getimg(imgtype.DPDYN)[ibin - 2*g.nbins, int(ctridx[0] + (icol - 3.5) * step), :, :])
+-                    pic[g.IS:(2*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling, 0)
+-                    dpimg = np.imag(g_res.getimg(imgtype.DPDYN)[ibin - 2*g.nbins, :, :, int(ctridx[2] + (icol - 3.5) * step)])
+-                    pic[(2*g.IS):(3*g.IS), (icol * g.IS):((icol + 1) * g.IS)] = np.rot90(dpimg / dp_scaling, 0)
+-        pic[pic < 0] = 0
+-        pic[pic >= 1] = .999
+-        thisimg = np.zeros((pic.shape[0], pic.shape[1], 3), dtype = np.uint8)
+-        thisimg[:, :, 0] = (pic * 255).astype(np.uint8)
+-        thisimg[:, :, 1] = (pic * 255).astype(np.uint8)
+-        thisimg[:, :, 2] = (pic * 255).astype(np.uint8)
+-        if(g.species == species.RABBIT and ibin >= g.nbins * 2):
+-            for j in range(0, pic.shape[0]):
+-                for k in range(0, pic.shape[1]):
+-                    f = pic[j,k] * 255
+-                    if(f < 0):
+-                        idx = 0
+-                    elif(f > 255):
+-                        idx = 255
++        print('recon FAILED (exit %d)' % proc.returncode)
++        datasets_label.config(text='recon FAILED (exit %d)' % proc.returncode, fg='red')
++
++def calcLVcb():
++    bt = getbintype()
++    if(bt == bintype.DIAPHRAGM and not len(g_raw.ilvbin[bt])):
++        print('calculating low-res b')
++        saveMS = g.MS
++        g.MS = g.IS + 4
++        g_res.calcb(g, g_raw, g_traj, True)
++        nusimg = int(g_raw.ntotalilvs * g_raw.npts / g_traj.nsmpperusimg)
++        tempvolmeasvol = []
++        for iusimg in range(0, nusimg):
++            res = g_res.dyn_usimg_recon(g, g_raw, g_traj, g.usegpu, iusimg)
++            if(not res):
++                continue
++            urfig = np.sum(np.abs(g_res.getimg(imgtype.GPDYN)[:, int(g.IS/4):int(3*g.IS/4), :]), 1)
++            dropoff = np.sum(np.abs(g_res.getimg(imgtype.GPDYN)[:, int(g.IS/4):int(3*g.IS/4), :]), (1, 2))
++            # fit from 25% to 75% signal
++            for p1 in range(g.IS - 1, 0, -1):
++                if(dropoff[p1] > np.min(dropoff) + 0.25 * (np.max(dropoff) - np.min(dropoff))):
++                    break
++            for p2 in range(p1, 0, -1):
++                if(dropoff[p2] > np.min(dropoff) + 0.75 * (np.max(dropoff) - np.min(dropoff))):
++                    break
++            if(p1 - p2 >= 2):
++                p = np.polyfit(np.array(range(p2, p1)), dropoff[p2:p1], 2)
++                # fit curve is where y = p[0] x^2 + p[1] x + p[2], need to choose x where y = avg of min and max
++                # (max - min) / 2 = p[0] x^2 + p[1] x + p[2]
++                # p[0] x^2 + p[1] x + (p[2] - (max - min) / 2) = 0
++                det = np.sqrt(p[1]**2 - 4 * p[0] * (p[2] - (np.max(dropoff) + np.min(dropoff)) / 2))
++                m1 = (-p[1] + det) / (2 * p[0])
++                m2 = (-p[1] - det) / (2 * p[0])
++                ilvperusimg = int(g_traj.nsmpperusimg / g_raw.npts + .1)
++                if(m1 > p2 and m1 < p1):
++                    tempvolmeasvol.append(m1)
++                    g_raw.volmeastime[bt].append(np.mean(g_raw.ilvtime[(iusimg * ilvperusimg):((iusimg + 1) * ilvperusimg)]))
++                    urfigline = m1
++                elif(m2 > p2 and m2 < p1):
++                    tempvolmeasvol.append(m2)
++                    g_raw.volmeastime[bt].append(np.mean(g_raw.ilvtime[(iusimg * ilvperusimg):((iusimg + 1) * ilvperusimg)]))
++                    urfigline = m2
+             else:
+-                        idx = np.uint8(f)
+-                    carray = cm.jet(range(256))[idx][0:3]
+-                    thisimg[j,k,:] = (carray * 255).astype(np.uint8)
+-        newthisimg = np.resize(thisimg, (thisimg.shape[0] * 2, thisimg.shape[1] * 2, 3))
+-        for j in range(0, newthisimg.shape[0]):
+-            for k in range(0, newthisimg.shape[1]):
+-                newthisimg[j,k,:] = thisimg[int(j/2), int(k/2),:]
+-        img = Image.fromarray(newthisimg)
+-        photo_img = ImageTk.PhotoImage(img)
+-        dyn_unreg_frames.append(photo_img)
+-        im.set_array(pic)
+-        return [im]
+-    dyn_unreg_frames = []
+-    anim = animation.FuncAnimation(fig, animate_func, frames = g.nbins * (3 if g_res.hasimg(imgtype.DPDYN) else 1), interval = 100) # 10 fps
+-    writergif = animation.PillowWriter(fps=1)
+-    anim.save(g_dir.datadirname + 'dynamic_unreg.gif', writer = writergif)
++                print('p2 - p1 < 2')
++            if(len(g_raw.volmeastime[bt]) > 5):
++                ftvol = savgol_filter(tempvolmeasvol, 5, 2)
++                minftvol = np.min(ftvol)
++                g_raw.ilvvol[bt] = np.interp(g_raw.ilvtime, g_raw.volmeastime[bt], \
++                        (ftvol - minftvol) / (max(ftvol) - minftvol), left=np.nan, right=np.nan)
++                g_raw.rescale(g_raw.ilvvol[bt])
++                g_raw.ilvbin[bt] = g_raw.bin(g_raw.ilvvol[bt])
++                binning_plot_update()
++            ur_fig_update(urimgtype.COLORMAPDIAPHRAGM, [urfig, urfigline, iusimg])
++            root.update()
++        ur_fig_update(urimgtype.COLORMAP, g_res.bmag[:, int(g.IS / 2), :])
++        g.MS = saveMS
++    binning_plot_update()
+     buttons_update()
++    root.update()
+ 
+ def calc_T1RF_function():
+     # first non-killed point of each acquisition should have the same phase
+@@ -451,96 +382,10 @@ def calc_T1RF_function():
+     urfig[urfig > 3] = 3
+     ur_fig_update(urimgtype.COLORMAP, urfig)
+ 
+-ur_plot_colors = ['b', 'k', 'r', 'm']
+-def ur_fig_update(type, thing):
+-    global ur_plot
+-    global ur_canvas
+-    ur_plot.cla()
+-    match type:
+-        case urimgtype.NONE:
+-            ur_plot.cla()
+-        case urimgtype.BWMAP:
+-            ur_plot.imshow(thing, cmap = 'gray')
+-        case urimgtype.COLORMAP:
+-            ur_plot.imshow(thing)
+-        case urimgtype.COLORMAPDIAPHRAGM:
+-            ur_plot.imshow(thing[0])
+-            ur_plot.plot([0, g.IS - 1], [thing[1], thing[1]], 'r')
+-            ur_plot.text(10, 10, '%d' % thing[2], color='w')
+-        case urimgtype.COMPLEXPLOT:
+-            for pltidx in range(len(thing)):
+-                ur_plot.plot(thing[pltidx], ur_plot_colors[pltidx])
+-    ur_canvas.draw()
+-       
+-        
+-def binning_plot_update():
+-    dataset_plot.cla()
+-    if(len(g_raw.ilvtime) == 0):
+-        return
+-    gpdyn_duration = 0.0
+-    if(g_raw.hasimg(imgtype.GPDYN)):
+-        dataset_plot.plot(g_raw.volmeastime[bintype.SIGNAL], g_raw.volmeasvol[bintype.SIGNAL], ':y')
+-        gpdyn_duration = g_raw.volmeastime[bintype.SIGNAL][-1]
+-    if(g_raw.hasimg(imgtype.GPREF)):
+-         sigref = np.sum(np.abs(g_raw.getimg(imgtype.GPREF)[0:10, :, :]), axis = (0, 1))
+-         dataset_plot.plot(np.array(range(len(sigref))) * g_raw.TR + gpdyn_duration, sigref / np.max(sigref), ':y')
+-    colors = ['r', 'g', 'b']
+-    bt = getbintype()
+-    if(showLV_var.get() == 'Bin' and len(g_raw.ilvbin[bt]) == len(g_raw.ilvtime)):
+-        dataset_plot.plot(g_raw.ilvtime[g_raw.ilvbin[bt] >= 0], g_raw.ilvbin[bt][g_raw.ilvbin[bt] >= 0], colors[int(bt)])
+-        for rg in g_raw.excluderanges:
+-            dataset_plot.plot(g_raw.ilvtime[int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], g_raw.ilvbin[bt][int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], '--w')
+-    elif(showLV_var.get() == 'Volume' and len(g_raw.ilvbin[bt]) == len(g_raw.ilvtime)):
+-        dataset_plot.plot(g_raw.ilvtime, g_raw.ilvvol[bt], colors[int(bt)])
+-        for rg in g_raw.excluderanges:
+-            dataset_plot.plot(g_raw.ilvtime[int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], g_raw.ilvvol[bt][int(rg.start / g_raw.TR):int(rg.stop / g_raw.TR)], '--w')
+-    for j in range(0, len(g_raw.volmeasEEtime[bt])):
+-        dataset_plot.plot([g_raw.volmeasEEtime[bt][j], g_raw.volmeasEEtime[bt][j]], [0, -.1], colors[int(bt)])
+-    dataset_plot.plot(g_raw.ilvtime, g_raw.ilvtime * 0, 'k')
+-    dataset_plot.set_yticks([])
+-    dataset_plot.set_ylim(-.1, 1)
+-    dataset_canvas.draw()
+-
+-def buttons_update():
+-    global excluderanges_str
+-    global excluderanges_cb_disable
+-    calc_T1RF_button['state'] = 'normal' if g_raw.hasimg(imgtype.GPREF) else 'disabled'
+-    dyn_recon_button['state'] = 'normal'# if not type(g_res.b) == list and len(g_raw.ilvbin[getbintype()]) > 0 else 'disabled'
+-    if(not calcLV_pneumo['state'] == 'normal' and getbintype() == bintype.PNEUMOTACH):
+-        calcLV_method.set('Signal')
+-    excluderanges_cb_disable = True
+-    excluderanges_entry.delete(0, END)
+-    excluderanges_entry.insert(0, rangelisttostring(g_raw.excluderanges))
+-    excluderanges_cb_disable = False
+-
+-def movie_update(ind):
+-    global dyn_image_label
+-    if(ind >= len(dyn_unreg_frames)):
+-        root.after(100, movie_update, 0)
+-        return
+-    frame = dyn_unreg_frames[ind]
+-
+-    dyn_image_label.configure(image = frame)
+-    dyn_image_label.image = frame
+-    root.after(100, movie_update, (ind + 1) % len(dyn_unreg_frames))
+-
+-dyn_image_photo_img = ImageTk.PhotoImage(Image.fromarray(np.zeros((1,1,3), dtype = np.uint8)))
+-dyn_image_label = Label(root, image = dyn_image_photo_img)
+-dyn_image_label.place(x = 470, y = 200)
+-
+-    
+-Label(root, text = 'Trajectories:').place(x = 60, y = 150)
+-gp_traj_found = 0
+-gp_traj_label = Label(root, text = 'GP,')
+-gp_traj_label.place(x = 130, y = 150)
+-dp_traj_found = 0
+-dp_traj_label = Label(root, text = 'DP')
+-dp_traj_label.place(x = 150, y = 150)
+-datasets_label = Label(root, text = 'No dynamic datasets found', fg = 'red')
+-datasets_label.place(x = 60, y = 170)
+-pneumotach_found_label = Label(root, text = 'No pneumotach file found', fg = 'red')
+-pneumotach_found_label.place(x = 60, y = 190)
+ 
++# ---------------------------------------------------------------------------
++# DIRECTORY / MENU CALLBACKS
++# ---------------------------------------------------------------------------
+ 
+ def ID_callback(*args):
+     global g_dir
+@@ -613,24 +458,160 @@ def data_callback(*args):
+         g.species = species.NONE
+     set_date_menu()
+ 
+-# dataset ID selector
+ def set_ID_menu():
+     options = listdir(g.basefolder + '/' + data_menu_var.get() + '/' + date_menu_var.get())
+     refresh_menu(ID_menu, ID_menu_var, options)
+ 
+-# dataset date selector
+ def set_date_menu():
+     options = listdir(g.basefolder + '/' + data_menu_var.get())
+     options = getdtlist(options)
+     refresh_menu(date_menu, date_menu_var, options)
+     set_ID_menu()
+ 
+-# dataset data type selector
+ def set_data_menu():
+     options = listdir(g.basefolder)
+     refresh_menu(data_menu, data_menu_var, options)
+     set_date_menu()
+ 
++
++# ---------------------------------------------------------------------------
++# SETUP FUNCTIONS
++# ---------------------------------------------------------------------------
++
++def setup_window():
++    global root
++    root = Tk()
++    root.title('HPX dynamic data analysis')
++    root.geometry('1300x600')
++
++def setup_figures():
++    global dataset_figure, dataset_plot, dataset_canvas
++    global ur_figure, ur_figuretype, ur_plot, ur_canvas
++
++    dataset_figure = Figure(figsize = (6.5, 2), dpi = 100)
++    dataset_figure.tight_layout()
++    dataset_plot = dataset_figure.add_subplot(111)
++    dataset_plot.set_yticks([])
++    dataset_canvas = FigureCanvasTkAgg(dataset_figure, master = root)
++    dataset_canvas.get_tk_widget().place(x = 470, y = 0)
++
++    ur_figure = Figure(figsize = (2, 2), dpi = 100)
++    ur_figuretype = urimgtype.NONE
++    ur_figure.tight_layout()
++    ur_plot = ur_figure.add_subplot(111)
++    ur_plot.set_xticks([])
++    ur_plot.set_yticks([])
++    ur_canvas = FigureCanvasTkAgg(ur_figure, master = root)
++    ur_canvas.get_tk_widget().place(x = 1070, y = 0)
++
++def setup_binning_controls():
++    global calcLV_method, calcLV_pneumo, showLV_var
++ 
++    calcLV_method = StringVar(None, 'Pneumotach')
++    calcLV_pneumo = Radiobutton(root, text = 'Pneumotach', value = 'Pneumotach', variable = calcLV_method, command=calcLVcb)
++    calcLV_pneumo.place(x = 360, y = 185)
++    calcLV_signal = Radiobutton(root, text = 'Signal', value = 'Signal', variable = calcLV_method, command=calcLVcb)
++    calcLV_signal.place(x = 360, y = 203)
++    calcLV_diaphragm = Radiobutton(root, text = 'Diaphragm', value = 'Diaphragm', variable = calcLV_method, command=calcLVcb)
++    calcLV_diaphragm.place(x = 360, y = 221)
++
++    def showLVcb(): binning_plot_update()
++    showLV_var = StringVar(None, 'Volume')
++    Radiobutton(root, text='Volume', value='Volume', variable=showLV_var, command=showLVcb).place(x = 360, y = 60)
++    Radiobutton(root, text='Bin',    value='Bin',    variable=showLV_var, command=showLVcb).place(x = 360, y = 78)
++
++def setup_param_entries():
++    global MS_entry, IS_entry, nbins_entry, xyz_kernel_entry, t_kernel_entry
++    global gplb_entry, dplb_entry, freqfilter_entry
++
++    Label(root, text = 'Matrix size =').place(x = 10, y = 230)
++    MS_entry = Entry(root, width = 3)
++    MS_entry.insert(0, str(g.MS))
++    MS_entry.place(x = 95, y = 230)
++
++    Label(root, text = 'Image size  =').place(x = 10, y = 250)
++    IS_entry = Entry(root, width = 3)
++    IS_entry.insert(0, str(g.IS))
++    IS_entry.place(x = 95, y = 250)
++
++    Label(root, text = '# of bins   =').place(x = 10, y = 270)
++    nbins_entry = Entry(root, width = 3)
++    nbins_entry.insert(0, str(g.nbins))
++    nbins_entry.place(x = 95, y = 270)
++
++    Label(root, text = 'Kernel dx  =').place(x = 10, y = 290)
++    xyz_kernel_entry = Entry(root, width = 3)
++    xyz_kernel_entry.insert(0, '1')
++    xyz_kernel_entry.place(x = 95, y = 290)
++
++    Label(root, text = 'Kernel dt  =').place(x = 10, y = 310)
++    t_kernel_entry = Entry(root, width = 3)
++    t_kernel_entry.insert(0, '1')
++    t_kernel_entry.place(x = 95, y = 310)
++
++    Label(root, text = 'GP LB =').place(x = 10, y = 330)
++    gplb_entry = Entry(root, width = 3)
++    gplb_entry.insert(0, '300')
++    gplb_entry.place(x = 95, y = 330)
++
++    Label(root, text = 'DP LB =').place(x = 10, y = 350)
++    dplb_entry = Entry(root, width = 3)
++    dplb_entry.insert(0, '40')
++    dplb_entry.place(x = 95, y = 350)
++
++    Label(root, text = 'Freq filter =').place(x = 10, y = 370)
++    freqfilter_entry = Entry(root, width = 3)
++    freqfilter_entry.insert(0, '0')
++    freqfilter_entry.place(x = 95, y = 370)
++
++def setup_exclude_ranges():
++    global excluderanges_cb_disable, excluderanges_str, excluderanges_entry
++
++    def excluderanges_cb(var, index, mode):
++        global excluderanges_cb_disable
++        if(excluderanges_cb_disable):
++            return
++        global g_raw
++        g_raw.excluderanges = stringtorangelist(excluderanges_str.get())
++        binning_plot_update()
++
++    Label(root, text = 'Exclude ranges').place(x = 320, y = 120)
++    excluderanges_str = StringVar()
++    excluderanges_str.trace_add('write', excluderanges_cb)
++    excluderanges_entry = Entry(root, width = 20, textvariable = excluderanges_str)
++    excluderanges_entry.place(x = 320, y = 140)
++
++def setup_action_buttons():
++    global dyn_recon_button, calc_T1RF_button
++
++    dyn_recon_button = Button(root, text = 'Convert + Recon', fg = 'green', command = convert_and_recon)
++    dyn_recon_button.place(x = 250, y = 150)
++
++    calc_T1RF_button = Button(root, text = 'Calc T1RF', fg = 'green', command = lambda: calc_T1RF_function())
++    calc_T1RF_button.place(x = 250, y = 200)
++
++def setup_status_labels():
++    global gp_traj_label, dp_traj_label, datasets_label, pneumotach_found_label, dyn_image_label
++
++    Label(root, text = 'Trajectories:').place(x = 60, y = 150)
++    gp_traj_label = Label(root, text = 'GP,')
++    gp_traj_label.place(x = 130, y = 150)
++    dp_traj_label = Label(root, text = 'DP')
++    dp_traj_label.place(x = 150, y = 150)
++    datasets_label = Label(root, text = 'No dynamic datasets found', fg = 'red')
++    datasets_label.place(x = 60, y = 170)
++    pneumotach_found_label = Label(root, text = 'No pneumotach file found', fg = 'red')
++    pneumotach_found_label.place(x = 60, y = 190)
++
++    dyn_image_photo_img = ImageTk.PhotoImage(Image.fromarray(np.zeros((1,1,3), dtype = np.uint8)))
++    dyn_image_label = Label(root, image = dyn_image_photo_img)
++    dyn_image_label.place(x = 470, y = 200)
++
++def setup_menus():
++    global data_menu_var, date_menu_var, ID_menu_var
++    global data_menu, date_menu, ID_menu
++    global rootdir_label, usegpu
++
+     options = listdir(g.basefolder)
+ 
+     ID_menu_var = StringVar()
+@@ -647,12 +628,11 @@ data_menu_var = StringVar()
+     data_menu_var.trace('w', data_callback)
+     data_menu = OptionMenu(root, data_menu_var, *options, command = set_date_menu)
+     data_menu.place(x = 20, y = 55)
+-set_data_menu()
+ 
+-# add rootdir selector
+     Label(root, text = "Data root dir:").place(x = 0, y = 30)
+     rootdir_label = Label(root, text = g.basefolder)
+     rootdir_label.place(x = 150, y = 30)
++
+     def select_file():
+         global g
+         selectedfolder = filedialog.askdirectory(title = 'dynamic data directory', initialdir = '/')
+@@ -660,9 +640,8 @@ def select_file():
+             g.basefolder = selectedfolder
+             rootdir_label.config(text = g.basefolder)
+             set_data_menu()
+-rootdir_selector = Button(root, text = 'change', command = select_file).place(x = 80, y = 27)
++    Button(root, text = 'change', command = select_file).place(x = 80, y = 27)
+ 
+-# GPU selector
+     usegpu = cuda.is_available()
+     if(usegpu):
+         Label(root, text = cuda.get_current_device()).place(x = 40, y = 3)
+@@ -672,26 +651,29 @@ if(usegpu):
+     else:
+         Label(root, text = 'No GPU available').place(x = 0, y = 0)
+ 
++    set_data_menu()
+ 
+-# load dataset and plot
+-def loadfunction():
+-    global g_raw
+-    global g_traj
+-    check_recon_entries()
+-    g_traj.load(g_dir.gptrajfilename, g_dir.dptrajfilename, 32)
+-    g_raw.load(g, g_traj, g_dir.dyndatasets, g_dir.dyndatasetslen, g_dir.fileformat, g_dir.pneumodatasets, g_dir.pneumodatasetslen)
+-    if(len(g_raw.sspect)):
+-        ur_fig_update(urimgtype.COMPLEXPLOT, [np.real(g_raw.sspect[0]), np.real(g_raw.sspectfit[0]), np.imag(g_raw.sspect[0]), np.imag(g_raw.sspectfit[0])])
+-    g_res = results()
+-    binning_plot_update()
+-    buttons_update()
+ 
+-load_button = Button(root, text = '  Load  ', fg = 'green', command = loadfunction)
+-load_button.place(x = 250, y = 95)
++# ---------------------------------------------------------------------------
++# MAIN ENTRY POINT
++# ---------------------------------------------------------------------------
++
++def main():
++    setup_window()              # setup TK window
++    setup_figures()             # canva draw
++    setup_binning_controls()    # set volume bins
++    setup_param_entries()       # setup parameters to be passed to mrd file header
++    setup_exclude_ranges()
++    setup_action_buttons()
++    setup_status_labels()       # must come before setup_menus (ID_callback uses these labels)
++    setup_menus()               # load function triggers ID_callback via StringVar trace
+ 
+-# Execute tkinter
+     binning_plot_update()
+     ur_fig_update(urimgtype.NONE, [])
+     buttons_update()
+     root.after(100, movie_update, 0)
+     root.mainloop()
++
++
++if __name__ == '__main__':
++    main()
+\ No newline at end of file
+diff --git a/raw.py b/raw.py
+index c193f12..0173e21 100644
+--- a/raw.py
++++ b/raw.py
+@@ -1,10 +1,11 @@
+ import os
++from sys import stderr
+ import numpy as np
+-import matplotlib.pyplot as plt
+-import mapvbvd
+-from gtypes import gvar, imgtype, graddir, bintype, species
++
+ from scipy.signal import savgol_filter
+ from scipy.optimize import curve_fit
++from gtypes import gvar, imgtype, graddir, bintype, species
++
+ 
+ def gaussfit(x, h, w, c):
+     return(h * np.exp(-(x - c)**2 / w**2))
+@@ -27,17 +28,37 @@ class traj:
+         self.spectBW = 1 / 60E-6 # spectrum acquisition in Hz
+         self.sfrq = 17.666 # MHz @ 1.5T
+     def gettraj(self, itype, dir): return(self.all[itype.value][dir.value])
+-    def load(self, gpfilename, dpfilename, nusimg):
+-        self.kgp = []
+-        self.kdp = []
+-        if(os.path.exists(gpfilename)):
+-            self.kgp = np.load(gpfilename) * self.FOV # in units of delta-k
+-        else:
+-            print('gas phase filename', gpfilename, ' not found')
+-            return
+-        if(os.path.exists(dpfilename)):
+-            self.kdp = np.load(dpfilename) * self.FOV
+-            print('loaded dp trajectory', self.kdp.shape)
++
++    def load_traj_from_npfile(self, gpfilename, dpfilename, nusimg):
++        """
++        From numpy file, load gas phase and dynamic phase trajectory as 1D array
++        Args:
++            - gpfilename: filepath to gas phase npy file
++            - dpfilename: filepath to dynamic phase npy file
++            - nusimg: 
++        """
++        # load from np files
++        if not os.path.exists(gpfilename):
++            raise FileNotFoundError(f'Gas phase trajectory file not found: {gpfilename}')
++        if not os.path.exists(dpfilename):
++            raise FileNotFoundError(f'Dissolved phase trajectory file not found: {dpfilename}')
++   
++        kgp = np.load(gpfilename)
++        print(f'Loaded gas phase trajectory with shape={kgp.shape}', file=stderr)
++        kdp = np.load(dpfilename)    
++        print(f'Loaded dynamic phase trajectory with shape={kdp.shape}', file=stderr)
++        self.load_traj_from_array(kgp, kdp, nusimg)
++
++    def load_traj_from_array(self, gp_array, dp_array, nusimg):
++        """
++        From 1D np.array of gp and dp, fill in the traj fields with acquired sample points
++        Args:
++            - gp_array: 1d np.array of gas phase data
++            - dp_array: 1d np.array of dissolved in tissue phase trajectory
++            - nusimage: number of images to use?
++        """
++        self.kgp = gp_array * self.FOV # in units of delta-k
++        self.kdp = dp_array * self.FOV
+         # figure out number of points per interleave by looking at the periodicity of the trajectory
+         abskgp = np.sum(self.kgp**2, 1)
+         absfftkgp = np.abs(np.fft.fft(abskgp))
+@@ -154,122 +175,132 @@ class raw:
+             bins[np.isnan(bins)] = -1
+             bins /= len(v)
+         return(bins)
+-    def load(self, g, trajec, dyndatasets, dyndatasetslen, fileformat, pneumodatasets, pneumodatasetslen):
++    
++    
++    def load_pneumotach_from_arrays(self, t, P):
++        """
++        Pneumotach NdArray parsed by the converter: t = time in seconds
++        (zeroed to first packet), P = pressure. Smooths, crops to the
++        acquisition window and integrates pressure into (unnormalized) volume.
++        Call after self.ilvtime is set.
++        """
++        bt = bintype.PNEUMOTACH
++        t = np.asarray(t, dtype = 'float64').copy()
++        P = np.asarray(P, dtype = 'float64').copy()
++        if(len(P) > 51):
++            P = savgol_filter(P, 51, 2)
++        keep = (t > self.ilvtime[0]) & (t < self.ilvtime[len(self.ilvtime) - 1])
++        P = P[keep]
++        t = t[keep]
++        self.volmeastime[bt] = t
++        self.volmeasvol[bt] = np.zeros(len(P))
++        for j in range(0, len(t) - 1):
++            self.volmeasvol[bt][j + 1] = self.volmeasvol[bt][j] + P[j]
++
++    def load_from_arr(self, traj, ref_acq_arr, dyn_acq_arr, pneumo_arr, fileformat, meta=None):
+         self.__init__()
+         noisespikethresh = 10
+-        dynrawfname = ''
+-        refrawfname = ''
+-        if len(dyndatasets) == 0:
+-            print('no datasets found')
+-        elif len(dyndatasets) == 1:
+-            print('a single raw file found, using as dynamic')
+-            print(dyndatasets[0])
+-            dynrawfname = dyndatasets[0]
+-        elif len(dyndatasets) == 2:
+-            print('two raw files found, breath-hold reference is')
+-            print(dyndatasets[np.argmin(dyndatasetslen)] + ' (%d bytes)' % dyndatasetslen[np.argmin(dyndatasetslen)])
+-            print('and dynamic is')
+-            print(dyndatasets[np.argmax(dyndatasetslen)] + ' (%d bytes)' % dyndatasetslen[np.argmax(dyndatasetslen)])
+-            dynrawfname = dyndatasets[np.argmax(dyndatasetslen)]
+-            refrawfname = dyndatasets[np.argmin(dyndatasetslen)]
+-        def unsqueeze(a):
+-            if(len(a.shape) == 3):
+-                return(a)
+-            acopy = np.zeros((a.shape[0], 1, a.shape[1]), dtype = 'complex')
+-            acopy[:, 0, :] = a
+-            return(acopy)
+-        if(fileformat == 'siemens'):
+-            import mapvbvd
+         # load raw datafiles, identify gas/dissolved excitation pattern, split into
+         # gas and dissolved
+-            if(len(refrawfname) > 0):
+-                twixObj = mapvbvd.mapVBVD(refrawfname)
++        if fileformat == 'mrd_siemens' or fileformat == 'siemens':
++            # acquisition arrays arrive channels-first (nch, npts, nilv); transpose to
++            # the internal (npts, nch, nilv) ordering used throughout the recon
++            if ref_acq_arr is not None:
++                ref_acq_arr = np.ascontiguousarray(ref_acq_arr.transpose(1, 0, 2))
++                self.npts = ref_acq_arr.shape[0]
++                self.nch = ref_acq_arr.shape[1]
++            if dyn_acq_arr is not None:
++                dyn_acq_arr = np.ascontiguousarray(dyn_acq_arr.transpose(1, 0, 2))
++                self.npts = dyn_acq_arr.shape[0]
++                self.nch = dyn_acq_arr.shape[1]
++                # parse acquisition metadata up front (the spectrum fit below uses self.TE)
++                numspec_raw = 0
++                dtdyn = 0.0
++                dtspec = 0.0
++                if fileformat == 'siemens':
++                    self.TR = meta[('alTR', '0')] * 1.0E-6 # s
++                    self.TE = meta[('alTE', '0')] * 1.0E-6 # s
++                    self.DPoff = meta[('sWipMemBlock', 'adFree', '2')]
++                    dtdyn = meta[('sRXSPEC', 'alDwellTime', '0')] * 1.0E-9 # s
+                     try:
+-                    twixObj.image.flagRemoveOS = False        # needed to prevent downsampling
++                        dtdyn = meta[('sRXSPEC', 'alDwellTime', '1')] * 1.0E-9
+                     except:
+-                    twixObj = twixObj[1]
+-                twixObj.image.flagRemoveOS = False        # needed to prevent downsampling
+-                twixObj.image.squeeze = True
+-                refraw = unsqueeze(twixObj.image.unsorted()).astype('complex64')[trajec.killpts:, :, :]
+-                self.npts = refraw.shape[0]
+-                self.nch = refraw.shape[1]
+-                # data ordering is [npts (512 - trajec.killpts), nch (1 or 8), nilv]
+-            if(len(dynrawfname) > 0):
+-                twixObj = mapvbvd.mapVBVD(dynrawfname)
++                        pass
+                     try:
+-                    twixObj.image.flagRemoveOS = False        # needed to prevent downsampling
++                        dtspec = meta[('sWipMemBlock', 'alFree', '12')] * 1.0E-6 # s
+                     except:
+-                    twixObj = twixObj[1]
+-                twixObj.image.flagRemoveOS = False        # needed to prevent downsampling
+-                twixObj.image.squeeze = True
+-                dynraw = unsqueeze(twixObj.image.unsorted()).astype('complex64')[trajec.killpts:, :, :]
+-                # TTTTTTTTTTTTTTTTTTERRRIBLE KLUGE FOR NOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+-                #dynraw = np.expand_dims(dynraw[:, 0, :] + 1j * dynraw[:, 1, :], 1)
+-                # TTTTTTTTTTTTTTTTTTERRRIBLE KLUGE FOR NOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+-                self.npts = dynraw.shape[0]
+-                self.nch = dynraw.shape[1] # this is meant to normalize each channel to its noise amplitude, but it seems like they already are for some reason
++                        pass
++                    try:
++                        numspec_raw = int(meta[('sWipMemBlock', 'alFree', '10')] * \
++                                meta[('sWipMemBlock', 'alFree', '11')] + 0.1)
++                    except:
++                        print(f'sWipMemBlock not found, setting numspec = 0', file=stderr)
++                elif fileformat == 'mrd_siemens':
++                    # plain dict built from the MRD header user parameters, all in SI units
++                    self.TR = meta.get('TR', 0.0)
++                    self.TE = meta.get('TE', 0.0)
++                    self.DPoff = meta.get('DPoff', 0.0)
++                    dtdyn = meta.get('dtdyn', 0.0)
++                    dtspec = meta.get('dtspec', 0.0)
++                    numspec_raw = int(meta.get('numspec', 0))
++                if(np.fabs(self.TR - 0.0223) < 1E-6):
++                    self.TR = 22.26E-3 ### KLUGE FOR NOW, IT ROUNDS IN THE FILE!
+                 for ich in range(self.nch):
+-                    std = np.std(np.real(dynraw[:, ich, :]))
+-                    y, x = np.histogram(np.real(dynraw), range=(-3*std, 3*std), bins=int(np.prod(dynraw[:, ich, :].shape) / 1000))
++                    std = np.std(np.real(dyn_acq_arr[:, ich, :]))
++                    y, x = np.histogram(np.real(dyn_acq_arr), range=(-3*std, 3*std), bins=int(np.prod(dyn_acq_arr[:, ich, :].shape) / 1000))
+                     popt, pcov = curve_fit(gaussfit, x[:-1], y, p0=(np.max(y), std, 0.0))
+-                    dynraw[:, ich, :] /= popt[1]
++                    dyn_acq_arr[:, ich, :] /= popt[1]
+                 # separate out initial spectrum acquisition
+-                numspec = 0
+-                rawspec = []
+-                try:
+-                    numspec = int(twixObj.hdr.MeasYaps[('sWipMemBlock', 'alFree', '10')] * \
+-                            twixObj.hdr.MeasYaps[('sWipMemBlock', 'alFree', '11')] + 0.1)
+                 # TEMP KLUGE BECAUSE OF 20 MAGIC COOKIE!!!!!!!!!!!!!
+-                    numspec = int(numspec / 20 * trajec.nsmpperusimg / self.npts + .1)
++                numspec = int(numspec_raw / 20 * traj.nsmpperusimg / self.npts + .1) if numspec_raw else 0
+                 # END TEMP KLUGE
+-                    rawspec = dynraw[:, :, :numspec]
+-                    dynraw = dynraw[:, :, numspec:]
+-                except:
+-                    print('sWipMemBlock not found, setting numspec = 0')
++                rawspec = dyn_acq_arr[..., :numspec]
++                dyn_acq_arr = dyn_acq_arr[..., numspec:]
++
+                 # separate out gas and dissolved acquisitions based on pattern of signal intensities.
+                 # can be just gas, gas/dissolved or gas/dissolved/dissolved
+-                pat = np.abs(np.fft.fft(dynraw[0, 0, :])) # FFT tells you acq ordering
++                pat = np.abs(np.fft.fft(dyn_acq_arr[0, 0, :])) # FFT tells you acq ordering
+                 if(max(pat[(int(len(pat) / 3) - 5):(int(len(pat) / 3) + 5)]) > pat[0] / 5):
+-                    print('identified sampling pattern gas-dissolved-dissolved')
+-                    self.setimg(imgtype.GPDYN, dynraw[:, :, 0:(3 * int(dynraw.shape[2] / 3)):3], 0)
+-                    self.setimg(imgtype.DPDYN, dynraw[:, :, 1:(3 * int(dynraw.shape[2] / 3)):3] + \
+-                           dynraw[:, :, 2:(3 * int(dynraw.shape[2] / 3)):3], 0)
+-                    if(len(refrawfname) > 0):
+-                        self.setimg(imgtype.GPREF, refraw[:, :, 0:(3 * int(refraw.shape[2] / 3)):3], 0)
+-                        self.setimg(imgtype.DPREF, refraw[:, :, 1:(3 * int(refraw.shape[2] / 3)):3] + \
+-                                refraw[:, :, 2:(3 * int(refraw.shape[2] / 3)):3], 0)
++                    print(f'identified sampling pattern gas-dissolved-dissolved', file=stderr)
++                    self.setimg(imgtype.GPDYN, dyn_acq_arr[..., 0:(3 * int(dyn_acq_arr.shape[2] / 3)):3], 0)
++                    self.setimg(imgtype.DPDYN, dyn_acq_arr[..., 1:(3 * int(dyn_acq_arr.shape[2] / 3)):3] + \
++                            dyn_acq_arr[..., 2:(3 * int(dyn_acq_arr.shape[2] / 3)):3], 0)
++                    if ref_acq_arr is not None:
++                        self.setimg(imgtype.GPREF, ref_acq_arr[..., 0:(3 * int(ref_acq_arr.shape[2] / 3)):3], 0)
++                        self.setimg(imgtype.DPREF, ref_acq_arr[..., 1:(3 * int(ref_acq_arr.shape[2] / 3)):3] + \
++                                ref_acq_arr[..., 2:(3 * int(ref_acq_arr.shape[2] / 3)):3], 0)
+                     self.ilvperTR = 3
+                 elif(max(pat[(int(len(pat) / 2) - 5):(int(len(pat) / 2) + 5)]) > pat[0] / 3):
+-                    print('identified sampling pattern gas-dissolved')
+-                    self.setimg(imgtype.GPDYN, dynraw[:, :, 0:(2 * int(dynraw.shape[2] / 2)):2], 0)
+-                    self.setimg(imgtype.DPDYN, dynraw[:, :, 1:(2 * int(dynraw.shape[2] / 2)):2], 0)
+-                    if(len(refrawfname) > 0):
+-                        self.setimg(imgtype.GPREF, refraw[:, :, 0:(2 * int(refraw.shape[2] / 2)):2], 0)
+-                        self.setimg(imgtype.DPREF, refraw[:, :, 1:(2 * int(refraw.shape[2] / 2)):2], 0)
++                    print(f'identified sampling pattern gas-dissolved', file=stderr)
++                    self.setimg(imgtype.GPDYN, dyn_acq_arr[..., 0:(2 * int(dyn_acq_arr.shape[2] / 2)):2], 0)
++                    self.setimg(imgtype.DPDYN, dyn_acq_arr[..., 1:(2 * int(dyn_acq_arr.shape[2] / 2)):2], 0)
++                    if ref_acq_arr is not None:
++                        self.setimg(imgtype.GPREF, ref_acq_arr[..., 0:(2 * int(ref_acq_arr.shape[2] / 2)):2], 0)
++                        self.setimg(imgtype.DPREF, ref_acq_arr[..., 1:(2 * int(ref_acq_arr.shape[2] / 2)):2], 0)
+                     self.ilvperTR = 2
+                 else:
+-                    print('identified sampling pattern gas-only')
+-                    self.setimg(imgtype.GPDYN, dynraw, 0)
+-                    if(len(refrawfname) > 0):
+-                        self.setimg(imgtype.GPREF, refraw, 0)
++                    print(f'identified sampling pattern gas-only', file=stderr)
++                    self.setimg(imgtype.GPDYN, dyn_acq_arr, 0)
++                    if ref_acq_arr is not None:
++                        self.setimg(imgtype.GPREF, ref_acq_arr, 0)
+                     self.ilvperTR = 1
+                 # rephase everything so that the beginning of the fids has zero phase
+                 for ich in range(self.nch):
+                     gasphase = np.mean(self.getimg(imgtype.GPDYN)[0:4, ich, :])
+                     gasrephase = np.conj(gasphase) / np.abs(gasphase)
+                     self.getimg(imgtype.GPDYN)[:, ich, :] *= gasrephase
+-                    if(len(rawspec) > 0):
++                    if(rawspec.size > 0):
+                         rawspec[:, ich, :] *= gasrephase
+-                    if(len(self.getimg(imgtype.DPDYN)) > 0):
++                    if(self.hasimg(imgtype.DPDYN)):
+                         self.getimg(imgtype.DPDYN)[:, ich, :] *= gasrephase
+                     # force spectra and regular dissolved phase imaging interleaves to have the same phase
+-                    if(len(rawspec) > 0 and len(self.getimg(imgtype.DPDYN)) > 0):
++                    if(rawspec.size > 0 and self.hasimg(imgtype.DPDYN)):
+                         specphase = np.mean(rawspec[0:4, ich, :])
+                         dissphase = np.mean(self.getimg(imgtype.DPDYN)[0:4, ich, :])
+                         rawspec[:, ich, :] *= np.conj(specphase) / np.abs(specphase) * dissphase / np.abs(dissphase)
+                 if(numspec > 0):
+                     for ich in range(self.nch):
+-                        fids = rawspec[:, ich, :]
++                        fids = rawspec[:, ich, :]    # fids shape=(samples, spectral lines)
+                         # choose fids for which the average of the first 100 points is at least 2x 
+                         # greater than the avg of the last 100
+                         idx = []
+@@ -306,8 +337,9 @@ class raw:
+                                 # arguments to lorfit are: t(x, f0, f1, a0, a1, ph0, ph1, w0, w1):
+                                 fitspect = lorfit(np.array(range(len(sspect))), p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7])
+                                 fitsspect = fitspect[0:int(len(fitspect) / 2 + 0.1)] + 1j * fitspect[int(len(fitspect) / 2 + 0.1):]
+-                                plt.plot(sspect+20000*iTE, 'k')
+-                                plt.plot(fitsspect+20000*iTE, 'r')
++                                # comment out plots for tyger process
++                                # plt.plot(sspect+20000*iTE, 'k')
++                                # plt.plot(fitsspect+20000*iTE, 'r')
+                                 RBCparams = [p[1], p[3], p[5], p[7]]
+                                 TPparams = [p[0], p[2], p[4], p[6]]
+                                 if(p[1] < p[0]):
+@@ -315,11 +347,10 @@ class raw:
+                                     RBCparams = TPparams
+                                     TPparams = temp
+                                 # this won't work for multiple coils yet
+-                                if(self.nch > 1):
+-                                    barf
++                                if self.nch == 1:
+                                     deltaph = RBCparams[2] - TPparams[2]
+                                     self.RBCTPratio.append(RBCparams[1] * RBCparams[3] / (TPparams[1] * TPparams[3]))
+-                                at = 1 / trajec.spectBW * len(sspect)
++                                    at = 1 / traj.spectBW * len(sspect)
+                                     self.fRBC.append((RBCparams[0] - np.floor(len(sspect) / 2 + 0.1)) / at)
+                                     self.fTP.append((TPparams[0] - np.floor(len(sspect) / 2 + 0.1)) / at)
+                                     self.sspect.append(sspect)
+@@ -327,53 +358,23 @@ class raw:
+                                     self.sspectfreq.append(np.fft.fftshift(np.linspace(0, (len(sspect) - 1) / at, len(sspect))))
+                                     self.RBCphase.append(RBCparams[2])
+                                     self.TPphase.append(TPparams[2])
+-                                self.TEphase.append(self.TE + iTE / trajec.spectBW)
+-                        plt.show()
+-                        plt.figure()
++                                    self.TEphase.append(self.TE + iTE / traj.spectBW)
+                                     pRBC = np.polyfit(self.TEphase, self.RBCphase, 1)
+-                        plt.plot(self.TEphase, self.RBCphase)
+-                        plt.plot(self.TEphase, np.polyval(pRBC, self.TEphase))
+                                     pTP = np.polyfit(self.TEphase, self.TPphase, 1)
+-                        plt.plot(self.TEphase, self.TPphase)
+-                        plt.plot(self.TEphase, np.polyval(pTP, self.TEphase))
+-                        plt.plot(self.TEphase, self.RBCTPratio)
+-                        plt.show()
+                                     self.deltaphase = pRBC[1] - pTP[1]
+                                     self.TEeff = self.deltaphase / (self.fRBC[0] - self.fTP[0]) / 2 / np.pi - \
+-                                trajec.killpts / trajec.spectBW + trajec.killpts / trajec.BW
++                                            traj.killpts / traj.spectBW + traj.killpts / traj.BW
+                                     self.TEeff2 = -(pRBC[1] - pTP[1]) / (pTP[0] - pRBC[0]) - \
+-                                trajec.killpts / trajec.spectBW + trajec.killpts / trajec.BW
+-                # figure out time of the first imaging interleave
+-                self.TR = twixObj.hdr.MeasYaps[('alTR', '0')] * 1.0E-6 # s
+-                self.TE = twixObj.hdr.MeasYaps[('alTE', '0')] * 1.0E-6 # s
+-                self.DPoff = twixObj.hdr.MeasYaps[('sWipMemBlock', 'adFree', '2')]
+-                if(np.fabs(self.TR - 0.0223) < 1E-6):
+-                    self.TR = 22.26E-3 ### KLUGE FOR NOW, IT ROUNDS IN THE FILE!
+-                dtdyn = twixObj.hdr.MeasYaps[('sRXSPEC', 'alDwellTime', '0')] * 1.0E-9 # s
+-                try:
+-                    dtdyn = twixObj.hdr.MeasYaps[('sRXSPEC', 'alDwellTime', '1')] * 1.0E-9
+-                except:
+-                    dtdyn = dtdyn
+-                extratime = self.TR / self.ilvperTR - dtdyn * self.npts
+-                extratime = 2.191E-3  ### KLUGE FOR NOW
+-                if(numspec > 0):
+-                    dtspec = twixObj.hdr.MeasYaps[('sWipMemBlock', 'alFree', '12')] * 1.0E-6 # s
+-                    TRspec = (extratime + self.npts * dtspec)
+-                    firstilvtime = numspec * TRspec
+-
++                                            traj.killpts / traj.spectBW + traj.killpts / traj.BW
+         if(fileformat == 'bruker'):
++            BHlength = 1    # temporary init value
+             self.nch = 1
+             self.TR = 10E-3
+             self.npts = 800
+             self.nuniqueilvs = 640
+             npts = int(BHlength / self.TR)
+-            dynraw = np.fromfile(dynrawfname, dtype = np.int32)
+-            dynraw = dynraw[0::2] + 1j * dynraw[1::2]
+-            dynraw = np.reshape(dynraw, (self.npts, 1, -1), order = 'F')
+-            # for some reason first two points seem to be garbage
+-            dynraw[0:2, :, :] = 0.0
+             # look for breath hold
+-            lns = np.log(np.sum(np.abs(dynraw[:6, 0, :]), 0))
++            lns = np.log(np.sum(np.abs(dyn_acq_arr[:6, 0, :]), 0))
+             x = np.array(range(0, npts))
+             a = np.zeros(len(lns) - npts)
+             for j in range(0, len(lns) - npts):
+@@ -389,13 +390,13 @@ class raw:
+             for j in range(bhstartidx, bhendidx):
+                 if(lns[j] > lns[bhstartidx]):
+                     bhstartidx = j
+-            self.setimg(imgtype.GPREF, dynraw[:, :, bhstartidx:bhendidx].copy(), bhstartidx)
+-            dynraw[:, :, bhstartidx:bhendidx] = 0.0
+-            self.setimg(imgtype.GPDYN, dynraw, 0)
+-            self.ntotalilvs = dynraw.shape[2]
++            self.setimg(imgtype.GPREF, dyn_acq_arr[..., bhstartidx:bhendidx].copy(), bhstartidx)
++            dyn_acq_arr[..., bhstartidx:bhendidx] = 0.0
++            self.setimg(imgtype.GPDYN, dyn_acq_arr, 0)
++            self.ntotalilvs = dyn_acq_arr.shape[2]
+ 
+         # remove fully sampled images with low SNR
+-        self.nuniqueilvs = int(trajec.nuniquesmp / self.npts)
++        self.nuniqueilvs = int(traj.nuniquesmp / self.npts)
+         self.ntotalilvs = self.getimg(imgtype.GPDYN).shape[2]
+         avgsig = np.zeros(int(self.ntotalilvs / self.nuniqueilvs) + 1)
+         for ifs in range(0, int(self.ntotalilvs / self.nuniqueilvs) + 1):
+@@ -413,8 +414,7 @@ class raw:
+         self.ilvtime = np.array(range(0, self.ntotalilvs)) * self.TR
+         # remove all sample points > noisespikethresh x the mean for that point
+         # across all the interleaves. Intended to filter out the noise spikes
+-        if(True):
+-            print('filtering noise spikes...')
++        print(f'filtering noise spikes...', file=stderr)
+         for acq in  self.alldynimg():
+             nzero = np.zeros(self.npts)
+             for ipt in range(0, self.npts):
+@@ -424,48 +424,16 @@ class raw:
+                     temp[temp > np.mean(temp[temp > 0]) * noisespikethresh] = 0
+                     acq[ipt, ich, temp == 0] = 0.0
+                     nzero[ipt] -= np.count_nonzero(acq[ipt, ich, :])
+-                print('removed ' , np.sum(nzero), 'points (noise spikes) of', np.prod(acq.shape))
++            print(f'removed {np.sum(nzero)} points (noise spikes) of {np.prod(acq.shape)}', file=stderr)
+         if(self.hasimg(imgtype.GPDYN)):
+             self.volmeasvol[bintype.SIGNAL] = np.sum(np.abs(self.getimg(imgtype.GPDYN)[:8, :, :]), axis = (0, 1))
+             self.volmeasvol[bintype.SIGNAL] -= np.min(self.volmeasvol[bintype.SIGNAL])
+             self.volmeasvol[bintype.SIGNAL] /= (np.max(self.volmeasvol[bintype.SIGNAL]) - np.min(self.volmeasvol[bintype.SIGNAL]))
+             self.volmeastime[bintype.SIGNAL] = self.ilvtime
+-        # load pneumotach datasets if present
+-        bt = int(bintype.PNEUMOTACH)
+-        updatesendsize = 54
+-        if(len(pneumodatasetslen) == 0):
+-            self.volmeasvol[bt] = []
+-            self.volmeastime[bt] = []
+-        else:
+-            with open(pneumodatasets[0], mode = 'rb') as f:
+-                a = f.read()
+-                cnt = 0
+-                # count the number of updates stored
+-                for j in range(0, len(a) - updatesendsize):
+-                    if(a[j] == 0xA6 and a[j+1] == 0x20):
+-                        cnt += 1
+-                print('found', cnt, 'pressure measurements')
+-                P = np.zeros(cnt)
+-                self.volmeastime[bt] = np.zeros(cnt)
+-                self.volmeasvol[bt] = np.zeros(cnt)
+-                cnt = 0
+-                for j in range(0, len(a) - updatesendsize):
+-                    if(a[j] == 0xA6 and a[j+1] == 0x20):
+-                        # this is (likely) a pressure measurement, the next four bytes are the time
+-                        self.volmeastime[bt][cnt] = a[j+5]*2**24 + a[j+4]*2**16+a[j+3]*2**8+a[j+2]
+-                        P[cnt] = -20 + 90 * (a[j+33]*2**8 + a[j+32]) / 65535.0
+-                        cnt += 1 
+-                self.volmeastime[bt] -= self.volmeastime[bt][0]
+-                self.volmeastime[bt] /= 1000
+-                P = savgol_filter(P, 51, 2)
+-                P = P[self.volmeastime[bt]  > self.ilvtime[0]]
+-                self.volmeastime[bt]  = \
+-                        self.volmeastime[bt][self.volmeastime[bt]  > self.ilvtime[0]]
+-                P = P[self.volmeastime[bt]  < self.ilvtime[len(self.ilvtime) - 1]]
+-                self.volmeastime[bt]  = self.volmeastime[bt][self.volmeastime[bt] < self.ilvtime[len(self.ilvtime) - 1]]
+-                self.volmeasvol[bt] = np.zeros(len(P))    
+-                for j in range(0, len(self.volmeastime[bt]) - 1):
+-                        self.volmeasvol[bt][j + 1] = self.volmeasvol[bt][j] + P[j]        
++
++        # pneumotach time/pressure NdArray from the converter, if present
++        if pneumo_arr is not None:
++            self.load_pneumotach_from_arrays(pneumo_arr[0], pneumo_arr[1])
+         for bt in [bintype.SIGNAL, bintype.PNEUMOTACH] if len(self.volmeasvol[bintype.PNEUMOTACH]) else [bintype.SIGNAL]:
+                 # identify minima
+                 mincnt = 0
+diff --git a/read_mapvbvd.py b/read_mapvbvd.py
+new file mode 100644
+index 0000000..478beab
+--- /dev/null
++++ b/read_mapvbvd.py
+@@ -0,0 +1,24 @@
++import json
++from mapvbvd import mapVBVD
++import argparse
++
++def print_mapvbvd_header(twix_path: str) -> None:
++    twix_obj = mapVBVD(twix_path)
++    twix_list = twix_obj if isinstance(twix_obj, list) else [twix_obj]
++
++    for idx, tw in enumerate(twix_list):
++        print(f"\n--- Twix dataset {idx} ---")
++        hdr = tw.hdr  # nested dict-like structure
++        try:
++            print(json.dumps(hdr, indent=2, default=str))
++        except TypeError:
++            # fallback: stringify non-serializable items
++            print(json.dumps({k: str(v) for k, v in hdr.items()}, indent=2))
++
++# Example:
++# print_mapvbvd_header("meas_MID00000_FID00000.dat")
++if __name__ == "__main__":
++    parser = argparse.ArgumentParser()
++    parser.add_argument('-i', '--input', type=str, required=True, help='Path to input MapVBVD file')
++    args = parser.parse_args()
++    print_mapvbvd_header(args.input)
+\ No newline at end of file
+diff --git a/requirements.txt b/requirements.txt
+new file mode 100644
+index 0000000..0f9afcd
+--- /dev/null
++++ b/requirements.txt
+@@ -0,0 +1,8 @@
++numpy
++scipy
++matplotlib
++Pillow
++numba
++pymapvbvd
++python-dateutil
++mrd-python @ git+https://github.com/MEDCAP/mrd-fork.git@dev#subdirectory=python
+diff --git a/results.py b/results.py
+index ae29b94..00b12ce 100644
+--- a/results.py
++++ b/results.py
+@@ -1,9 +1,11 @@
+ import numpy as np
+-from gtypes import gvar, imgtype, graddir, species
+ from numba import cuda
+-from recon import cudarezero, cudarenorm, cudarecon
+ import matplotlib.pyplot as plt
+ from scipy.optimize import curve_fit
++from sys import stderr
++
++from gtypes import gvar, imgtype, graddir, species
++from recon import cudarezero, cudarenorm, cudarecon
+ 
+ # HELPER FUNCTIONS
+ def rangeoverlap(f1, f2, rg):
+@@ -63,8 +65,8 @@ class results:
+         reconparams = np.array([g.MS, g.get_MScenter(), g_traj.nuniquesmp, g_raw.npts, 1, 0, 0, g.gplb])
+ 
+         # send arrays to gpu. kspace arrays are already there
+-        d_reconparams = cuda.to_device(np.ascontiguousarray(reconparams)) if(usegpu) else params
+-        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int'))
++        d_reconparams = cuda.to_device(np.ascontiguousarray(reconparams)) if(usegpu) else reconparams
++        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')) if(usegpu) else np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')
+         d_trajx = cuda.to_device(g_traj.gettraj(imgtype.GPDYN, graddir.X)) if(usegpu) else g_traj.gettraj(imgtype.GPDYN, graddir.X)
+         d_trajy = cuda.to_device(g_traj.gettraj(imgtype.GPDYN, graddir.Y)) if(usegpu) else g_traj.gettraj(imgtype.GPDYN, graddir.Y)
+         d_trajz = cuda.to_device(g_traj.gettraj(imgtype.GPDYN, graddir.Z)) if(usegpu) else g_traj.gettraj(imgtype.GPDYN, graddir.Z)
+@@ -78,9 +80,9 @@ class results:
+         # calc b
+         threadsperblock = 256
+         self.b = np.zeros((g_raw.nch, g.MS, g.MS, g.MS), dtype = 'complex64')
+-        print('calcb channel ', end = '', flush = True)
++        print(f'calcb: computing coil sensitivity b-matrix over {g_raw.nch} channels (MS={g.MS}, IS={g.IS})', file=stderr)
+         for ich in range(0, g_raw.nch):
+-            print('%d... ' % ich, end = '', flush = True)
++            print(f'  calcb: channel {ich + 1}/{g_raw.nch}', file=stderr)
+             rawdata = np.ascontiguousarray(np.reshape(g_raw.getimg(imgtype.GPDYN)[:, ich, :], \
+                 (g_raw.npts * g_raw.ntotalilvs), order = 'F').copy() * mask)
+             if(usegpu):
+@@ -150,13 +152,13 @@ class results:
+             plt.imshow(np.angle(self.b[ich, :,50,:]))
+             plt.show()
+         self.b /= np.max(np.abs(self.b), 0)
+-        print('done')
++        print(f'calcb: done, b-matrix shape={self.b.shape}', file=stderr)
+    
+     def T1RF_recon(self, g, g_raw, g_traj, rawdata, usegpu):
+         ### calculation of T1RF map
+         reconparams = np.array([g.MS, g.get_MScenter(), g_traj.nuniquesmp, g_raw.npts, 1, 0, 0, 100])
+-        d_reconparams = cuda.to_device(np.ascontiguousarray(reconparams)) if(usegpu) else params
+-        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int'))
++        d_reconparams = cuda.to_device(np.ascontiguousarray(reconparams)) if(usegpu) else reconparams
++        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')) if(usegpu) else np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')
+         d_binarr = cuda.to_device(np.zeros(1)) if(usegpu) else np.zeros(1)
+         # send trajectories to gpu if it's available
+         trajx = np.array([])
+@@ -195,12 +197,14 @@ class results:
+         ilvperusimg = int(g_traj.nsmpperusimg / g_raw.npts + .1)
+         for el in g_raw.excluderanges:
+             if(rangeoverlap(iusimg * ilvperusimg * g_raw.TR, (iusimg + 1) * ilvperusimg * g_raw.TR, el)):
+-                print('skipping iter', iusimg, ilvperusimg * g_raw.TR, el)
++                print(f'dyn_usimg_recon: skipping undersampled image {iusimg} '
++                      f'(t={iusimg * ilvperusimg * g_raw.TR:.2f}s falls in exclude range '
++                      f'{el.start}-{el.stop}s)', file=stderr)
+                 return(False)
+         # reconparams array is MS, numiquesmp, npts, nbins, ibin, idxoff, smoothing
+         reconparams = np.array([g.MS, g.get_MScenter(), g_traj.nuniquesmp, g_raw.npts, 1, 0, 0, 50])
+-        d_reconparams = cuda.to_device(np.ascontiguousarray(reconparams)) if(usegpu) else params
+-        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int'))
++        d_reconparams = cuda.to_device(np.ascontiguousarray(reconparams)) if(usegpu) else reconparams
++        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')) if(usegpu) else np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')
+         d_binarr = cuda.to_device(np.zeros(1)) if(usegpu) else np.zeros(1)
+ 
+         # send trajectories to gpu if it's available
+@@ -220,7 +224,7 @@ class results:
+             rawdata = np.ascontiguousarray(np.reshape(g_raw.getimg(imgtype.GPDYN)[:, ich, \
+                     (iusimg * ilvperusimg):((iusimg + 1) * ilvperusimg)], g_traj.nsmpperusimg, order = 'F'))
+             if(np.abs(rawdata[10]) == 0.0):
+-                print('skipping')
++                print(f'dyn_usimg_recon: skipping channel {ich} of undersampled image {iusimg} (zero raw data)', file=stderr)
+                 continue
+             if(usegpu):
+                 d_rawdata = cuda.to_device(rawdata)
+@@ -248,7 +252,7 @@ class results:
+                 if(iilv * g_raw.TR >= el.start and iilv * g_raw.TR <= el.stop):
+                     mask[(iilv * g_raw.npts):((iilv + 1) * g_raw.npts)] = 0
+         # send arrays to gpu. kspace arrays are already there
+-        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int'))
++        d_renormparams = cuda.to_device(np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')) if(usegpu) else np.array([g.get_MScenter() * (g.MS**2 + g.MS + 1)], dtype = 'int')
+         d_binarr = cuda.to_device(binarr) if(usegpu) else binarr
+         threadsperblock = 256
+         for itype in [imgtype.GPDYN, imgtype.DPDYN]:
+@@ -265,14 +269,15 @@ class results:
+             d_trajz = cuda.to_device(g_traj.gettraj(itype, graddir.Z)) if(usegpu) else g_traj.gettraj(itype, graddir.Z)
+             # bin
+             rspace = np.zeros((g.nbins, g.IS, g.IS, g.IS), dtype = 'complex' if itype == imgtype.DPDYN else 'double')
++            print(f'dyn_recon: reconstructing {itype.name} over {g.nbins} bins x {g_raw.nch} channels', file=stderr)
+             for ich in range(0, g_raw.nch):
+                 rawdata = np.ascontiguousarray(np.reshape(g_raw.getimg(itype)[:, ich, :].copy(), \
+                         (g_raw.npts * g_raw.ntotalilvs), order = 'F') * mask)
+                 d_rawdata = cuda.to_device(rawdata) if(usegpu) else rawdata
+-                print('bin channel %d,' % ich, 'bin 0', end = '', flush = True)
++                print(f'  {itype.name} channel {ich + 1}/{g_raw.nch}: gridding bin 0', end = '', flush = True, file=stderr)
+                 for ibin in range(0, g.nbins):
+                     if(ibin > 0):
+-                        print(',%d' % ibin, end = '' if(ibin < g.nbins - 1) else '\n', flush = True)
++                        print(',%d' % ibin, end = '' if(ibin < g.nbins - 1) else '\n', flush = True, file=stderr)
+                     reconparams = np.array([g.MS, g.get_MScenter(), g_traj.nuniquesmp, g_raw.npts, g.nbins, ibin, 0, \
+                             g.gplb if(itype == imgtype.GPDYN) else g.dplb])
+                     if(usegpu):
+@@ -292,7 +297,7 @@ class results:
+                     thisrspace = thisrspace[g.ISLL():g.ISUL(), g.ISLL():g.ISUL(), g.ISLL():g.ISUL()] * self.b[ich, :, :, :]
+                     rspace[ibin, :, :, :] += np.real(thisrspace) if itype == imgtype.GPDYN else thisrspace
+                     # SAVE IT FOR NOW
+-                    print('saving', ibin)
++                    print(f'  saving debug volume savedbin{ibin}.npy ({itype.name} bin {ibin})', file=stderr)
+                     np.save('savedbin'+str(ibin), rspace[ibin, :, :, :])
+                     # END SAVE IT
+             if(itype == imgtype.DPDYN):
+@@ -320,11 +325,13 @@ class results:
+                         R = sumaRBC / sumaTP
+                         if(iph > 0 and sumaTP > 0.0 and sumaRBC > 0.0 and \
+                                 ((R - g_raw.RBCTPratio[0]) * (lastR - g_raw.RBCTPratio[0]) < 0.0)):
+-                            print('SETTING rspace')
++                            print(f'  DP bin {ibin}: RBC/TP phase solved at ph={ph:.2f} rad '
++                                  f'(R={R:.3f} crossed target RBCTPratio={g_raw.RBCTPratio[0]:.3f}); '
++                                  f'storing aRBC + 1j*aTP', file=stderr)
+                             rspace[ibin, :, :, :] = aRBC + 1j * aTP
+                             break
+                         lastR = R
+-                        print(ph, ratio)
++                        print(f'  DP bin {ibin} phase sweep: ph={ph:.2f} rad RBC/TP_ratio={ratio:.4f}', file=stderr)
+             self.setimg(itype, rspace)
+ 
+     def register(usegpu):
+diff --git a/tyger_deploy/plot_recon.py b/tyger_deploy/plot_recon.py
+new file mode 100644
+index 0000000..6d2aa03
+--- /dev/null
++++ b/tyger_deploy/plot_recon.py
+@@ -0,0 +1,71 @@
++import argparse
++import math
++from pathlib import Path
++
++import numpy as np
++import matplotlib.pyplot as plt
++import mrd
++
++
++def montage(vol, slice_idx, suptitle, out_path):
++    nbins = vol.shape[0]
++    grid = math.ceil(math.sqrt(nbins))
++    fig, axes = plt.subplots(grid, grid, figsize=(2 * grid, 2 * grid))
++    axes = np.atleast_1d(axes).ravel()
++    for i in range(grid * grid):
++        ax = axes[i]
++        if i < nbins:
++            ax.imshow(vol[i, slice_idx, :, :], cmap='gray')
++            ax.set_title(f'bin {i}')
++            ax.set_xticks([])
++            ax.set_yticks([])
++        else:
++            ax.axis('off')
++    fig.suptitle(suptitle)
++    fig.savefig(out_path)
++    print(f'saved {out_path}')
++
++
++def main():
++    parser = argparse.ArgumentParser()
++    parser.add_argument('input', nargs='?', default='xe_dyn_recon.mrd')
++    parser.add_argument('--slice', type=int, default=None)
++    args = parser.parse_args()
++
++    input_path = Path(args.input)
++    if not input_path.is_absolute():
++        input_path = Path.cwd() / input_path
++
++    gas = None
++    dissolved = None
++    with mrd.BinaryMrdReader(str(input_path)) as reader:
++        reader.read_header()
++        for item in reader.read_data():
++            if isinstance(item, mrd.StreamItem.NdArrayFloat):
++                if item.value.meta.get('gas_phase_image'):
++                    gas = item.value.data
++            elif isinstance(item, mrd.StreamItem.NdArrayComplexFloat):
++                if item.value.meta.get('dissolved_phase_image'):
++                    dissolved = item.value.data
++
++    if args.slice is None:
++        ref = gas if gas is not None else dissolved
++        slice_idx = ref.shape[1] // 2
++    else:
++        slice_idx = args.slice
++
++    if gas is not None:
++        print(f'gas phase: shape={gas.shape} dtype={gas.dtype}')
++        out = input_path.with_name(f'{input_path.stem}_gp.png')
++        montage(gas, slice_idx, 'Gas phase', out)
++
++    if dissolved is not None:
++        print(f'dissolved phase: shape={dissolved.shape} dtype={dissolved.dtype}')
++        out = input_path.with_name(f'{input_path.stem}_dp.png')
++        montage(np.abs(dissolved), slice_idx, 'Dissolved phase (magnitude)', out)
++
++    plt.show()
++
++
++if __name__ == '__main__':
++    main()
+diff --git a/tyger_deploy/recon_codespec.yml b/tyger_deploy/recon_codespec.yml
+new file mode 100644
+index 0000000..509eb16
+--- /dev/null
++++ b/tyger_deploy/recon_codespec.yml
+@@ -0,0 +1,23 @@
++job:
++  codespec:
++    image: ghcr.io/medcap/xe-tyger-recon:latest
++    buffers:
++      inputs: ["input"]
++      outputs: ["output"]
++    args:
++      - --input
++      - $(INPUT_PIPE)
++      - --output
++      - $(OUTPUT_PIPE)
++  buffers:
++  
++  tags:
++    version: 1.0
++
++  nodePool: gpunp
++
++  replicas: 1
++
++cluster: tep-centralus-1
++
++timeoutSeconds: 43200
+diff --git a/tyger_recon.py b/tyger_recon.py
+new file mode 100644
+index 0000000..b6b6462
+--- /dev/null
++++ b/tyger_recon.py
+@@ -0,0 +1,123 @@
++"""
++Loads mrd file populated with siemens .dat file acquisitions and npy trajectory fields
++in NdArray field. This script file is used as entrypoint of docker container to run reconstruction on tyger
++"""
++from typing import BinaryIO
++from sys import stderr
++import argparse
++
++import matplotlib
++matplotlib.use('Agg')  # headless subprocess: results.py calls plt.show()
++
++from numba import cuda
++
++import mrd
++
++from gtypes import gvar, imgtype, bintype
++from raw import traj, raw
++from results import results
++
++def _write_results_to_mrd(g_res, header, output):
++    """Write GPDYN and DPDYN reconstructed images as NdArray items to the output MRD stream."""
++    items = []
++    if g_res.hasimg(imgtype.GPDYN):
++        items.append(mrd.StreamItem.NdArrayFloat(
++            mrd.NdArray(data=g_res.getimg(imgtype.GPDYN).astype('float32'),
++                        meta={'gas_phase_image': [mrd.ArrayMetaValue.String('1')]})))
++    if g_res.hasimg(imgtype.DPDYN):
++        items.append(mrd.StreamItem.NdArrayComplexFloat(
++            mrd.NdArray(data=g_res.getimg(imgtype.DPDYN).astype('complex64'),
++                        meta={'dissolved_phase_image': [mrd.ArrayMetaValue.String('1')]})))
++    with mrd.BinaryMrdWriter(output) as writer:
++        writer.write_header(header)
++        writer.write_data(iter(items))
++
++
++def reconstruct_from_mrd(input: BinaryIO, output: BinaryIO):
++    # class objects init to store mrd streamitem
++    g = gvar()
++    g_traj = traj()
++    g_raw = raw()
++    g_res = results()
++
++    # NdArray streamitems, discriminated by meta key
++    ref_acq_arr = None
++    dyn_acq_arr = None
++    pneumo_arr = None
++    gas_phase_traj_arr = None
++    dissolved_phase_traj_arr = None
++    with mrd.BinaryMrdReader(input) as reader:
++        header = reader.read_header()
++        for item in reader.read_data():
++            if isinstance(item, (mrd.StreamItem.NdArrayDouble, mrd.StreamItem.NdArrayFloat)):
++                if item.value.meta.get('gas_phase_trajectory'):
++                    gas_phase_traj_arr = item.value.data
++                elif item.value.meta.get('dissolved_phase_trajectory'):
++                    dissolved_phase_traj_arr = item.value.data
++                elif item.value.meta.get('pneumotach'):
++                    pneumo_arr = item.value.data
++            elif isinstance(item, mrd.StreamItem.NdArrayComplexFloat):
++                # raw acquisitions stored whole, shape (channels, samples, lines)
++                if item.value.meta.get('reference_acquisition'):
++                    ref_acq_arr = item.value.data
++                elif item.value.meta.get('dynamic_acquisition'):
++                    dyn_acq_arr = item.value.data
++
++    # header user parameters → recon parameters / acquisition metadata
++    user_long, user_double, user_string = {}, {}, {}
++    if header.user_parameters is not None:
++        user_long = {p.name: p.value for p in header.user_parameters.user_parameter_long}
++        user_double = {p.name: p.value for p in header.user_parameters.user_parameter_double}
++        user_string = {p.name: p.value for p in header.user_parameters.user_parameter_string}
++    g.MS = int(user_long.get('MS', g.MS))
++    g.IS = int(user_long.get('IS', g.IS))
++    g.nbins = int(user_long.get('nbins', g.nbins))
++    g.gplb = int(user_long.get('gplb', g.gplb))
++    g.dplb = int(user_long.get('dplb', g.dplb))
++    g.freqfilter = int(user_long.get('freqfilter', g.freqfilter))
++    g.griddx = float(user_double.get('griddx', g.griddx))
++    g.bindt = float(user_double.get('bindt', g.bindt))
++    killpts = int(user_long.get('killpts', 2))
++    meta = {'TR': user_double.get('TR', 0.0), 'TE': user_double.get('TE', 0.0),
++            'DPoff': user_double.get('DPoff', 0.0), 'dtdyn': user_double.get('dtdyn', 0.0),
++            'dtspec': user_double.get('dtspec', 0.0), 'numspec': int(user_long.get('numspec', 0))}
++
++    # load trajectories
++    if gas_phase_traj_arr is None or dissolved_phase_traj_arr is None:
++        raise ValueError('MRD file missing gas_phase_trajectory or dissolved_phase_trajectory NdArray')
++    g_traj.killpts = killpts
++    g_traj.load_traj_from_array(gas_phase_traj_arr, dissolved_phase_traj_arr,
++                                int(user_long.get('nusimg', 32)))
++
++    # trim killpts on the samples axis of the (channels, samples, lines) arrays
++    if dyn_acq_arr is None:
++        raise ValueError('MRD file missing dynamic_acquisition NdArray')
++    dyn_acq_arr = dyn_acq_arr[:, killpts:, :]
++    if ref_acq_arr is not None:
++        ref_acq_arr = ref_acq_arr[:, killpts:, :]
++    print(f'read mrd: dyn={dyn_acq_arr.shape} ref={ref_acq_arr.shape if ref_acq_arr is not None else None}'
++          f' pneumo={pneumo_arr is not None} MS={g.MS} IS={g.IS} nbins={g.nbins}', file=stderr)
++
++    g_raw.load_from_arr(g_traj, ref_acq_arr, dyn_acq_arr, pneumo_arr, 'mrd_siemens', meta)
++
++    g.usegpu = int(cuda.is_available())
++    print(f'usegpu={g.usegpu}, calculating b-matrix...', file=stderr)
++    g_res.calcb(g, g_raw, g_traj, g.usegpu)
++    binning = user_string.get('binning', 'SIGNAL')
++    bt = bintype.PNEUMOTACH if (binning == 'PNEUMOTACH' and len(g_raw.ilvbin[bintype.PNEUMOTACH])) \
++            else bintype.SIGNAL
++    print(f'binned dynamic recon with {bt.name} binning...', file=stderr)
++    g_res.dyn_recon(g, g_raw, g_traj, g_raw.ilvbin[bt], g.usegpu)
++
++    print('writing reconstructed images to output mrd', file=stderr)
++    _write_results_to_mrd(g_res, header, output)
++
++if __name__ == '__main__':
++    parser = argparse.ArgumentParser()
++    parser.add_argument('--input',  required=True, help='Path to input MRD binary file')
++    parser.add_argument('--output', required=True, help='Path to output MRD binary file')
++    args = parser.parse_args()
++
++    with open(args.input, 'rb') as input_file:
++        with open(args.output, 'wb') as output_file:
++            reconstruct_from_mrd(input_file, output_file)

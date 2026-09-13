@@ -32,6 +32,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io
+from scipy.signal import savgol_filter
 import mrd
 from PIL import Image
 
@@ -44,9 +45,12 @@ NAV_KEYS = ('nav_coronal', 'nav_diaphragm_z', 'nav_time',
 
 
 def read_output_mrd(mrd_path):
-    """Returns (gas, dissolved, nav) where nav is a dict of navigator arrays
-    (empty if the recon was not DIAPHRAGM-binned)."""
-    gas = dissolved = None
+    """Returns (gas, dissolved, nav, rbc_tp_separated) where nav is a dict of
+    navigator arrays (empty if the recon was not DIAPHRAGM-binned) and
+    rbc_tp_separated is True when dissolved is stored as aRBC + 1j*aTP, False
+    when it is unsplit complex (magnitude only), None if the tag is absent
+    (images reconstructed before 40d23a4 — those always split when present)."""
+    gas = dissolved = rbc_tp_separated = None
     nav = {}
     with mrd.BinaryMrdReader(str(mrd_path)) as reader:
         reader.read_header()
@@ -62,7 +66,53 @@ def read_output_mrd(mrd_path):
             elif isinstance(item, mrd.StreamItem.NdArrayComplexFloat):
                 if item.value.meta.get('dissolved_phase_image'):
                     dissolved = item.value.data
-    return gas, dissolved, nav
+                    tag = item.value.meta.get('rbc_tp_separated')
+                    if tag:
+                        rbc_tp_separated = str(tag[0].value) == '1'
+    return gas, dissolved, nav, rbc_tp_separated
+
+
+def _pneumo_volume(t, P, N=50, sg_win=51, sg_ord=2, poly_deg=8):
+    """Integrate pneumotach pressure into a drift-corrected, normalized volume.
+
+    Port of Steve's raw.py pneumotach path (load_pneumotach_from_arrays + the
+    PNEUMOTACH branch of load_from_arr):
+      1. Savitzky-Golay smooth the pressure  (window 51, order 2)
+      2. cumulative-integrate P -> volume    (a DC offset in P becomes a ramp here)
+      3. find end-expiration minima: points that are a strict local minimum over a
+         +/-N window (the breath-baseline troughs)
+      4. fit a degree-`poly_deg` polynomial THROUGH THOSE TROUGHS ONLY and subtract
+         it -> removes slow drift, keeps breath oscillations
+      5. crop to the trough span (the acquisition/breathing window — Steve crops to
+         ilvtime; we don't have it here, so use the first..last trough) and
+         normalize to [0,1] there, so the pre/post tails can't grab the max.
+    Returns (t_out, vol_out). Falls back to plain integration if too few troughs.
+    """
+    t = np.asarray(t, dtype='float64')
+    P = np.asarray(P, dtype='float64')
+    if len(P) > sg_win:
+        P = savgol_filter(P, sg_win, sg_ord)
+    vol = np.cumsum(P)
+
+    # end-expiration minima: j is a trough iff it is the sole point <= vol[j] in its
+    # +/-N window (matches Steve's `<=`-breaks-the-loop test).
+    ee_idx = [j for j in range(N, len(vol) - N - 1)
+              if np.sum(vol[j - N:j + N + 1] <= vol[j]) == 1]
+
+    if len(ee_idx) >= poly_deg + 1:
+        ee_t = t[ee_idx]
+        # scale time to ~unit range: a degree-8 fit on raw seconds is badly
+        # conditioned (Vandermonde blows up). Shape is unchanged.
+        mu, sd = ee_t.mean(), ee_t.std() + 1e-9
+        c = np.polyfit((ee_t - mu) / sd, vol[ee_idx], poly_deg)
+        vol = vol - np.polyval(c, (t - mu) / sd)
+        # crop to the acquisition window (first..last trough) before normalizing
+        keep = (t >= ee_t[0]) & (t <= ee_t[-1])
+        t, vol = t[keep], vol[keep]
+
+    vol -= vol.min()
+    vol /= (vol.max() + 1e-9)
+    return t, vol
 
 
 def read_input_mrd(mrd_path):
@@ -70,7 +120,7 @@ def read_input_mrd(mrd_path):
     Returns (fid_signal, pneumo_time, pneumo_vol) — any may be None.
     fid_signal: (N_interleaves,) normalized [0,1]
     pneumo_time: (M,) seconds
-    pneumo_vol:  (M,) integrated volume, normalized [0,1]
+    pneumo_vol:  (M,) drift-corrected integrated volume, normalized [0,1]
     """
     dyn_acq = None
     pneumo = None
@@ -96,10 +146,8 @@ def read_input_mrd(mrd_path):
     if pneumo is not None:
         t = pneumo[0].astype(float)
         P = pneumo[1].astype(float)
-        vol = np.cumsum(P)   # integrate pressure → volume (unnormalized)
-        mn, mx = vol.min(), vol.max()
-        pneumo_vol = (vol - mn) / (mx - mn + 1e-9)
-        pneumo_time = t
+        # Steve's EE-minima drift correction; returns the cropped acq-window trace
+        pneumo_time, pneumo_vol = _pneumo_volume(t, P)
 
     return fid_signal, pneumo_time, pneumo_vol
 
@@ -350,10 +398,13 @@ def run(out_dir, input_mrd_path=None):
         sys.exit(f'[post_process] ERROR: {mrd_path} not found')
 
     print(f'[post_process] reading {mrd_path} ...')
-    gas, dissolved, nav = read_output_mrd(mrd_path)
+    gas, dissolved, nav, rbc_tp_separated = read_output_mrd(mrd_path)
     if gas is None:
         sys.exit('[post_process] ERROR: no gas_phase_image in output.mrd')
     print(f'[post_process] gas shape {gas.shape} dtype {gas.dtype}')
+    if dissolved is not None and rbc_tp_separated is False:
+        print('[post_process] dissolved image is UNSPLIT complex (no RBC/TP fit): '
+              'dissolved_phase_real/imag are NOT RBC/TP — use dissolved_phase_magnitude')
     if nav:
         print(f'[post_process] navigator arrays: '
               + ', '.join(f'{k}{np.asarray(v).shape}' for k, v in nav.items()))
@@ -384,6 +435,10 @@ def run(out_dir, input_mrd_path=None):
         mat_vars['dissolved_phase_magnitude'] = np.abs(dissolved).astype(np.float32)
         mat_vars['dissolved_phase_real'] = dissolved.real.astype(np.float32)
         mat_vars['dissolved_phase_imag'] = dissolved.imag.astype(np.float32)
+        # 1 = real/imag are aRBC/aTP; 0 = unsplit complex (magnitude only);
+        # -1 = untagged (pre-40d23a4 image; dissolved present there always meant split)
+        mat_vars['rbc_tp_separated'] = np.int8(
+            -1 if rbc_tp_separated is None else int(rbc_tp_separated))
     diaphragm_pos = estimate_diaphragm_pos(gas)
     mat_vars['diaphragm_pos'] = diaphragm_pos
     if fid_signal is not None:

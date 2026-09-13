@@ -19,16 +19,24 @@ flowchart TD
   B7["● auto-Steve pipeline (06-18)<br/>asap_run.py 6-stage orchestrator"]
   B8["✅ DIAPHRAGM navigator on Tyger (06-19→24)<br/>fork branch diaphragm-recon · apex→diaphragm fix"]
   B9["✅ ASAP→XeCS restructure (06-24)<br/>CS ops via xecs_recon.pth · originals in _delete/"]
-  B10["● batch cohort recon (Jul 2026)<br/>84/144 done · pipeline DOWN (F1) · Bug A/B fixes"]
+  B10["✅ batch cohort recon (Jul→Sep 2026)<br/>104 unique sessions done · pipeline fixed (F42)"]
   B11["● diaphragm-binning study (07-17)<br/>bin() = amplitude rank (F38) · nav window MEASURED 26 (F37)<br/>bin_time recipe parked · tyger nav 26-guard added (local)"]
-  B12["✅ aikill-atlas cohort QC (08-27)<br/>dis_atlas.py · 60 IDs / 84 sessions · 614-pg PDF + 119 mp4<br/>gas-picked slices · fraction-aligned columns"]
-  B13["★ tyger-access-check (09-03)<br/>cert renewed → 2028-08 (F39) · 005JJ run 558 on db80f16 (F41)<br/>download recipe buffer read -p 4 (F40)"]
+  B12["⚠ aikill-atlas cohort QC (08-27)<br/>dis_atlas.py · 614-pg PDF + 119 mp4<br/>dp pages use |aRBC+i·aTP| → suspect (F47)"]
+  B13["✅ tyger-access-check (09-03)<br/>cert renewed → 2028-08 (F39) · 005JJ run 558"]
+  B14["✅ leftover-recon (09-12/13)<br/>fork 472fbc9 + 40d23a4 · 21 recon'd · audit 136 folders<br/>20 no-traj 2022 (F51) · --ttl 500 (F44) · plt.show hang (F45)"]
+  B15["✅ steve-provenance (09-12/13)<br/>2026_Steve_Recon plain snapshot · diffs<br/>z-flip = real deviation (F49)"]
+  B16["✅ snr-table (09-13)<br/>snr_calc.py · xlsx cols I–S · max/min/EI (F52)<br/>shared to XeCS + PCA"]
+  B17["★ rbctp-split-audit (09-13)<br/>Steve split invalid 60/86 (F47) · whitened DP SNR (F48)<br/>2steve/04 unsent · atlas dp pages to redo"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
   B8 --> B11
   B10 --> B12
   B6 --> B13
+  B10 --> B14
+  B8 --> B15
+  B14 --> B16 --> B17
+  B17 -.F47.-> B12
   B9 -.xecs_recon.pth.-> B10
 ```
 
@@ -38,17 +46,20 @@ flowchart TD
 |------|-----------|
 | B2 arbiter | C18 compare_baseline.py, C19 steve_kernel_numpy.py, C20 dump_inputs, C21 convert_calib, C22 faraz_* (F22) |
 | B3–B5 CS | → `2026_XeCS_Recon` repo; ASAP keeps only C23 cs_montage.py bridge (F35) |
-| B6 tyger | C6 convert_siemens_to_mrd.py, C13 recon_codespec.yml (F1 F2 F3) |
+| B6 tyger | C6 convert_siemens_to_mrd.py, C13 recon_codespec*.yml (F2 F3 F42) |
 | B7 auto-steve | C10 asap_run.py, C11 post_process.py, C12 param_gui.py |
 | B8 diaphragm | C7 tyger_recon.py, fork branch `diaphragm-recon` (F30) |
-| B10 batch | C8 batch_recon.py, C9 dyn_recon.py, C14–C17 helpers, SNR_Table_All.xlsx Recon Status tab (F1 F4–F16) |
-| B12 aikill-atlas | C26 dis_atlas.py, outputs/aikill_atlas/dissolved_atlas.pdf (614 pg), Ext videos/ (119 mp4) |
+| B10 batch | C8 batch_recon.py, C9 dyn_recon.py, C29 todo_batch.sh, C14–C17 helpers, SNR_Table_All.xlsx (F4–F16 F42–F45) |
+| B12 aikill-atlas ⚠ | C26 dis_atlas.py, outputs/aikill_atlas/dissolved_atlas.pdf (614 pg, SUSPECT_F47.md), Ext videos/ (119 mp4) |
+| B13 tyger-access | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558), memory tyger_setup.md |
+| B14 leftover-recon | fork commits 472fbc9/40d23a4, C9 dyn_recon.py, C29 todo_batch.sh, outputs/roundtrip_audit_2026-09-13/, outputs/leftover_recon_2026-09-12/, Ext pipeline_runs/logs + quarantine/ (F42–F46 F51) |
+| B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
+| B16 snr-table | C28 snr_calc.py, outputs/snr_2026-09-13/snr_table.csv, SNR_Table_All.xlsx cols I–S (F48 F50 F52) |
+| B17 rbctp-split ★ | outputs/snr_2026-09-13/{rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png}, `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`, reference/DP_RBCTP_Split_Noise_Diagnostics.md (F47 F48) |
 
-| B13 tyger-access ★ | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558 output.mrd + montages), memory tyger_setup.md |
+## Current position (★ B17, 2026-09-13)
 
-## Current position (★ B13, 2026-09-03)
-
-Tyger access restored (new cert to 2028-08-04) and proven: 005JJ SIGNAL recon ran on GPU
-(run 558, image db80f16). Single-coil subjects are runnable NOW; F1 still blocks nch=8.
-Next: either resume batch B10 for the runnable set (first harden dyn_recon.submit() download
-per F40), or atlas audit follow-ups (B12), or bin_time.py (B11). Root-repo commits forbidden.
+All reconstructable v2/v3 dynamics are done (104 sessions) with a measured gas/DP SNR table.
+Open: Steve's RBC/TP split is invalid for most split sessions (F47) — decide what to do
+(send 2steve note 04 via fork; regenerate atlas dp pages with whitened |z|; any RBC:TP work
+only on the 19 valid sessions). Parked: 20 sessions on 2022 sequences need trajectories (F51).

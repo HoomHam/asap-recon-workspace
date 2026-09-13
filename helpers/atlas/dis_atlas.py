@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# ⚠ SUSPECT-DEPENDENCY [F47]: dp pages use dissolved_phase_magnitude = |aRBC+i·aTP|, which for RBC/TP-split sessions is noise-amplified by Steve's ill-conditioned split (not |dissolved|) — see workspace/canon/facts.md
 """Gas + dissolved atlas over /Volumes/HoomHamExt/AIkill_Dynamic.
 
 Groups sessions by subject ID (dates sorted). Per ID:

@@ -1,0 +1,366 @@
+diff --git a/.github/workflows/build-image.yml b/.github/workflows/build-image.yml
+new file mode 100644
+index 0000000..fc9b5a6
+--- /dev/null
++++ b/.github/workflows/build-image.yml
+@@ -0,0 +1,40 @@
++name: build-tyger-recon-image
++
++# Builds the Tyger reconstruction container (Dockerfile at repo root) and pushes
++# it to this fork's GitHub Container Registry. Used because the dev Mac has no
++# local container runtime and the target Tyger GPU node needs an amd64 image.
++#
++# The default GITHUB_TOKEN already carries packages:write, so no PAT is needed.
++# NOTE: the pushed package is private by default — make it public (or give Tyger
++# pull credentials) before submitting a job that references it.
++
++on:
++  push:
++    branches: [diaphragm-recon]
++  workflow_dispatch:
++
++jobs:
++  build:
++    runs-on: ubuntu-latest
++    permissions:
++      contents: read
++      packages: write
++    steps:
++      - uses: actions/checkout@v4
++
++      - name: Log in to ghcr.io
++        uses: docker/login-action@v3
++        with:
++          registry: ghcr.io
++          username: ${{ github.actor }}
++          password: ${{ secrets.GITHUB_TOKEN }}
++
++      - name: Build and push
++        uses: docker/build-push-action@v6
++        with:
++          context: .
++          platforms: linux/amd64
++          push: true
++          tags: |
++            ghcr.io/hoomham/xe-tyger-recon:diaphragm-recon
++            ghcr.io/hoomham/xe-tyger-recon:${{ github.sha }}
+diff --git a/convert_siemens_to_mrd.py b/convert_siemens_to_mrd.py
+index 4c22dab..701cb1c 100644
+--- a/convert_siemens_to_mrd.py
++++ b/convert_siemens_to_mrd.py
+@@ -246,7 +246,7 @@ if __name__ == '__main__':
+     parser.add_argument('--gplb',       type=int,   default=gvar.gplb,       help='Gas-phase line broadening')
+     parser.add_argument('--dplb',       type=int,   default=gvar.dplb,       help='Dissolved-phase line broadening')
+     parser.add_argument('--freqfilter', type=int,   default=gvar.freqfilter, help='Frequency filter')
+-    parser.add_argument('--binning',    default='SIGNAL', choices=['SIGNAL', 'PNEUMOTACH'],
++    parser.add_argument('--binning',    default='SIGNAL', choices=['SIGNAL', 'PNEUMOTACH', 'DIAPHRAGM'],
+                         help='Respiratory binning method')
+     args = parser.parse_args()
+     params = dict(MS=args.ms, IS=args.IS, nbins=args.nbins, griddx=args.griddx,
+diff --git a/main.py b/main.py
+index dfea640..75de9fe 100644
+--- a/main.py
++++ b/main.py
+@@ -393,10 +393,10 @@ def ID_callback(*args):
+     global dp_traj_label
+     global datasets_label
+     datatype = data_menu_var.get()
+-    g_dir.trajdirname = g.basefolder + datatype + '/traj/'
++    g_dir.trajdirname = g.basefolder + '/' + datatype + '/traj/'
+ 
+-    g_dir.datadirname = g.basefolder + datatype + '/' + date_menu_var.get() + '/' + ID_menu_var.get() + '/'
+-    allrawdir = listdir(g_dir.datadirname)
++    g_dir.datadirname = g.basefolder + '/' + datatype + '/' + date_menu_var.get() + '/' + ID_menu_var.get() + '/'
++    allrawdir = [f for f in listdir(g_dir.datadirname) if not f.startswith('.')]
+     g_dir.dyndatasets = [g_dir.datadirname + i for i in allrawdir if i.find('rawdata.job0') != -1]
+     g_dir.fileformat = 'bruker' if len(g_dir.dyndatasets) > 0 else 'siemens'
+     try:
+@@ -459,17 +459,17 @@ def data_callback(*args):
+     set_date_menu()
+ 
+ def set_ID_menu():
+-    options = listdir(g.basefolder + '/' + data_menu_var.get() + '/' + date_menu_var.get())
++    options = [f for f in listdir(g.basefolder + '/' + data_menu_var.get() + '/' + date_menu_var.get()) if not f.startswith('.')]
+     refresh_menu(ID_menu, ID_menu_var, options)
+ 
+ def set_date_menu():
+-    options = listdir(g.basefolder + '/' + data_menu_var.get())
++    options = [f for f in listdir(g.basefolder + '/' + data_menu_var.get()) if not f.startswith('.')]
+     options = getdtlist(options)
+     refresh_menu(date_menu, date_menu_var, options)
+     set_ID_menu()
+ 
+ def set_data_menu():
+-    options = listdir(g.basefolder)
++    options = [f for f in listdir(g.basefolder) if not f.startswith('.')]
+     refresh_menu(data_menu, data_menu_var, options)
+     set_date_menu()
+ 
+@@ -612,7 +612,7 @@ def setup_menus():
+     global data_menu, date_menu, ID_menu
+     global rootdir_label, usegpu
+ 
+-    options = listdir(g.basefolder)
++    options = [f for f in listdir(g.basefolder) if not f.startswith('.')]
+ 
+     ID_menu_var = StringVar()
+     ID_menu_var.trace('w', ID_callback)
+diff --git a/raw.py b/raw.py
+index 0173e21..46c36a3 100644
+--- a/raw.py
++++ b/raw.py
+@@ -58,7 +58,8 @@ class traj:
+             - nusimage: number of images to use?
+         """
+         self.kgp = gp_array * self.FOV # in units of delta-k
+-        self.kdp = dp_array * self.FOV
++        # no dissolved trajectory (gas-only sequence): empty (0, 3) kdp -> rescale_to_MS skips DPDYN
++        self.kdp = dp_array * self.FOV if dp_array is not None else np.zeros((0, gp_array.shape[1]))
+         # figure out number of points per interleave by looking at the periodicity of the trajectory
+         abskgp = np.sum(self.kgp**2, 1)
+         absfftkgp = np.abs(np.fft.fft(abskgp))
+@@ -284,6 +285,18 @@ class raw:
+                     if ref_acq_arr is not None:
+                         self.setimg(imgtype.GPREF, ref_acq_arr, 0)
+                     self.ilvperTR = 1
++                # --- TR (gas-interleave time base) ---
++                # self.TR is the spacing between consecutive GAS interleaves for
++                # the dynamic time axis (results.dyn_*_recon: t = iilv * TR). It
++                # is taken straight from metadata (alTR / MRD 'TR') and used
++                # as-is. A gas-only dataset legitimately carries either the
++                # minimum TR (half the dual-phase TR) or a non-minimal ~17.2 ms;
++                # both are real acquisition timings, so no correction is applied.
++                # Logged so the TR actually in force is visible per run.
++                print(f'TR (from metadata) = {self.TR * 1e3:.3f} ms, '
++                      f'ilvperTR={self.ilvperTR} '
++                      f'({"gas-only" if self.ilvperTR == 1 else "dual-phase"})',
++                      file=stderr)
+                 # rephase everything so that the beginning of the fids has zero phase
+                 for ich in range(self.nch):
+                     gasphase = np.mean(self.getimg(imgtype.GPDYN)[0:4, ich, :])
+@@ -331,8 +344,19 @@ class raw:
+                                                 len(abssspect) / 2)).astype(int))])
+                                     x0 = np.concatenate((np.array(maxlist), np.abs(sspect[maxlist]), \
+                                             np.angle(sspect[maxlist]), np.array([1, 1])))
++                                try:
+                                     p, pcov = curve_fit(lorfit, np.array(range(len(sspect))), np.concatenate((np.real(sspect), \
+                                             np.imag(sspect))), p0 = x0, method='lm', maxfev=50000)
++                                except RuntimeError as err:
++                                    # Non-converged RBC/TP fit: do not raise maxfev (a forced fit
++                                    # yields a wrong dissolved image). Drop all spectral params so
++                                    # results.dyn_recon skips DPDYN and reconstructs gas only.
++                                    print(f'spectral fit failed at iTE={iTE} ({err}) -- discarding '
++                                          f'RBC/TP params, dissolved recon will be skipped', file=stderr)
++                                    self.RBCTPratio, self.fRBC, self.fTP = [], [], []
++                                    self.sspect, self.sspectfit, self.sspectfreq = [], [], []
++                                    self.RBCphase, self.TPphase, self.TEphase = [], [], []
++                                    break
+                                 x0 = p.copy()
+                                 # arguments to lorfit are: t(x, f0, f1, a0, a1, ph0, ph1, w0, w1):
+                                 fitspect = lorfit(np.array(range(len(sspect))), p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7])
+diff --git a/requirements.txt b/requirements.txt
+index 0f9afcd..0e6d6a0 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -1,8 +1,9 @@
+-numpy
+-scipy
++numpy==2.4.6
++scipy==1.17.1
+ matplotlib
+ Pillow
+-numba
++numba==0.65.1
++llvmlite==0.47.0
+ pymapvbvd
+ python-dateutil
+-mrd-python @ git+https://github.com/MEDCAP/mrd-fork.git@dev#subdirectory=python
++mrd-python @ git+https://github.com/MEDCAP/mrd-fork.git@b6b6d184f59f8638998109d7eed9ce644d4d4bcc#subdirectory=python
+diff --git a/results.py b/results.py
+index 00b12ce..953bbb2 100644
+--- a/results.py
++++ b/results.py
+@@ -300,7 +300,18 @@ class results:
+                     print(f'  saving debug volume savedbin{ibin}.npy ({itype.name} bin {ibin})', file=stderr)
+                     np.save('savedbin'+str(ibin), rspace[ibin, :, :, :])
+                     # END SAVE IT
++            # The RBC/TP split needs the spectral fit (fRBC/fTP/RBCTPratio/TEeff from
++            # raw.load). It is empty when there is no usable spectrum (numspec==0,
++            # <5 good spectra, non-converged fit) or for multi-coil data (fit only
++            # runs for nch==1). Gridding above does not need it, so keep the complex
++            # dissolved image unsplit and tag it (rbc_tp_separated=0) instead of
++            # dropping dissolved entirely.
+             if(itype == imgtype.DPDYN):
++                self.rbc_tp_separated = len(g_raw.fRBC) > 0
++                if(not self.rbc_tp_separated):
++                    print('dyn_recon: no RBC/TP spectral params (fRBC empty) -- dissolved image '
++                          'kept as unsplit complex (magnitude valid; RBC/TP not separated)', file=stderr)
++            if(itype == imgtype.DPDYN and self.rbc_tp_separated):
+                 # mask based on gas phase
+                 for ibin in range(0, g.nbins):
+                     noisethresh = np.mean(np.abs(self.getimg(imgtype.GPDYN)[:, 0:5, 0:5, 0:5])) * 5
+diff --git a/tyger_recon.py b/tyger_recon.py
+index b6b6462..32939e6 100644
+--- a/tyger_recon.py
++++ b/tyger_recon.py
+@@ -9,6 +9,8 @@ import argparse
+ import matplotlib
+ matplotlib.use('Agg')  # headless subprocess: results.py calls plt.show()
+ 
++import numpy as np
++from scipy.signal import savgol_filter
+ from numba import cuda
+ 
+ import mrd
+@@ -17,8 +19,86 @@ from gtypes import gvar, imgtype, bintype
+ from raw import traj, raw
+ from results import results
+ 
+-def _write_results_to_mrd(g_res, header, output):
+-    """Write GPDYN and DPDYN reconstructed images as NdArray items to the output MRD stream."""
++
++def _diaphragm_navigator(g, g_raw, g_traj, g_res):
++    """Populate g_raw.ilvbin[DIAPHRAGM] via a low-res navigator loop.
++
++    Ported from main.py:calcLVcb (Steve's GUI). Reconstructs each undersampled
++    spiral interleave group as one low-res image, extracts the diaphragm z-position
++    from the z-dropoff profile (parabola fit on the 25%-75% transition), smooths
++    with Savgol, and bins. Caller is responsible for restoring g.MS and recomputing
++    the full-res b-matrix afterward.
++    """
++    bt = bintype.DIAPHRAGM
++    saveMS = g.MS
++    g.MS = g.IS + 4                       # low-res navigator matrix
++    print(f'DIAPHRAGM: computing low-res b (MS={g.MS})...', file=stderr)
++    g_res.calcb(g, g_raw, g_traj, g.usegpu)
++    nusimg = int(g_raw.ntotalilvs * g_raw.npts / g_traj.nsmpperusimg)
++    tempvolmeasvol = []
++    nav_imgs = []      # per usimg: low-res coronal projection (z, x)
++    nav_lines = []     # per usimg: tracked diaphragm z (nan if no fit)
++    nav_times = []     # per usimg: mean interleave time
++    for iusimg in range(0, nusimg):
++        res = g_res.dyn_usimg_recon(g, g_raw, g_traj, g.usegpu, iusimg)
++        if not res:
++            continue
++        # dyn_usimg_recon stores GPDYN z-flipped (np.flip axis 0). For our Siemens-via-
++        # MRD data that puts the diaphragm at LOW z, but Steve's edge-finder below walks
++        # from the high-z end, so it would lock onto the apex (the less-mobile edge).
++        # Flip z back so the diaphragm sits at high z (matching the final recon
++        # orientation) — the edge-finder then tracks the diaphragm and the exported
++        # projection is already apex-up / diaphragm-down.
++        gpdyn = g_res.getimg(imgtype.GPDYN)[::-1, :, :]
++        proj = np.abs(gpdyn[:, int(g.IS / 4):int(3 * g.IS / 4), :])
++        urfig = np.sum(proj, 1)        # (z, x) coronal projection (navigator image)
++        dropoff = np.sum(proj, (1, 2))  # (z,) z-profile
++        ilvperusimg = int(g_traj.nsmpperusimg / g_raw.npts + .1)
++        nav_imgs.append(urfig.astype('float32'))
++        nav_times.append(float(np.mean(
++            g_raw.ilvtime[(iusimg * ilvperusimg):((iusimg + 1) * ilvperusimg)])))
++        urfigline = np.nan
++        # walk down from the top to find the 25% and 75% signal crossings
++        for p1 in range(g.IS - 1, 0, -1):
++            if dropoff[p1] > np.min(dropoff) + 0.25 * (np.max(dropoff) - np.min(dropoff)):
++                break
++        for p2 in range(p1, 0, -1):
++            if dropoff[p2] > np.min(dropoff) + 0.75 * (np.max(dropoff) - np.min(dropoff)):
++                break
++        if p1 - p2 >= 2:
++            p = np.polyfit(np.array(range(p2, p1)), dropoff[p2:p1], 2)
++            # solve p[0]x^2 + p[1]x + (p[2] - (max+min)/2) = 0 for the half-max crossing
++            det = np.sqrt(p[1] ** 2 - 4 * p[0] * (p[2] - (np.max(dropoff) + np.min(dropoff)) / 2))
++            m1 = (-p[1] + det) / (2 * p[0])
++            m2 = (-p[1] - det) / (2 * p[0])
++            candidate = m1 if (m1 > p2 and m1 < p1) else (m2 if (m2 > p2 and m2 < p1) else None)
++            if candidate is not None:
++                urfigline = float(candidate)
++                tempvolmeasvol.append(candidate)
++                g_raw.volmeastime[bt].append(nav_times[-1])
++        nav_lines.append(urfigline)
++        if len(g_raw.volmeastime[bt]) > 5:
++            ftvol = savgol_filter(tempvolmeasvol, 5, 2)
++            minftvol = np.min(ftvol)
++            g_raw.ilvvol[bt] = np.interp(g_raw.ilvtime, g_raw.volmeastime[bt],
++                    (ftvol - minftvol) / (max(ftvol) - minftvol), left=np.nan, right=np.nan)
++            g_raw.rescale(g_raw.ilvvol[bt])
++            g_raw.ilvbin[bt] = g_raw.bin(g_raw.ilvvol[bt])
++    g.MS = saveMS
++    print(f'DIAPHRAGM: navigator done, {len(g_raw.volmeastime[bt])} measurements, '
++          f'ilvbin populated={bool(len(g_raw.ilvbin[bt]))}', file=stderr)
++    return {
++        'nav_coronal': np.array(nav_imgs, dtype='float32'),     # (nframes, z, x)
++        'nav_diaphragm_z': np.array(nav_lines, dtype='float32'),  # (nframes,)
++        'nav_time': np.array(nav_times, dtype='float32'),         # (nframes,)
++        'nav_volume': np.asarray(g_raw.ilvvol[bt], dtype='float32'),       # (ntotalilvs,)
++        'nav_ilvtime': np.asarray(g_raw.ilvtime, dtype='float32'),         # (ntotalilvs,)
++        'nav_volmeastime': np.asarray(g_raw.volmeastime[bt], dtype='float32'),
++    }
++
++def _write_results_to_mrd(g_res, header, output, nav=None):
++    """Write GPDYN and DPDYN reconstructed images as NdArray items to the output MRD stream.
++    If `nav` (the DIAPHRAGM navigator dict) is given, also stream its arrays."""
+     items = []
+     if g_res.hasimg(imgtype.GPDYN):
+         items.append(mrd.StreamItem.NdArrayFloat(
+@@ -27,7 +107,17 @@ def _write_results_to_mrd(g_res, header, output):
+     if g_res.hasimg(imgtype.DPDYN):
+         items.append(mrd.StreamItem.NdArrayComplexFloat(
+             mrd.NdArray(data=g_res.getimg(imgtype.DPDYN).astype('complex64'),
+-                        meta={'dissolved_phase_image': [mrd.ArrayMetaValue.String('1')]})))
++                        meta={'dissolved_phase_image': [mrd.ArrayMetaValue.String('1')],
++                              # '1': stored as aRBC + 1j*aTP; '0': unsplit complex (magnitude only)
++                              'rbc_tp_separated': [mrd.ArrayMetaValue.String(
++                                  '1' if getattr(g_res, 'rbc_tp_separated', True) else '0')]})))
++    if nav is not None:
++        for key, arr in nav.items():
++            if arr is None or np.asarray(arr).size == 0:
++                continue
++            items.append(mrd.StreamItem.NdArrayFloat(
++                mrd.NdArray(data=np.asarray(arr).astype('float32'),
++                            meta={key: [mrd.ArrayMetaValue.String('1')]})))
+     with mrd.BinaryMrdWriter(output) as writer:
+         writer.write_header(header)
+         writer.write_data(iter(items))
+@@ -83,8 +173,11 @@ def reconstruct_from_mrd(input: BinaryIO, output: BinaryIO):
+             'dtspec': user_double.get('dtspec', 0.0), 'numspec': int(user_long.get('numspec', 0))}
+ 
+     # load trajectories
+-    if gas_phase_traj_arr is None or dissolved_phase_traj_arr is None:
+-        raise ValueError('MRD file missing gas_phase_trajectory or dissolved_phase_trajectory NdArray')
++    # dissolved trajectory is optional: gas-only sequences (e.g. v3_20230821) ship none
++    if gas_phase_traj_arr is None:
++        raise ValueError('MRD file missing gas_phase_trajectory NdArray')
++    if dissolved_phase_traj_arr is None:
++        print('no dissolved_phase_trajectory in MRD -- gas-phase only', file=stderr)
+     g_traj.killpts = killpts
+     g_traj.load_traj_from_array(gas_phase_traj_arr, dissolved_phase_traj_arr,
+                                 int(user_long.get('nusimg', 32)))
+@@ -104,13 +197,26 @@ def reconstruct_from_mrd(input: BinaryIO, output: BinaryIO):
+     print(f'usegpu={g.usegpu}, calculating b-matrix...', file=stderr)
+     g_res.calcb(g, g_raw, g_traj, g.usegpu)
+     binning = user_string.get('binning', 'SIGNAL')
+-    bt = bintype.PNEUMOTACH if (binning == 'PNEUMOTACH' and len(g_raw.ilvbin[bintype.PNEUMOTACH])) \
+-            else bintype.SIGNAL
++
++    # DIAPHRAGM needs a low-res navigator loop to populate ilvbin[DIAPHRAGM];
++    # it temporarily drops g.MS, so recompute the full-res b-matrix afterward.
++    nav = None
++    if binning == 'DIAPHRAGM' and not len(g_raw.ilvbin[bintype.DIAPHRAGM]):
++        nav = _diaphragm_navigator(g, g_raw, g_traj, g_res)
++        print(f'recomputing full-res b (MS={g.MS})...', file=stderr)
++        g_res.calcb(g, g_raw, g_traj, g.usegpu)
++
++    if binning == 'DIAPHRAGM' and len(g_raw.ilvbin[bintype.DIAPHRAGM]):
++        bt = bintype.DIAPHRAGM
++    elif binning == 'PNEUMOTACH' and len(g_raw.ilvbin[bintype.PNEUMOTACH]):
++        bt = bintype.PNEUMOTACH
++    else:
++        bt = bintype.SIGNAL
+     print(f'binned dynamic recon with {bt.name} binning...', file=stderr)
+     g_res.dyn_recon(g, g_raw, g_traj, g_raw.ilvbin[bt], g.usegpu)
+ 
+     print('writing reconstructed images to output mrd', file=stderr)
+-    _write_results_to_mrd(g_res, header, output)
++    _write_results_to_mrd(g_res, header, output, nav=nav)
+ 
+ if __name__ == '__main__':
+     parser = argparse.ArgumentParser()
