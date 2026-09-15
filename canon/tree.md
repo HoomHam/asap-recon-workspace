@@ -27,12 +27,14 @@ flowchart TD
   B15["✅ steve-provenance (09-12/13)<br/>2026_Steve_Recon plain snapshot · diffs<br/>z-flip = real deviation (F49)"]
   B16["✅ snr-table (09-13)<br/>snr_calc.py · xlsx cols I–S · max/min/EI (F52)<br/>shared to XeCS + PCA"]
   B17["★ rbctp-split-audit (09-13)<br/>Steve split invalid 60/86 (F47) · whitened DP SNR (F48)<br/>2steve/04 unsent · atlas dp pages to redo"]
+  B18["✅ siemens-mrd-doc (09-14)<br/>.dat→MRD v2 fork→Tyger write-up for Oxford (F53)<br/>Avanto D13 VD multi-RAID (F54) · PHI/IRB flag"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
   B8 --> B11
   B10 --> B12
   B6 --> B13
+  B6 --> B18
   B10 --> B14
   B8 --> B15
   B14 --> B16 --> B17
@@ -56,6 +58,7 @@ flowchart TD
 | B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
 | B16 snr-table | C28 snr_calc.py, outputs/snr_2026-09-13/snr_table.csv, SNR_Table_All.xlsx cols I–S (F48 F50 F52) |
 | B17 rbctp-split ★ | outputs/snr_2026-09-13/{rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png}, `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`, reference/DP_RBCTP_Split_Noise_Diagnostics.md (F47 F48) |
+| B18 siemens-mrd-doc | notes/Data_SiemensToMRD_Pipeline_2026-09-14.md (DRAFT; C6 C7 C9 C11 C13) (F53 F54) |
 
 ## Current position (★ B17, 2026-09-13)
 
@@ -63,3 +66,5 @@ All reconstructable v2/v3 dynamics are done (104 sessions) with a measured gas/D
 Open: Steve's RBC/TP split is invalid for most split sessions (F47) — decide what to do
 (send 2steve note 04 via fork; regenerate atlas dp pages with whitened |z|; any RBC:TP work
 only on the 19 valid sessions). Parked: 20 sessions on 2022 sequences need trajectories (F51).
+Side twig 2026-09-14: B18 pipeline write-up for the Oxford meeting delivered; any data exchange
+format/PHI decisions come out of that meeting (see note §5.4).

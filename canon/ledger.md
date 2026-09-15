@@ -140,3 +140,18 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
 - BRANCH: snr-table (B16), parent: B14. Closed (delivered).
 - BRANCH: rbctp-split-audit (B17), parent: B16. OPEN ★ (note to Steve unsent; atlas dp pages suspect).
 - BRANCH: tyger-access-check (B13) — closed ✅ (superseded by B14).
+
+## 2026-09-14 · session 6
+- Read-only survey for Hooman (requested via System session system-f3): documented the Siemens .dat → MRD → Tyger
+  path ahead of the 2026-09-15 Spinhance × Oxford gas-imaging meeting (raw-data exchange, their modified ISMRMRD).
+  Note: `notes/Data_SiemensToMRD_Pipeline_2026-09-14.md` (DRAFT, file:line cited). No code changed, nothing run.
+- Findings: our MRD is the MEDCAP MRD v2 fork with a private NdArray+meta layout, unreadable by stock v2 or v1
+  tools; gas/dissolved split and Xe constants live in raw.py, not the file (F53). Scanner measured as Avanto
+  1.494 T, syngo MR D13, VD multi-RAID .dat (F54, n=1). No "MRD1" term exists anywhere in repo/canon/vault.
+- Also noted: dyn_recon default `--codespec` still → broken d136eb1 (C13); `reference/Tyger_Setup.md` stale
+  (shows .dat as --input, old basefolder).
+- CONFLICT (A5, Hooman to decide): root + workspace CLAUDE.md say "phantom data, no PHI", but the cohort pipeline
+  runs on human sessions (.dat headers + session folders carry PHI; IRB cloud letter covers Tyger, not an outside group).
+- DECIDED: the pipeline note stays in this repo (`workspace/notes/`), per Hooman.
+- BRANCH: siemens-mrd-doc (B18), parent: B6 (tyger). Closed (delivered). ★ stays B17.
+- Model: Opus 5 (not Fable 5).
