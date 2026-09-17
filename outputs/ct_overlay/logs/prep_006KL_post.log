@@ -1,0 +1,2 @@
+006KL_post nifti {'src': '/Volumes/HoomHamExt/Work/CT/CT EBV/006KL_post/NIFTI/CT.nii.gz', 'size': [512, 512, 402], 'spacing': [0.574, 0.574, 0.7], 'lung_L': 4.593, 'kernel': '?', 'thk': 0.699999988079071}
+  manifest 006KL_post__2024-03-12_006KL -> nifti

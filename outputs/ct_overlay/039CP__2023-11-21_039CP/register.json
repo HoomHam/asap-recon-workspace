@@ -1,0 +1,40 @@
+{
+  "subject": "039CP__2023-11-21_039CP",
+  "mri": "/Volumes/HoomHamExt/Work/Codes/2026_PCA_registration/elastix_oneshot_2026-09-16/2023-11-21_039CP/registered_elastix.npy",
+  "ei_bin": 6,
+  "ct_phase": "s4_Br40f_2mm",
+  "provenance": "elastix one-shot PCAMetric2 (PCA session); CT CT LTX/039CP (2023) series s4_Br40f_2mm (lung 3.662 L, max of 3)",
+  "mri_voxel_mm": 3.5,
+  "orientation": {
+    "perm": "012",
+    "flips": "--+",
+    "meaning": "MRI (Z,Y,X) axes -> (S,P,L) with signs"
+  },
+  "rigid": {
+    "euler_deg": [
+      -7.392152525877502,
+      -1.2604180250058001,
+      -1.638539446330728
+    ],
+    "translation_mm": [
+      -6.519753826627619,
+      0.12484421111075433,
+      4.986083831040495
+    ],
+    "center": [
+      -1.0576266945497252,
+      -116.95470740576135,
+      60.83543210751915
+    ],
+    "mi_lowres": -0.30550520624109256,
+    "mi_fullres": -0.3128949470356458,
+    "stop": "RegularStepGradientDescentOptimizerv4: Maximum number of iterations (150) exceeded.",
+    "mri_inside_ctlung": 0.9644807546391345,
+    "ctlung_covered_by_mri": 0.5840027674761097
+  },
+  "similarity_diag": {
+    "scale": 0.9588896161628114,
+    "mi": -0.3462646404257802,
+    "note": "7-DOF fit only to check the 350 mm FOV assumption; overlay uses rigid"
+  }
+}

@@ -1,0 +1,24 @@
+{
+ "euler_deg": [
+  6.427335009299075,
+  1.7122887265090074,
+  -1.5464166750275017
+ ],
+ "translation_mm": [
+  15.310396989202479,
+  12.949629509971562,
+  11.165659807516663
+ ],
+ "center": [
+  3.1375158666601806,
+  -165.44907984838068,
+  -32.303001742635615
+ ],
+ "mi_lowres": -0.1778892897764893,
+ "mi_fullres": -0.178669257245577,
+ "stop": "RegularStepGradientDescentOptimizerv4: Maximum number of iterations (150) exceeded.",
+ "mri_inside_ctlung": 0.9620318390570896,
+ "ctlung_covered_by_mri": 0.38387863331180166
+}
+similarity scale 0.9809564583675359
+01BB overlays done: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/01BB

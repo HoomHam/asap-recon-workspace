@@ -1,0 +1,26 @@
+=== RUN 012SR__2023-05-02_012SR
+{
+ "euler_deg": [
+  -12.765337686112234,
+  -0.10129882272544047,
+  -5.3284561672096515
+ ],
+ "translation_mm": [
+  -3.289873734150202,
+  -1.2529145092677596,
+  8.608398443847992
+ ],
+ "center": [
+  6.3322707384813555,
+  -174.02619928354147,
+  150.32260851686314
+ ],
+ "mi_lowres": -0.33178588885426125,
+ "mi_fullres": -0.343615335092904,
+ "stop": "RegularStepGradientDescentOptimizerv4: Step too small after 55 iterations. Current step (0.00094037) is less than minimum step (0.001).",
+ "mri_inside_ctlung": 0.7566219937766483,
+ "ctlung_covered_by_mri": 0.8893373231103574
+}
+similarity scale 1.0277162452614326
+012SR__2023-05-02_012SR overlays done: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/012SR__2023-05-02_012SR
+012SR__2023-05-02_012SR video: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/012SR__2023-05-02_012SR/bins_video.mp4 | gif: /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/ct_overlay/012SR__2023-05-02_012SR/bins_video.gif

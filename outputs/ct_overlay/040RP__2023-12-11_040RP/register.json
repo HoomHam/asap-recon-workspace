@@ -1,0 +1,40 @@
+{
+  "subject": "040RP__2023-12-11_040RP",
+  "mri": "/Volumes/HoomHamExt/Work/Codes/2026_PCA_registration/elastix_oneshot_2026-09-16/2023-12-11_040RP/registered_elastix.npy",
+  "ei_bin": 6,
+  "ct_phase": "s2_Br40d_1mm",
+  "provenance": "elastix one-shot PCAMetric2 (PCA session); CT CT LTX/040RP (2023) series s2_Br40d_1mm (lung 3.817 L, max of 2)",
+  "mri_voxel_mm": 3.5,
+  "orientation": {
+    "perm": "012",
+    "flips": "--+",
+    "meaning": "MRI (Z,Y,X) axes -> (S,P,L) with signs"
+  },
+  "rigid": {
+    "euler_deg": [
+      1.1828650653836645,
+      4.015602224786363,
+      -3.6429548201790696
+    ],
+    "translation_mm": [
+      10.510278318241932,
+      4.4000926782876855,
+      -0.4532598178986789
+    ],
+    "center": [
+      -8.818008146657206,
+      -156.45012056403965,
+      -469.73508546498624
+    ],
+    "mi_lowres": -0.2237031034966042,
+    "mi_fullres": -0.2225609107780781,
+    "stop": "RegularStepGradientDescentOptimizerv4: Step too small after 63 iterations. Current step (0.00094037) is less than minimum step (0.001).",
+    "mri_inside_ctlung": 0.9327036492305141,
+    "ctlung_covered_by_mri": 0.506497555224826
+  },
+  "similarity_diag": {
+    "scale": 0.9536071525043862,
+    "mi": -0.2470338533730276,
+    "note": "7-DOF fit only to check the 350 mm FOV assumption; overlay uses rigid"
+  }
+}

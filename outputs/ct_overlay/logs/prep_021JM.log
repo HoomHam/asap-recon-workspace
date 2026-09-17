@@ -1,0 +1,6 @@
+021JM s3_Br49f_1mm 4.132 L
+WARNING: In /Users/ec2-user/actions-runner/_work/SimpleITK/SimpleITK/bld/ITK-prefix/include/ITK-5.4/itkImageSeriesReader.hxx, line 478
+ImageSeriesReader (0xb55060000): Non uniform sampling or missing slices detected,  maximum nonuniformity:3.55882
+
+021JM s8_Br49f_1mm 1.721 L
+  manifest 021JM__2023-04-18_021JM -> s3_Br49f_1mm

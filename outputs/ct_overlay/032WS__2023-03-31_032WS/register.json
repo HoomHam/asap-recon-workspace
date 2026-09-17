@@ -1,0 +1,40 @@
+{
+  "subject": "032WS__2023-03-31_032WS",
+  "mri": "/Volumes/HoomHamExt/Work/Codes/2026_PCA_registration/elastix_oneshot_2026-09-16/2023-03-31_032WS/registered_elastix.npy",
+  "ei_bin": 6,
+  "ct_phase": "s5_Bf37f_1mm",
+  "provenance": "elastix one-shot PCAMetric2 (PCA session); CT CT LTX/032WS (2023) series s5_Bf37f_1mm (lung 3.336 L, max of 2)",
+  "mri_voxel_mm": 3.5,
+  "orientation": {
+    "perm": "012",
+    "flips": "--+",
+    "meaning": "MRI (Z,Y,X) axes -> (S,P,L) with signs"
+  },
+  "rigid": {
+    "euler_deg": [
+      1.965608049537874,
+      2.2780667704058932,
+      0.22283806562344385
+    ],
+    "translation_mm": [
+      1.32541709591066,
+      -4.8009251681578755,
+      24.212608404271364
+    ],
+    "center": [
+      -6.839973241439424,
+      -145.1630675913113,
+      790.271705161863
+    ],
+    "mi_lowres": -0.1902559923045653,
+    "mi_fullres": -0.1922012750017784,
+    "stop": "RegularStepGradientDescentOptimizerv4: Gradient magnitude tolerance met after 53 iterations. Gradient magnitude (5.49208e-06) is less than gradient magnitude tolerance (1e-05).",
+    "mri_inside_ctlung": 0.8228342589294307,
+    "ctlung_covered_by_mri": 0.6258150953059667
+  },
+  "similarity_diag": {
+    "scale": 1.0094827708492171,
+    "mi": -0.1911651610265733,
+    "note": "7-DOF fit only to check the 350 mm FOV assumption; overlay uses rigid"
+  }
+}

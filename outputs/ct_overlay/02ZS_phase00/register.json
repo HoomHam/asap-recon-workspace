@@ -1,0 +1,40 @@
+{
+  "subject": "02ZS",
+  "mri": "/Volumes/HoomHamExt/Work/Codes/2026_PCA_registration/elastix_oneshot_2026-09-16/2023-11-06_002ZS/registered_elastix.npy",
+  "ei_bin": 8,
+  "ct_phase": "phase00",
+  "provenance": "elastix one-shot PCAMetric2 (no legacy final); Tyger 2023-11-06_002ZS; CT 2023-10-23",
+  "mri_voxel_mm": 3.5,
+  "orientation": {
+    "perm": "012",
+    "flips": "--+",
+    "meaning": "MRI (Z,Y,X) axes -> (S,P,L) with signs"
+  },
+  "rigid": {
+    "euler_deg": [
+      3.8061606894406608,
+      -0.6929694927508584,
+      3.044472649428869
+    ],
+    "translation_mm": [
+      16.50207458945983,
+      -2.8054455055463583,
+      2.526618964689011
+    ],
+    "center": [
+      -27.514937181569337,
+      -185.69963756000251,
+      -4.539234168261771
+    ],
+    "mi_lowres": -0.29572039597996563,
+    "mi_fullres": -0.3006532933479985,
+    "stop": "RegularStepGradientDescentOptimizerv4: Step too small after 142 iterations. Current step (0.00094037) is less than minimum step (0.001).",
+    "mri_inside_ctlung": 0.7896611043059767,
+    "ctlung_covered_by_mri": 0.7725701038624249
+  },
+  "similarity_diag": {
+    "scale": 0.9997120867647149,
+    "mi": -0.29904353263709127,
+    "note": "7-DOF fit only to check the 350 mm FOV assumption; overlay uses rigid"
+  }
+}

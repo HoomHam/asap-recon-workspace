@@ -1,0 +1,40 @@
+{
+  "subject": "042DR__2024-01-17_042DR",
+  "mri": "/Volumes/HoomHamExt/Work/Codes/2026_PCA_registration/elastix_oneshot_2026-09-16/2024-01-17_042DR/registered_elastix.npy",
+  "ei_bin": 7,
+  "ct_phase": "s4_Br40f_2mm",
+  "provenance": "elastix one-shot PCAMetric2 (PCA session); CT CT LTX/042DR (2023) series s4_Br40f_2mm (lung 3.584 L, max of 3)",
+  "mri_voxel_mm": 3.5,
+  "orientation": {
+    "perm": "012",
+    "flips": "--+",
+    "meaning": "MRI (Z,Y,X) axes -> (S,P,L) with signs"
+  },
+  "rigid": {
+    "euler_deg": [
+      -7.45282933522118,
+      -2.958560894915469,
+      4.9097336408480725
+    ],
+    "translation_mm": [
+      6.82912851702209,
+      -10.885571094965144,
+      7.2820500629516145
+    ],
+    "center": [
+      19.556926527429084,
+      -160.6559124708716,
+      -167.14234795464432
+    ],
+    "mi_lowres": -0.24500576353103698,
+    "mi_fullres": -0.25801965667041693,
+    "stop": "RegularStepGradientDescentOptimizerv4: Maximum number of iterations (150) exceeded.",
+    "mri_inside_ctlung": 0.8451950824867804,
+    "ctlung_covered_by_mri": 0.5557883439835868
+  },
+  "similarity_diag": {
+    "scale": 0.9739697446988346,
+    "mi": -0.2527783415881244,
+    "note": "7-DOF fit only to check the 350 mm FOV assumption; overlay uses rigid"
+  }
+}

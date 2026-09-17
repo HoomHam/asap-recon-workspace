@@ -1,0 +1,2 @@
+007RA_pre nifti {'src': '/Volumes/HoomHamExt/Work/CT/CT EBV/007RA_pre/NIFTI/CT.nii.gz', 'size': [512, 512, 184], 'spacing': [0.719, 0.719, 2.0], 'lung_L': 6.766, 'kernel': '?', 'thk': 2.0}
+  manifest 007RA_pre__2024-01-22_007RA -> nifti

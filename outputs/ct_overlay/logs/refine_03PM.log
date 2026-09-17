@@ -1,0 +1,24 @@
+{
+ "euler_deg": [
+  0.8304233750959339,
+  -1.7407470636386848,
+  -0.9461528258584123
+ ],
+ "translation_mm": [
+  -7.789470964651972,
+  -0.2568150561787406,
+  -2.1670132648385083
+ ],
+ "center": [
+  4.461338245617441,
+  -156.4596414201959,
+  22.659946810545534
+ ],
+ "mi_lowres": -0.4178263346979727,
+ "mi_fullres": -0.40467174353269403,
+ "stop": "RegularStepGradientDescentOptimizerv4: Step too small after 22 iterations. Current step (0.00094037) is less than minimum step (0.001).",
+ "mri_inside_ctlung": 0.9280789154152111,
+ "ctlung_covered_by_mri": 0.7408104408028351
+}
+similarity scale 0.9684864493833715
+03PM overlays done: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/03PM

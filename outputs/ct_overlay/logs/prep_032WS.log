@@ -1,0 +1,7 @@
+032WS s5_Bf37f_1mm 3.336 L
+WARNING: In /Users/ec2-user/actions-runner/_work/SimpleITK/SimpleITK/bld/ITK-prefix/include/ITK-5.4/itkImageSeriesReader.hxx, line 478
+ImageSeriesReader (0xc61110000): Non uniform sampling or missing slices detected,  maximum nonuniformity:0.996855
+
+032WS s6_Br51f_1mm 3.342 L
+  manifest 032WS__2023-03-31_032WS -> s5_Bf37f_1mm
+  manifest 032WS__2023-09-25_032WS -> s5_Bf37f_1mm

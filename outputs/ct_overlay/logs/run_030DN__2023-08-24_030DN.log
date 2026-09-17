@@ -1,0 +1,26 @@
+=== RUN 030DN__2023-08-24_030DN
+{
+ "euler_deg": [
+  -0.09175816705682145,
+  -0.7744452239343699,
+  2.9795896173763863
+ ],
+ "translation_mm": [
+  10.49304796846955,
+  -1.2014926702498525,
+  -5.981653987346737
+ ],
+ "center": [
+  6.080882155107645,
+  -142.53977935910075,
+  -221.42862092903962
+ ],
+ "mi_lowres": -0.3022551106458204,
+ "mi_fullres": -0.301363452680087,
+ "stop": "RegularStepGradientDescentOptimizerv4: Gradient magnitude tolerance met after 48 iterations. Gradient magnitude (9.24687e-06) is less than gradient magnitude tolerance (1e-05).",
+ "mri_inside_ctlung": 0.9782784113097279,
+ "ctlung_covered_by_mri": 0.570615072016492
+}
+similarity scale 0.9529645871797355
+030DN__2023-08-24_030DN overlays done: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/030DN__2023-08-24_030DN
+030DN__2023-08-24_030DN video: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/030DN__2023-08-24_030DN/bins_video.mp4 | gif: /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/ct_overlay/030DN__2023-08-24_030DN/bins_video.gif

@@ -1,0 +1,2 @@
+005DS_pre nifti {'src': '/Volumes/HoomHamExt/Work/CT/CT EBV/005DS_Pre/NIFTI/CT.nii.gz', 'size': [512, 512, 291], 'spacing': [0.694, 0.694, 1.0], 'lung_L': 5.281, 'kernel': '?', 'thk': 1.0}
+  manifest 005DS_pre__2023-11-17_005DS -> nifti

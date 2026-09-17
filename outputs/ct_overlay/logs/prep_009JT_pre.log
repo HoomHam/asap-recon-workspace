@@ -1,0 +1,2 @@
+009JT_pre nifti {'src': '/Volumes/HoomHamExt/Work/CT/CT EBV/009JT_pre/NIFTI/CT.nii.gz', 'size': [512, 512, 282], 'spacing': [0.748, 0.748, 1.25], 'lung_L': 8.636, 'kernel': '?', 'thk': 1.25}
+  manifest 009JT_pre__2024-02-27_009JT -> nifti

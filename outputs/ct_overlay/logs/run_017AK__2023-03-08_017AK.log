@@ -1,0 +1,26 @@
+=== RUN 017AK__2023-03-08_017AK
+{
+ "euler_deg": [
+  -1.5141622635089234,
+  1.203292096176317,
+  1.2956360026994547
+ ],
+ "translation_mm": [
+  7.898668536093054,
+  -7.184445127349877,
+  6.166149621763372
+ ],
+ "center": [
+  -8.49994665820509,
+  -151.14510109893226,
+  1150.1249300489385
+ ],
+ "mi_lowres": -0.30464025486638924,
+ "mi_fullres": -0.3025685216937409,
+ "stop": "RegularStepGradientDescentOptimizerv4: Maximum number of iterations (150) exceeded.",
+ "mri_inside_ctlung": 0.9460159449567885,
+ "ctlung_covered_by_mri": 0.558734109153509
+}
+similarity scale 0.9640103607289637
+017AK__2023-03-08_017AK overlays done: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/017AK__2023-03-08_017AK
+017AK__2023-03-08_017AK video: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/ct/../../outputs/ct_overlay/017AK__2023-03-08_017AK/bins_video.mp4 | gif: /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/ct_overlay/017AK__2023-03-08_017AK/bins_video.gif

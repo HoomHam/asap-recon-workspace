@@ -1,0 +1,2 @@
+003KH_pre nifti {'src': '/Volumes/HoomHamExt/Work/CT/CT EBV/003KH_pre/NIFTI/CT.nii.gz', 'size': [512, 512, 330], 'spacing': [0.707, 0.707, 1.0], 'lung_L': 8.151, 'kernel': '?', 'thk': 1.0}
+  manifest 003KH_pre__2023-10-31_003KH -> nifti

@@ -1,0 +1,7 @@
+WARNING: In /Users/ec2-user/actions-runner/_work/SimpleITK/SimpleITK/bld/ITK-prefix/include/ITK-5.4/itkImageSeriesReader.hxx, line 478
+ImageSeriesReader (0xb48f24300): Non uniform sampling or missing slices detected,  maximum nonuniformity:1.94295
+
+038RL s11_Br56u_1mm 1.924 L
+038RL s2_Br56u_1mm 3.169 L
+038RL s4_Br40u_2mm 3.209 L
+  manifest 038RL__2023-11-16_038RL -> s4_Br40u_2mm

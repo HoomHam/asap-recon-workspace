@@ -1,0 +1,5 @@
+023DB s2_Br49d_1mm 3.956 L
+023DB s3_Br40d_2mm 3.979 L
+023DB s4_Br49d_1mm 2.713 L
+  manifest 023DB__2023-03-09_023DB -> s3_Br40d_2mm
+  manifest 023DB__2023-04-26_023DB -> s3_Br40d_2mm
