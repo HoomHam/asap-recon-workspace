@@ -233,3 +233,59 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
   (untracked but carded C14), archive/*_auto_*.jsonl exports, canon/.nudge. Root repo: nothing committed
   (root is Kento's read-only repo; root handoff-report.md regenerated, untracked there by design).
 - Model: Fable 5.1.
+- 2026-09-17 ~04:00 session (Fable 5.1): Hooman order — CT overlay for the RT subjects. Ext
+  `Work/CT/Data/{01BB,02ZS,03PM}` have Siemens RT 4D-CT (8 phases + Average, 3 mm). Converted to NIfTI
+  (C33, Ext mirror path `Codes/2026_ASAP_Recon/ct_overlay/<subj>/ct/`). Asked PCA session for registered
+  stacks: 03PM has legacy final (gas only), 01BB/02ZS none → elastix one-shot best; all 16×100³, identity
+  affine, orientation arbitrary; FOV 350 (raw.py) ⇒ 3.5 mm. 01BB CT 2023-03-27 = Tyger 2023-03-27_02BB
+  (same day; NOT 2023-10-10_002BB). Rigid only (Hooman: no deforming). C34 orientation search launched.
+- BRANCH: ct-overlay (B21), parent: B14 (leftover-recon). Open. ★ → B21.
+- RESULT (04:40): C34 done for 3 subjects. Orientation F58 (S=−Z, P=−Y, L=+X) — unanimous across subjects.
+  Rigid (full-res Mattes MI, ROI = lung⊕25 mm): 01BB rot [6.4,1.7,−1.5]° trans [15,13,11] mm, gas-in-CT-lung
+  0.96 / lung covered 0.38 (bad lung, apices unventilated); 02ZS rot [3.8,−0.7,3.0]° trans [17,−3,3] mm,
+  0.79/0.77 (left lung largely unventilated, gas slightly below CT diaphragm at right base = inflation
+  mismatch, rigid cannot fix); 03PM rot ≤1.7° trans [−8,0,−2] mm, 0.93/0.74 — trachea/carina line up in
+  sagittal. Similarity-scale diag 0.981/1.000/0.968 ⇒ FOV 350 holds. Dead ends: (1) sitk registration
+  returns CompositeTransform — downcast via GetNthTransform(0).Downcast(); (2) lung mask by
+  border-touching-air deleted lungs when pharynx/mouth in FOV; (3) area-threshold slice range let sinus
+  air in — use contiguous run around max-area slice. Figures: outputs/ct_overlay/<subj>/; big files on Ext.
+  Reply sent to PCA session with F58.
+- 04:55 CT-phase check (C34 `phases`, phase_scores.csv): EI ↔ CT phase chosen by MAX CT lung volume (not the 0%
+  label). 03PM phase00 = max (2.78 L, MI best) ✓; 01BB phase00 = max (4.62 L, MI flat ±0.005 across phases) ✓;
+  02ZS: 0% is NOT end-inhale on this scan (2.18 L) — phase37 = max (2.35 L), MI −0.34 vs −0.30 → 02ZS
+  re-registered to phase37 (gas-in-lung 0.79→0.85; base-of-lung spill under CT diaphragm reduced). phase00
+  result kept as `outputs/ct_overlay/02ZS_phase00/` + Ext `mri_on_ct_phase00.nii.gz`, `rigid_phase00.tfm`.
+  Overlay clip = tissue(HU>−500) ∪ lung⊕15 mm (01BB immobilization bag encloses air gaps, fill-holes body
+  mask let noise specks through).
+- 05:55 COHORT RESULT (C35): 29 keys (17 LTX subjects, 3 with two 2023 sessions; 9 EBV pre/post) all ran
+  (exit 0, ~8 min/key, 3-wide). CT pick = max lung-volume ORIGINAL axial ≤2.5 mm series (all soft-kernel
+  1–2 mm); EBV 002JM/007RA/009JT/010AJ used the pre-made NIFTI/CT.nii.gz. Fit table
+  `outputs/ct_overlay/cohort_fit_table.csv`; one page per key `cohort_summary.pdf` (53 MB, on Ext, symlinked). Eye review of the
+  numeric outliers: 012SR OK (patient tilt −13°); 010AJ OK — gas only in upper lobes (basal non-
+  ventilation), z-shift −30 mm follows the trachea; 037GD OK but low SNR (noise blobs, EI bin 2 by count
+  — bins 2/7/8 equal by top-signal); 002JM = UNREGISTERED stack (no elastix result), noisy but fits;
+  038RL POOR — CT anatomy distorted (mediastinal shift, small high left lung) vs a symmetric MRI, rigid
+  cannot reconcile (gas-in-lung 0.64) — needs Hooman's read (different disease state at CT?). Hooman
+  approved the 16-bin videos (04:40) before the batch. S1/S2 EBV folders skipped (subject unknown).
+
+## 2026-09-17 · session 8 (Fable 5.1; 03:35 → 19:10)
+(the "2026-09-17 ~04:00", RESULT 04:40, 04:55, COHORT RESULT 05:55 bullets above, appended live under the
+session-7 header, belong to THIS session — left in place, append-only.)
+- CT overlay delivered: 4D-CT (RT) + clinical CT (LTX 2023, EBV pre/post) → NIfTI; rigid-only xenon gas EI
+  overlay (Mattes MI, no deformation) for 32 keys; axial all-slice + 1 mm coronal montages; 16-bin videos.
+- Tyger grid ↔ scanner orientation established (F58) by 48-combo brute force, unanimous over 3 subjects;
+  PCA session recorded it as their F63.
+- CT inhale phase/series chosen by max lung-mask volume (02ZS 4D-CT 0% ≠ end-inhale → phase37).
+- Eye review of numeric outliers: 038RL poor (distorted CT anatomy); 010AJ/037GD/012SR/002JM OK with caveats.
+- Evening: Hooman asked which subject a 3-tile xenon coronal screenshot is. Template matching against the 104
+  stacks was NOT discriminative (NCC 0.56–0.64 flat). ScreenPipe placed the screenshot in
+  `Workshop_EBV_Dynamic_HH_2025_Finaled.pptx` (Presentations/2025_Workshop), slide text "COPD, Male, 68,
+  RUL Blocked (EBV), FEV1 > 32 % improve, EBV-PRE/POST". Deck file not locatable from the sandbox (mdfind/
+  find empty); Hooman took over the lookup. Lesson: for "which subject is this figure" go to ScreenPipe
+  first, image matching second.
+- DECIDED (Hooman): 16-bin video format approved (6 axial + 6 coronal tiles, EI-fixed colour scale) — then
+  batch for all.
+- DECIDED: rigid only; CT phase/series = max lung volume; big outputs on Ext mirror path, montages in repo,
+  53 MB cohort_summary.pdf on Ext + symlink.
+- BRANCH: ct-overlay (B21), parent: B14. Open (038RL read, S1/S2 EBV subject ids, workshop-slide subject
+  pending Hooman). ★ → B21.

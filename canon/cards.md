@@ -39,6 +39,9 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C30 | helpers/structure_rank.py | structure-rank | WORKS (107 sessions incl. 3 merged; carina-slice panels as mp4/gif over 16 bins, F57) |
 | C31 | pipeline/merge_dyn.py | merged-dyn | WORKS (030DN validated through raw loader, F56) |
 | C32 | pipeline/merged_batch.sh | merged-dyn | DONE 2026-09-16 (4 run, 3 adopted: 030DN 013VM 008CR; 025VP REJECTED — weak 2nd dose) |
+| C33 | helpers/ct/ct_to_nifti.py | ct-overlay | WORKS (RT 4D-CT → 27 NIfTI phases on Ext) |
+| C34 | helpers/ct/ct_mri_overlay.py | ct-overlay | WORKS (search/refine/overlay/video/phases; F58 orientation; rigid only) |
+| C35 | helpers/ct/ct_cohort_batch.py | ct-overlay | DONE 2026-09-17 (29 LTX+EBV keys; 038RL poor fit; S1/S2 skipped) |
 
 ## Cards
 
@@ -281,10 +284,48 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - out: `AIkill_Dynamic/<date>_<id>_merged/{s,d}`; logs `pipeline_runs/logs/<session>_merged.log`, SUMMARY
 - status: launched 2026-09-16 20:55 via nohup
 
+### C33 · helpers/ct/ct_to_nifti.py
+- why: Hooman has RT-planning 4D-CT for 01BB/02ZS/03PM and wants the xenon MRI overlaid on it; step 1 =
+  DICOM → one NIfTI per respiratory phase
+- origin: H (2026-09-17 order) · branch: ct-overlay (B21) · facts: —
+- in: `/Volumes/HoomHamExt/Work/CT/Data/<subj>/CT/<series>/*.dcm` (Siemens RT chest, 512², 0.977 mm, 3 mm, HFS)
+- out: `/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/ct_overlay/<subj>/ct/{phase00..phase87,average,pbv}.nii.gz`
+  + index.json (HU int16; SimpleITK series reader, LPS geometry in header)
+- status: WORKS — 27 volumes, 819 MB (Ext, mirror path per big-output rule)
+
+### C34 · helpers/ct/ct_mri_overlay.py
+- why: rigid (NO deformation — Hooman: diseased lungs have missing regions, never stretch to fill CT lung)
+  overlay of registered xenon gas EI bin on CT phase00 (end-inhale); axial all slices + interpolated coronal
+- origin: H · branch: ct-overlay (B21) · facts: (pending — orientation of Tyger (Z,Y,X) grid vs LPS)
+- in: PCA-session stacks (01BB/02ZS elastix one-shot `registered_elastix.npy`, 03PM legacy
+  `Analysis/2024-12-06_003PM/reg/5000/registered.nii`), EI bins 8/8/6; CT phase00 from C33; FOV 350 mm ⇒ 3.5 mm
+- out: Ext `ct_overlay/<subj>/{mri_ei_native,mri_on_ct,ct_lungmask}.nii.gz, rigid.tfm, axial_png/, coronal_png/`;
+  repo `outputs/ct_overlay/<subj>/{orientation_scores.csv, register.json, axial_montage.png, axial.gif,
+  coronal_montage.png, coronal.gif, summary_3plane.png}`
+- method: `search` = 6 axis perms × 8 flips, each rigid Mattes-MI on 3.5 mm CT (ROI = lung ⊕ 25 mm), pick
+  lowest MI + cross-subject consensus; `refine` = full-res rigid from it; similarity (7-DOF) run only as a
+  scale diagnostic of the 350 mm FOV; CT lung mask = air < −400 HU ∩ per-slice filled body (pharynx-safe)
+- status: WORKS 2026-09-17 — same orientation won for all 3 subjects (F58); `video` = 16-bin mp4/gif (all bins through the one rigid transform, 6 axial + 6 coronal tiles); specs also from Ext `ct_overlay/manifest.json` (C35); rigid fits: rot ≤6.4°, trans ≤17 mm,
+  scale diag 0.97–1.00. `phases` subcommand = CT-phase match diagnostic (phase_scores.csv); `refine <s> phase=phaseNN` overrides the CT phase (02ZS → phase37, max lung volume). v1 lung-mask bug
+  (mouth-connected air deleted lungs) fixed with per-slice body fill.
+
+### C35 · helpers/ct/ct_cohort_batch.py
+- why: Hooman: "do it for all" — extend the CT overlay to the EBV (pre/post) and LTX (2023) clinical CTs
+- origin: H · branch: ct-overlay (B21) · facts: F58
+- in: `Work/CT/CT EBV/*`, `Work/CT/CT LTX/*` (DICOM ORIGINAL axial ≤2.5 mm, or given NIFTI/CT.nii.gz); PCA elastix
+  one-shot stacks (fallback unregistered stack.npy); COHORT table inside = CT folder → xenon session(s)
+- out: Ext `ct_overlay/<ct_subject>/ct/<series_tag>.nii.gz` + index.json (lung volume per candidate, `_chosen`);
+  Ext `ct_overlay/manifest.json` (key `<ct_subject>__<session>`); then C34 outputs per key
+- method: `prep` converts every candidate, picks max lung-mask volume (ties → thicker, softer kernel);
+  `run <key>` = C34 refine (F58 orientation fixed) + overlay + video; parallel via `keys | xargs -P 3`
+- status: DONE 2026-09-17 05:55 — 29/29 keys ran; 1 poor fit (038RL, distorted CT anatomy), 1 unregistered input (002JM);
+  S1/S2 EBV folders skipped (subject unknown). cohort_fit_table.csv + cohort_summary.pdf in outputs/ct_overlay/
+
 ## Outputs index
 
 | Output dir (workspace/outputs/) | From | Facts | Status |
 |---|---|---|---|
+| ct_overlay/ | C33 C34 C35 | F58 | VALID — RT 3 + LTX 20 + EBV 9 keys (cohort_fit_table.csv, cohort_summary.pdf, bins_video.mp4 per key; 038RL poor fit) (per subj: summary_3plane, axial/coronal montages, register.json, orientation_scores.csv, phase_scores.csv; gifs + per-slice PNGs + NIfTI on Ext `Codes/2026_ASAP_Recon/ct_overlay/`) |
 | snr_2026-09-13/ | C28, _rbctp_fig.py | F47 F48 F52 | VALID (snr_table.csv, rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png, test CSVs) |
 | structure_rank/ | C30 | F57 | VALID (panels sorted by G_struct; eye-pick tool, not a verdict) |
 | twix_audit_2026-09-16/ | inline script (ledger s7) | F55 | VALID (twix_audit.csv, 104 rows) |
