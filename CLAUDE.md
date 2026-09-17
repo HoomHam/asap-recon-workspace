@@ -29,6 +29,16 @@ ASAP scripts that still need CS operators import them from XeCS via an
 in `helpers/_delete/` — safe to remove once XeCS is in daily use. CS theory docs are
 mirrored into `2026_XeCS_Recon/workspace/reference/` (XeCS is canonical for CS now).
 
+## Recon input rule (Hooman, 2026-09-16)
+Before reconning a session NOT yet screened, check XeCS `workspace/outputs/calspec/k0_sessions.csv`
+(copy: `notes/calspec_package_2026-09-16/`) column `extra_free` for a second free-breathing dynamic
+and merge the good ones into one input with `dyn_recon.py --merge MIDa,MIDb [--ref MID]` (s+d only,
+see `pipeline/merge_dyn.py`). The 104-session cohort is ALREADY screened: the only merges are
+008CR 2024-01-31, 030DN 2024-03-06, 013VM 2024-08-12 (done, `*_merged/`). 025VP 2023-11-02 was
+tried and REJECTED (second dose 2.4× weaker → SNR drops; Steve's bins weight interleaves equally),
+use its original. Merge only when the two doses have comparable k0 SNR.
+Rule is for future / unscreened data, not a re-check of the 104.
+
 ## Token Efficiency Rules for Agents
 - Read files on demand — never preload entire codebase
 - Reference `../CLAUDE.md` for project identity and main code map
@@ -87,3 +97,9 @@ Obsidian deep-dive comparison (`Action/MRI/ASAP Recon/ASAP Faraz vs Steve.md`) a
 1. Read latest `handoffs/ASAP_Handoff_*.md` (most recent date)
 2. Check `reference/` for relevant domain doc
 3. Main code lives at `../` — read-only, no git ops there
+
+## `../2steve/` — notes to Steve (added 2026-09-04 by a XeCS Claude session)
+Root-level folder of tested suggestions for Steve's recon code (calcb weak-region gate,
+soft-bin index rounding, …). Read `../2steve/README.md` first. Goes to Steve via the
+`hooman` fork, never to `origin`. Our own deviations live in the XeCS repo:
+`2026_XeCS_Recon/workspace/reference/SteveEquivalent_Prime.md`.

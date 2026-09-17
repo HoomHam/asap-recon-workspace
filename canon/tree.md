@@ -28,6 +28,8 @@ flowchart TD
   B16["✅ snr-table (09-13)<br/>snr_calc.py · xlsx cols I–S · max/min/EI (F52)<br/>shared to XeCS + PCA"]
   B17["★ rbctp-split-audit (09-13)<br/>Steve split invalid 60/86 (F47) · whitened DP SNR (F48)<br/>2steve/04 unsent · atlas dp pages to redo"]
   B18["✅ siemens-mrd-doc (09-14)<br/>.dat→MRD v2 fork→Tyger write-up for Oxford (F53)<br/>Avanto D13 VD multi-RAID (F54) · PHI/IRB flag"]
+  B19["✅ structure-rank (09-16/17)<br/>structure_rank.py · patchiness G/P (F57) · carina-slice panels<br/>16-bin videos · per-cohort panels (HC/HC_OLD/EBV/LTX/RT)"]
+  B20["★ merged-dyn (09-16)<br/>merge_dyn.py + dyn_recon --merge · 3 adopted, 025VP rejected (F56)<br/>twix audit 104/104 = k0 primary (F55) · rule in workspace/CLAUDE.md"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -38,6 +40,8 @@ flowchart TD
   B10 --> B14
   B8 --> B15
   B14 --> B16 --> B17
+  B16 --> B19
+  B14 --> B20
   B17 -.F47.-> B12
   B9 -.xecs_recon.pth.-> B10
 ```
@@ -59,12 +63,17 @@ flowchart TD
 | B16 snr-table | C28 snr_calc.py, outputs/snr_2026-09-13/snr_table.csv, SNR_Table_All.xlsx cols I–S (F48 F50 F52) |
 | B17 rbctp-split ★ | outputs/snr_2026-09-13/{rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png}, `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`, reference/DP_RBCTP_Split_Noise_Diagnostics.md (F47 F48) |
 | B18 siemens-mrd-doc | notes/Data_SiemensToMRD_Pipeline_2026-09-14.md (DRAFT; C6 C7 C9 C11 C13) (F53 F54) |
+| B19 structure-rank | C30 structure_rank.py, outputs/structure_rank/ (F57) |
+| B20 merged-dyn ★ | C31 merge_dyn.py, C32 merged_batch.sh, C9 dyn_recon.py --merge/--ref, outputs/twix_audit_2026-09-16/, Ext AIkill_Dynamic/*_merged/ + pipeline_runs/logs/*_merged.log (F55 F56) |
 
-## Current position (★ B17, 2026-09-13)
+## Current position (★ B20, 2026-09-17)
 
-All reconstructable v2/v3 dynamics are done (104 sessions) with a measured gas/DP SNR table.
-Open: Steve's RBC/TP split is invalid for most split sessions (F47) — decide what to do
-(send 2steve note 04 via fork; regenerate atlas dp pages with whitened |z|; any RBC:TP work
-only on the 19 valid sessions). Parked: 20 sessions on 2022 sequences need trajectories (F51).
-Side twig 2026-09-14: B18 pipeline write-up for the Oxford meeting delivered; any data exchange
-format/PHI decisions come out of that meeting (see note §5.4).
+Cohort = 104 sessions + 3 adopted merged recons (030DN 03-06, 013VM 08-12, 008CR 01-31 →
+`AIkill_Dynamic/*_merged/`, F56); 025VP merge rejected. Every recon's source twix audited = XeCS
+k0 primary (F55). Patchiness ranking + carina-slice panels/videos per cohort exist for Hooman's
+eye-pick (B19, F57) — he picks, no further metric tuning asked. Recon-input rule (extra dynamics →
+`--merge`, comparable doses only) lives in workspace/CLAUDE.md, for unscreened data only.
+Open elsewhere: PCA/XeCS registrations of the 3 merged sessions (their lane, after ~09-18); Steve's
+RBC/TP split invalid for most split sessions (F47, B17 — 2steve note 04 unsent, atlas dp pages to
+redo); 20 sessions on 2022 sequences need trajectories (F51); 2024-05-13_002ZS has no recon.mat
+(post_process never ran).

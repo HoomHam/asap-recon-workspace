@@ -128,7 +128,16 @@ def resolve(args):
     if not cand:
         _die(f'no spiral-dyn .dat (known seqnames {seqnames}) in {datadir}\n'
              f'  found: {dats}')
-    dyn = max(cand, key=lambda f: os.path.getsize(datadir / f))
+    merge = [m.strip() for m in args.merge.split(',')] if args.merge else None
+    if merge:
+        # merged input: the first MID is the head file (keeps its cal block); the rest
+        # are appended by merge_dyn.py. See merge_dyn.py for why this is recon-legal.
+        heads = [f for f in cand if f'_{merge[0]}_' in f]
+        if len(heads) != 1:
+            _die(f'--merge: {merge[0]} matches {heads} in {datadir}')
+        dyn = heads[0]
+    else:
+        dyn = max(cand, key=lambda f: os.path.getsize(datadir / f))
     seqname = args.seqname or next(s for s in seqnames if s in dyn)
 
     # -- trajectory --
@@ -151,6 +160,8 @@ def resolve(args):
     _log(f'data dir   : {datadir}')
     _log(f'date / id  : {date} / {subj_id}')
     _log(f'dynamic    : {dyn} ({os.path.getsize(datadir / dyn)} bytes)')
+    if merge:
+        _log(f'MERGE      : {" + ".join(merge)}  (ref {args.ref or "none"})')
     _log(f'seqname    : {seqname}')
     _log(f'gp / dp    : {os.path.basename(gp)} / {os.path.basename(dp) if dp else "(none)"}')
     _log(f'pneumotach : {os.path.basename(pneumo) if pneumo else "(none)"}')
@@ -159,11 +170,12 @@ def resolve(args):
     if args.out_dir:
         outbase = Path(args.out_dir)
     else:
-        outbase = Path(args.out_root) / f'{date}_{subj_id}'
+        outbase = Path(args.out_root) / f'{date}_{subj_id}{"_merged" if merge else ""}'
     _log(f'output base: {outbase}  (methods -> s/p/d subfolders)')
 
     return dict(datadir=str(datadir), seqname=seqname, gp=gp, dp=dp,
-                pneumo=pneumo, outbase=outbase, date=date, id=subj_id)
+                pneumo=pneumo, outbase=outbase, date=date, id=subj_id,
+                merge=merge, ref=args.ref)
 
 
 # --- stage 2: convert --------------------------------------------------------
@@ -190,6 +202,18 @@ def _clean_datadir(datadir, run_dir):
 
 def convert(ds, run_dir, binning):
     input_mrd = run_dir / 'input.mrd'
+    if ds.get('merge'):
+        sys.path.insert(0, str(PIPELINE_DIR))
+        import merge_dyn
+        _log(f'merging {" + ".join(ds["merge"])} ({binning}) -> {input_mrd}')
+        _, rep = merge_dyn.build_merged(ds['datadir'], ds['merge'], ds['gp'], ds['dp'], input_mrd,
+                                        binning=binning, ref_mid=ds.get('ref'),
+                                        pneumotach_file=None, report_dir=run_dir)
+        for p in rep['parts']:
+            _log(f'  {p["mid"]}: {p["lines"]} lines, {p["dur_s"]} s'
+                 + (f', trimmed {p["trimmed_s"]} s' if 'trimmed_s' in p else f', gap {p["gap_before_s"]} s'))
+        _log(f'  merged: {rep["merged_lines"]} lines = {rep["merged_imaging_s"]} s imaging')
+        return input_mrd
     cmd = [PY, str(CONVERT),
            '-i', _clean_datadir(ds['datadir'], run_dir), '-o', str(input_mrd),
            '--seqname', ds['seqname'],
@@ -320,7 +344,8 @@ def publish(output_mrd, run_dir, target_dir, args):
     subprocess.run(plot_cmd, cwd=run_dir, env=headless)  # writes *_gp.png / *_dp.png beside output.mrd
 
     target_dir.mkdir(parents=True, exist_ok=True)
-    for name in ('output.mrd', 'input.mrd', 'tyger.log', 'codespec.yml'):
+    for name in ('output.mrd', 'input.mrd', 'tyger.log', 'codespec.yml',
+                 'merge_report.json', 'merge_k0.png'):
         src = run_dir / name
         if src.is_file():
             shutil.copy2(src, target_dir / name)
@@ -352,6 +377,10 @@ def main():
                     help="binning methods to run, as letters s(ignal)/p(neumotach)/"
                          "d(iaphragm), comma-separated (default 's,p,d' = all three)")
     ap.add_argument('--seqname', help='override auto-detected trajectory seqname')
+    ap.add_argument('--merge', help='comma-separated MIDs of free-breathing dynamics to merge into '
+                                    'one input (acquisition order; first keeps its cal block). '
+                                    'Output folder gets a _merged suffix; p binning is skipped.')
+    ap.add_argument('--ref', help='breath-hold MID stored as reference_acquisition (with --merge)')
     ap.add_argument('--codespec', default=str(TYGER_SPEC),
                     help=f'Tyger run spec (pins the image sha; default {TYGER_SPEC.name})')
     ap.add_argument('--runs-dir', default=str(RUNS_DIR),
@@ -379,6 +408,9 @@ def main():
     # pneumotach binning needs a pneumotach file — drop it (with a warning) if absent
     if 'PNEUMOTACH' in binnings and not ds['pneumo']:
         _log('WARNING: no pneumotach file — skipping the PNEUMOTACH (p) recon')
+        binnings = [b for b in binnings if b != 'PNEUMOTACH']
+    if 'PNEUMOTACH' in binnings and ds.get('merge'):
+        _log('WARNING: --merge collapses the wall clock; PNEUMOTACH (p) binning not supported — skipped')
         binnings = [b for b in binnings if b != 'PNEUMOTACH']
 
     _check_login()  # fail fast before any conversion

@@ -36,6 +36,9 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C27 | helpers/rt_prepost_fig.py | main | WORKS (RT pre/post figs 2026-08-31) |
 | C28 | helpers/snr_calc.py | snr-table | WORKS (gas + whitened DP SNR, 104 sessions, F48) |
 | C29 | pipeline/todo_batch.sh | leftover-recon | WORKS (25-session worklist, FORCE=1) |
+| C30 | helpers/structure_rank.py | structure-rank | WORKS (107 sessions incl. 3 merged; carina-slice panels as mp4/gif over 16 bins, F57) |
+| C31 | pipeline/merge_dyn.py | merged-dyn | WORKS (030DN validated through raw loader, F56) |
+| C32 | pipeline/merged_batch.sh | merged-dyn | DONE 2026-09-16 (4 run, 3 adopted: 030DN 013VM 008CR; 025VP REJECTED — weak 2nd dose) |
 
 ## Cards
 
@@ -242,11 +245,51 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - out: per-session logs + `SUMMARY.txt` in `/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/logs/`; outputs via C9
 - status: WORKS (run with nohup; bigmac 2023-11-02 000LL commented out — duplicate)
 
+### C30 · helpers/structure_rank.py
+- why: Hooman wanted the recons with the most intra-lung patchiness (COPD-like bright/dark patches with
+  edges) at good SNR, size-normalised, with one panel of coronal trachea slices so his eye picks
+- origin: C · branch: structure-rank (B19) · facts: F57
+- in: `AIkill_Dynamic/<session>/d/recon.mat` gas_phase; `outputs/snr_2026-09-13/snr_table.csv` (max-SNR bin);
+  `--only`, `--sort <col>`, `--figs-only` (rebuild panels from csv + tiles.npz without recompute)
+- out: `outputs/structure_rank/{structure_table.csv, panel_bifurcation_slice.{png,mp4,gif},
+  panel_maxarea_slice.{png,mp4,gif}, *_frames/, scatter_snr_vs_G.png, tiles.npz (bins,z,x per session)}`;
+  `--figs-only --sort <col> --fps N --no-video` rebuild without recompute; per-cohort panels
+  (`cohorts/panel_<HC|HC_OLD|EBV|LTX|RT>_{bifurcation,maxarea}.*`, subject blocks date-ordered) from
+  `--cohort-map notes/calspec_package_2026-09-16/cohort_map.csv`, `--cohorts-only`
+- method: per coronal slice at max-SNR bin: extent = 5σ mask closed r=8 per midline side + fill; rim weight
+  0→1 over 3–8 px; R = I/localmean(σ10); G = w-mean |∇ gaussian(R, σ3)| − background floor; P = perimeter
+  (bright)/perimeter(extent); session = area-weighted mean over slices. Carina slice (2026-09-17) = Y
+  template (trachea column × diagonal arms, anchored at apex/midline) on max-over-bins volume, slices
+  ≥30 % max area; * = column < 5σ. Videos: one frame per bin, fixed grey per session, ffmpeg mp4+gif
+- status: WORKS (103/104; 002ZS has no recon.mat). Dead ends in docstring. Needs scikit-image (venv).
+
+### C31 · pipeline/merge_dyn.py
+- why: sessions where the sequence was stopped and restarted have a second good free-breathing dynamic;
+  Hooman wants both doses in ONE binned recon
+- origin: C (Hooman's decision via XeCS session) · branch: merged-dyn (B20) · facts: F56
+- in: `--data-dir Images/<date>/<id> --mids MIDa,MIDb[,…] --gp-traj --dp-traj [--ref MID] --binning S|D --out input.mrd`
+- out: input.mrd (MEDCAP MRD via root converter, monkeypatched reader — root untouched), merge_report.json
+  (lines, numspec, MDH t0/t1, gap, trim), merge_k0.png (|k0| gas across seam)
+- method: A keeps cal block, trimmed to whole arm cycles (nuniquesmp/npts gas ilv); B's cal block stripped;
+  concat along lines; header equality asserted (TR/TE/dwell/numspec)
+- status: WORKS on 030DN (27460 lines = 229 s imaging). p binning unsupported.
+
+### C32 · pipeline/merged_batch.sh
+- why: run the 4 merged sessions unattended (harness kills long foreground jobs)
+- origin: C · branch: merged-dyn (B20) · facts: F56
+- in: WORK list inside (date id mids ref); `SPEC` env (default recon_codespec_40d23a4.yml)
+- out: `AIkill_Dynamic/<date>_<id>_merged/{s,d}`; logs `pipeline_runs/logs/<session>_merged.log`, SUMMARY
+- status: launched 2026-09-16 20:55 via nohup
+
 ## Outputs index
 
 | Output dir (workspace/outputs/) | From | Facts | Status |
 |---|---|---|---|
 | snr_2026-09-13/ | C28, _rbctp_fig.py | F47 F48 F52 | VALID (snr_table.csv, rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png, test CSVs) |
+| structure_rank/ | C30 | F57 | VALID (panels sorted by G_struct; eye-pick tool, not a verdict) |
+| twix_audit_2026-09-16/ | inline script (ledger s7) | F55 | VALID (twix_audit.csv, 104 rows) |
+| merged_dyn_2026-09-16/ | C31 C32 + snr_calc | F56 | VALID (snr_merged_vs_orig.csv, panel_orig_vs_merged_gas_d.png; 025VP merge hurts) |
+| archive/ | ? (pre-canon) | ? | untagged — verify before trust (reconciled 2026-09-17) |
 | roundtrip_audit_2026-09-13/ | _roundtrip_audit.py | F51 | VALID (roundtrip_audit.csv, 136 folders) |
 | steve_vs_fork_diff/ | git diff main/dev/diaphragm-recon | F49 | VALID (4 .diff files) |
 | zorder_check_2026-09-12/ | _zorder_check.py | F49 | VALID (030DN edge-finder figure) |

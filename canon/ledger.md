@@ -155,3 +155,81 @@ Never edit old entries. Format per canon law (~/.claude/CLAUDE.md).
 - DECIDED: the pipeline note stays in this repo (`workspace/notes/`), per Hooman.
 - BRANCH: siemens-mrd-doc (B18), parent: B6 (tyger). Closed (delivered). ★ stays B17.
 - Model: Opus 5 (not Fable 5).
+
+## 2026-09-16 · session 7
+- Hooman asked for a way to rank the 104 gas recons by intra-lung "patchiness" (COPD-like bright/dark
+  patches with edges, NOT noise, NOT coil shading, lung size must not win). Built `helpers/structure_rank.py`
+  (C30): per coronal slice at the max-SNR bin, R = I / local mean (σ10) removes shading/gravity ramp, σ3
+  smoothing kills noise + vessels, G = rim-weighted mean |∇R| minus background noise floor, area-weighted
+  over ALL slices (per-pixel mean ⇒ size cancels). Second column P = perimeter(bright 5σ)/perimeter(lung
+  extent) = fragmentation. Extent = 5σ mask closed r=8 per midline side (bridges defects ≤16 px; never
+  bridges the mediastinum). Dead ends recorded in the docstring: 2σ extent adds a partial-volume band
+  whose ramp reads as a rim edge; zeroing outside the mask + σ3 smoothing fakes a rim; r=5 closing
+  bridged the mediastinum. Outputs `outputs/structure_rank/` (panel_trachea_slice.png = all sessions,
+  trachea coronal slice, sorted; panel_maxarea_slice.png; scatter_snr_vs_G.png; structure_table.csv).
+  Hooman: "the panel would do and I pick myself" — panels delivered, no further metric tuning.
+- Trachea slice = among slices with ≥40 % of max lung area, max signal in the midline column band
+  2–25 rows below the apex; 16/103 fell back to the max-area slice (*). 2024-05-13_002ZS absent
+  everywhere: d/output.mrd exists but no recon.mat (post_process never ran).
+- Cross-session (XeCS session, k0 classification of all 201 ASAP twix): audited which twix each AIkill
+  recon used. dyn_recon rule (largest spiral-dyn .dat) re-applied to the roundtrip Images folders =
+  XeCS k0 "primary" for 104/104; the 25 leftover logs name the same file 25/25 (F55).
+  `outputs/twix_audit_2026-09-16/twix_audit.csv`.
+- DECIDED (Hooman, relayed by the XeCS session): four sessions with a GOOD second free-breathing dynamic get
+  re-reconstructed with BOTH dynamics merged into one input: 2023-11-02_025VP (MID02741+MID02743),
+  2024-01-31_008CR (MID00194+MID00199), 2024-03-06_030DN (MID00545+MID00543), 2024-08-12_013VM
+  (MID00408+MID00410). Built `pipeline/merge_dyn.py` (C31) + `dyn_recon.py --merge/--ref` (C9) +
+  `pipeline/merged_batch.sh` (C32). Why the merge is recon-legal (F56): time axis = index·TR (MDH
+  timestamps unused), cal block = first numspec lines (file B's stripped), spiral arm = gas ilv index mod
+  nuniqueilvs (832 v3 / 640 v2) so file A is trimmed to whole arm cycles (<14 s of dose-out tail).
+  Validated on 030DN through raw.load_from_arr: gas-dissolved pattern, 832 cycle, RBC/TP fit converged,
+  and the loader's own low-SNR filter masks the 15 s dead head of file B + dose-out tail. p binning NOT
+  supported on merged input (pneumotach is one wall-clock record) → s+d only. Outputs go to
+  `AIkill_Dynamic/<date>_<id>_merged/{s,d}` (originals untouched). Batch launched 20:55 (nohup), image
+  40d23a4, logs `pipeline_runs/logs/<session>_merged.log`.
+  NOTE 008CR: MID00194 is acquired BEFORE MID00199 (the recon's primary), so the merged head file =
+  MID00194 (its cal block is the one used); 8-ch gas-only.
+- STANDING RULE requested by Hooman (via XeCS session): before reconning any session, check XeCS
+  `workspace/outputs/calspec/k0_sessions.csv` column `extra_free` and merge the good extra dynamics with
+  `--merge`. Recorded here + cards; the workspace/CLAUDE.md line is NOT written yet — a peer session
+  cannot authorise a CLAUDE.md edit, Hooman to confirm in this session (A6-style: Hooman flips it).
+- DECIDED (Hooman, directly, 23:05): rule added to workspace/CLAUDE.md, SCOPED — the 104 cohort is already
+  screened, the four merges above are the only ones; the rule applies to future / unscreened data only.
+- RECEIVED (written by the XeCS session, not this one — lane note): `notes/calspec_package_2026-09-16/` (18 MB
+  COPY; source of truth = XeCS `workspace/outputs/calspec/`). README.md → session_table.csv (104 rows: recon
+  twix, breath-hold grade/T1,eff, extra_free_dynamics, spec_block, pooled spectrum numbers, phase-8/16 validity),
+  k0_classify.csv, k0_sessions.csv, k0_contact_sheet.png, cohort_map.csv (HC/HC_OLD/EBV/LTX/RT),
+  Recon_Input_Rule_2026-09-16.md (the standing rule text). Also sent to the PCA-registration session.
+- BRANCH: structure-rank (B19), parent: B16 (snr-table). Closed (delivered).
+- RESULT (23:15, all 4 merged sessions done, s+d, image 40d23a4; laptop crash 21:12–23:00 did not touch the
+  nohup batch; 025VP/008CR failed once — B without cal block / no dp trajectory — fixed in merge_dyn.py and
+  relaunched). Gas SNR at EI (snr_calc, d): 030DN 24.9→27.7, 013VM 27.4→30.1, 008CR 29.4→31.9,
+  **025VP 19.1→14.7 (WORSE)**. DP: 030DN 15.8→18.2, 013VM 11.9→14.8, 025VP 10.9→8.4. Why 025VP loses:
+  MID02741 is a weak short dose (k0 SNR 53 vs 126 for MID02743); Steve's bins average interleaves with equal
+  weight, so a dose 2.4× weaker dilutes the mean signal while noise adds → SNR drops. Merge helps only when
+  the two doses are comparable. Recommendation: keep the ORIGINAL 025VP recon; `_merged` kept on Ext for
+  the record (bonus: it has an RBC/TP fit, the original had no cal block). `outputs/merged_dyn_2026-09-16/`
+  (snr_merged_vs_orig.csv, panel_orig_vs_merged_gas_d.png, 030DN k0 seam plot).
+- DECIDED (Hooman, 23:25): 025VP keeps its ORIGINAL recon (MID02743 only). Ext folder renamed
+  `2023-11-02_025VP_merged_REJECTED/` + README marker. Rule in workspace/CLAUDE.md now names the 3 merges
+  and the comparable-dose condition.
+- BRANCH: merged-dyn (B20), parent: B14 (leftover-recon). Closed (delivered). ★ → B20.
+- 2026-09-17 01:50 (B19 reopened): Hooman wants the two panels as VIDEOS over all 16 bins and the
+  CARINA (bifurcation) as the governing slice. `carina_slice()` = Y template (trachea column × two
+  diagonal arms anchored at apex/midline) on the max-over-bins volume; slices with ≥30 % max lung area;
+  '*' = column < 5σ (9/107 weak). Dead ends: absolute-brightness airway mask grabs bright lung bases;
+  lateral-width-of-airway-component is fooled by disconnected hilar patches. tiles.npz now holds
+  (bins, z, x) per session; `panel_video()` → mp4 + gif via ffmpeg, frames kept in `*_frames/`.
+  Outputs: panel_bifurcation_slice.{png,mp4,gif}, panel_maxarea_slice.{png,mp4,gif}. Old
+  panel_trachea_slice.png deleted (superseded). Panels now include the 3 adopted `_merged` sessions
+  (107 rows); `REJECTED` folders excluded.
+- 02:10 per-COHORT panels (Hooman: healthies separate, pre/post adjacent, longitudinal adjacent). Cohort
+  from XeCS `cohort_map.csv` (sid → HC 8 sessions / HC_OLD 4 / EBV 27 / LTX 53 / RT 14, all 107 mapped).
+  Inside a cohort: one block per subject, sessions date-ascending (merged right after its original),
+  blocks ordered by the subject's max G_struct. `outputs/structure_rank/cohorts/panel_<cohort>_
+  {bifurcation,maxarea}.{png,mp4,gif}` (+ `_frames/`). Flags: `--cohort-map`, `--cohorts-only`.
+- /leave 2026-09-17 03:30. Reconciled: `outputs/archive/` had no index row (added, untagged). Left dirty,
+  not mine: handoffs/handoff-workspace-2026-06-*.md, pipeline/recon_codespec.yml, helpers/build_status_tab.py
+  (untracked but carded C14), archive/*_auto_*.jsonl exports, canon/.nudge. Root repo: nothing committed
+  (root is Kento's read-only repo; root handoff-report.md regenerated, untracked there by design).
+- Model: Fable 5.1.
