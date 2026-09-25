@@ -175,7 +175,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 - status: WORKS but coupled — rerunning XeCS sweep silently changes later montages
 
 ## Scratch / reference (uncarded)
-`read_mapvbvd.py` (root, standalone loader, UNKNOWN) · `workspace/codes/kasap.c` (Kento reference, F20) · `asap/asap.c` (Steve reference, F20) · `helpers/_delete/` (byte-verified CS originals, moved to XeCS 2026-06-24) · `helpers/calib/` (duplicate .npy pair) · `pipeline/runs/`, `batch_recon.log`, `__pycache__/` · 2026-09 scratch tier: `helpers/_roundtrip_audit.py` (roundtrip image-tree audit → outputs/roundtrip_audit_2026-09-13/), `helpers/_zorder_check.py` (F49 check → outputs/zorder_check_2026-09-12/), `helpers/_rbctp_fig.py` (F47 evidence figure → outputs/snr_2026-09-13/04_rbctp_split_evidence.png) · `Codes/2026_Steve_Recon/` (plain snapshot of Steve main 3303276, diff reference only).
+`read_mapvbvd.py` (root, standalone loader, UNKNOWN) · `workspace/codes/kasap.c` (Kento reference, F20) · `asap/asap.c` (Steve reference, F20) · `helpers/_delete/` (byte-verified CS originals, moved to XeCS 2026-06-24) · `helpers/calib/` (duplicate .npy pair) · `pipeline/runs/`, `batch_recon.log`, `__pycache__/` · 2026-09 scratch tier: `helpers/_roundtrip_audit.py` (roundtrip image-tree audit → outputs/roundtrip_audit_2026-09-13/), `helpers/_zorder_check.py` (F49 check → outputs/zorder_check_2026-09-12/), `helpers/_rbctp_fig.py` (F47 evidence figure → outputs/snr_2026-09-13/04_rbctp_split_evidence.png), `helpers/_f59_check.py` (reruns Steve's spectral fit on d/input.mrd, compares split basis Δφ vs measured → outputs/f59_te_term_2026-09-24/, F59), `helpers/_calcb_8ch_weight.py` (calcb Σ|b| map via XeCS numpy replica at MS=104 → outputs/calcb_imprint_2026-09-24/) · `Codes/2026_Steve_Recon/` (plain snapshot of Steve main 3303276, diff reference only).
 
 Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/recon — STALE, they moved to 2026_XeCS_Recon in the 2026-06-24 decouple.
 
@@ -327,6 +327,8 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 |---|---|---|---|
 | ct_overlay/ | C33 C34 C35 | F58 | VALID — RT 3 + LTX 20 + EBV 9 keys (cohort_fit_table.csv, cohort_summary.pdf, bins_video.mp4 per key; 038RL poor fit) (per subj: summary_3plane, axial/coronal montages, register.json, orientation_scores.csv, phase_scores.csv; gifs + per-slice PNGs + NIfTI on Ext `Codes/2026_ASAP_Recon/ct_overlay/`) |
 | snr_2026-09-13/ | C28, _rbctp_fig.py | F47 F48 F52 | VALID (snr_table.csv, rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png, test CSVs) |
+| f59_te_term_2026-09-24/ | _f59_check.py (scratch) | F59 | VALID (f59.json 208/218-ppm sessions, f59_oddsessions.json bad fits, 05_rbctp_split_te_term.png, 05b_…_218ppm_badfits.png → 2steve/05) |
+| calcb_imprint_2026-09-24/ | _calcb_8ch_weight.py, inline recon.mat pass (scratch) | F47 | VALID (neg_imprint.json + 06_neg_imprint_*.png per-bin negative fraction; W_2024-01-17_042DR.{json,npy,log} + 06_W_map_*.png Σ\|b\| static gain, 8 ch → 2steve/06) |
 | structure_rank/ | C30 | F57 | VALID (panels sorted by G_struct; eye-pick tool, not a verdict) |
 | twix_audit_2026-09-16/ | inline script (ledger s7) | F55 | VALID (twix_audit.csv, 104 rows) |
 | merged_dyn_2026-09-16/ | C31 C32 + snr_calc | F56 | VALID (snr_merged_vs_orig.csv, panel_orig_vs_merged_gas_d.png; 025VP merge hurts) |

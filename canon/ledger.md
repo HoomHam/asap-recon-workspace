@@ -289,3 +289,65 @@ session-7 header, belong to THIS session — left in place, append-only.)
   53 MB cohort_summary.pdf on Ext + symlink.
 - BRANCH: ct-overlay (B21), parent: B14. Open (038RL read, S1/S2 EBV subject ids, workshop-slide subject
   pending Hooman). ★ → B21.
+
+## 2026-09-24 · session 9 (Fable 5.1; ~18:30 → 20:10)
+- Hooman asked for a critical read of the 129Xe 1-point Dixon literature (Duke canon, consortium, critics) +
+  an opinion on what the field converged on. Delivered `reference/OnePointDixon_Review.md` (tags learn,
+  literature): 14 papers read in full by the session, ~25 secondary papers extracted by two sub-agents
+  (dossiers condensed into §8), Duke public pipeline `xenon-gas-exchange-consortium` decomposition code
+  inspected, Steve's `raw.py`/`results.py` phase model re-read against it.
+- Verdict (short): convergence is on acquisition + reporting conventions, not on validation of the
+  RBC/membrane decomposition. Imaging RBC:M equals the spectroscopic ratio BY CONSTRUCTION in 1-point
+  Dixon, so "agrees with spectroscopy" is not evidence. Unclosed physics: RF/exchange phase intercept
+  (TE90 ≠ 1/4Δf, disease-dependent), phase evolution across the readout (consortium: "not rigorously
+  examined"), third dissolved resonance (~100° from barrier-1). Confounders (lung volume r≈−0.97, sex
+  ±15–20 %, Hb ≤20–40 %, age −0.05 RBC:M/decade) exceed site-to-site scatter. Robust outputs = total
+  dissolved, spectroscopic RBC:M, RBC shift, oscillation amplitude.
+- SUSPECT (F59, not yet tested): Steve's `TEeff` (raw.py:389) is the phase-vs-TE INTERCEPT converted to
+  time, minus/plus killpts terms; the 2πΔf·TE term of the real echo (`self.TE`) is absent, yet
+  results.py:324 uses 2π·f·TEeff as the split basis. At 1.5 T (F54) that is ≈0.12°/µs of TE. If the
+  fitted `RBCphase[0]−TPphase[0]` differs from 2πΔf·TEeff by ≈2πΔf·TE, the near-singular split in B17
+  (Δφ 6–39°) is a code artefact, not an acquisition property. One-line test per session from the cal block.
+- Noted for later: our 1.5 T (T2*≈2 ms) is the friendlier field for a Collier-style multi-echo
+  (ΔTE 0.7 ms) spiral decomposition on ASAP — no ratio prior, contamination modelled not subtracted.
+- Duke pipeline facts recorded: `dixon_decomposition` = global rotation to arctan2(RBC:M,1) + gas-image
+  phase map subtraction; Hb/volume/T2* corrections are global scalars; contamination phase hard-coded
+  (`optimized_conta_phase = 49.9`).
+- Lane note: no scripts written; no root writes. Vault topic note `Literature/Topics/Dixon Methods in HP
+  Gas MRI.md` NOT edited (Hooman's/Librarian's lane) — a "see also" pointer to the review is suggested.
+- BRANCH: dixon-lit-review (B22), parent: B17 (rbctp-split-audit). Open (F59 test pending). ★ stays B21.
+- 20:40 F59 VERIFIED (SUSPECT → VALID): ran Steve's spectral fit locally (CPU) on 041WF/004DS/043AS via
+  `helpers/_f59_check.py` (scratch tier). `TEeff` encodes the phase difference EXTRAPOLATED TO t=0
+  (intercept 32°/43°, the Kaushik-2016 "RF intercept"); the split then uses Δφ_model = 20.5°/32.3°/≈9°
+  (noise gain 2.9/1.9/6.7). The phase difference actually measured at the first spectral sample
+  (t = TE + 2·60 µs) is 95.6°/102.6°/≈88° — the gap equals 2πΔf·TE (74°/66°/77°). So our TE = 0.62 ms
+  puts RBC/TP ≈ in quadrature already; Steve's "it's just math, no TE90 needed" is right in principle,
+  the code just uses the wrong time point. One-line fix in results.py:324–325 (use RBCphase[0]−TPphase[0]).
+  043AS shows phase wrap (−632°) in the polyfit path → unwrap/complex-fit needed. Also traj.BW hard-coded
+  10 µs vs header dtdyn 5 µs (only the killpts term, ≈1°). Root untouched; goes to Steve via 2steve note
+  (to write: 05_RBCTP_Split_TE_Term.md) when Hooman says so.
+- 21:05 Wrote `2steve/05_RBCTP_Split_TE_Term.md` (+ README index row, figs `2steve/fig/05_*.png`,
+  `05b_*_218ppm_badfits.png`; data `outputs/f59_te_term_2026-09-24/`). Extra finding while making the
+  figure: on 218-ppm (RBC-centred) sessions 2023-04-07 030DN, 2023-05-04 034LR, 2023-08-24 030DN the
+  2-peak picker locks onto wrong peaks (Δf = 4403 / 991 / 1460 Hz vs the physical ~330 Hz; ratios
+  0.53 / 0.66 / 1.64 meaningless) → note 05 asks for a Δf/fRBC gate. Not sent to Steve (Hooman decides).
+- 21:40 Wrote `2steve/06_Calcb_Static_Structure.md` (+ README row; figs `2steve/fig/06_*.png`; data
+  `outputs/calcb_imprint_2026-09-24/`). Mechanism from code: one cycle-average b (10σ mask + global
+  quadratic outside; nch=8 → image-derived magnitude Σ|b| ∈ [1,8]) multiplies all 16 bins, gas takes
+  real(). Saved-recon check (real images): negative lung-mask voxels 8.4→0→7.5 % across the SIGNAL cycle
+  (041WF 2024-09-03), deep (<−3σ) ≤0.4 % → attenuation at the fixed average-lung boundary, not
+  inversion. 13 sessions are 8-channel (list in note). Σ|b| map for 042DR being computed with the XeCS
+  numpy replica at MS=104 (`helpers/_calcb_8ch_weight.py`, background) — append numbers to note §C.
+  Our solution stated in the note: hybrid_b + imag_qc (XeCS, note 01), magnitude for videos, Σ|b|
+  normalisation for 8-ch, EE∪EI navigator mask for b's support.
+- 22:05 042DR (8 ch) Σ|b| map done (numpy replica, MS=104, ~20 min): W inside lung min/p5/median/p95/max =
+  1.97/2.65/3.66/5.26/6.95, background median 4.51 → the 8-channel bins carry a fixed ×2 (p5–p95)
+  lung-shaped gain, bright apical/peripheral rim, darker core, noise weighted above lung. Appended to
+  `2steve/06` §C; fig `2steve/fig/06_calcb_W_map_042DR_8ch.png`. Notes 05+06 complete, unsent.
+- 22:20 /leave. Session scope was literature + diagnosis; no root code changed, nothing sent to Steve.
+- DECIDED (Hooman): 8-channel Σ|b| normalisation deferred — single-channel fixes first.
+- DECIDED (Hooman): implement notes 05 + 06 in a NEW session (context hygiene); order given via /handoff.
+- DECIDED: dissolved RBC/TP re-split is doable OFFLINE from saved aRBC/aTP (invertible linear map) —
+  no Tyger re-run needed for the 86 sessions; calcb imprint is NOT fixable offline (real() already applied).
+- BRANCH: dixon-lit-review (B22), parent: B17. Closed (delivered: reference/OnePointDixon_Review.md,
+  2steve/05, 2steve/06, F59 VALID, F60). ★ → B17 (rbctp-split-audit reopened: resplit next). B21 stays open.
