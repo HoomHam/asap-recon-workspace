@@ -1,0 +1,44 @@
+{
+ "key": "2024-11-26_050EH",
+ "sigma": 2.5,
+ "phi_k0_deg": 49.4,
+ "b_abs_unique": [
+  0.9999998102573764,
+  1.0000002040555964
+ ],
+ "corr_deltaproxy_deltab_lung": 0.4500988267661427,
+ "corr_deltaproxy_deltab_support": 0.6769100765392441,
+ "corr_deltaproxy_deltab_outside_support": 0.17932204372095056,
+ "slope_proxy_on_b_lung": 0.9778403370568195,
+ "delta_b_lung_deg": {
+  "median_abs": 2.0353884677139096,
+  "p90_abs": 7.727135345153961
+ },
+ "delta_proxy_lung_deg": {
+  "median_abs": 3.822376353061838,
+  "p90_abs": 12.392158428359634
+ },
+ "fine_phase_b_static_vs_fine_aRBC_corr": 0.9119038275837137,
+ "before": {
+  "static_fine_corr07_rbc": 0.8237816864016055,
+  "static_fine_corr07_tm": 0.7671209669344002,
+  "static_fine_corr07_dis": 0.3578334115828538,
+  "oow_pct_bin7": 18.615020951971633,
+  "lung_rbc_over_bgsd_bin7": 2.0431934684665554
+ },
+ "proxy_fix": {
+  "static_fine_corr07_rbc": -0.09501654259266998,
+  "static_fine_corr07_tm": 0.21512637223154496,
+  "static_fine_corr07_dis": 0.3578334115828538,
+  "oow_pct_bin7": 9.434654919236417,
+  "lung_rbc_over_bgsd_bin7": 2.2888809200485603
+ },
+ "true_b_fix": {
+  "static_fine_corr07_rbc": 0.1843491328444912,
+  "static_fine_corr07_tm": 0.3118729825070449,
+  "static_fine_corr07_dis": 0.3578334115828538,
+  "oow_pct_bin7": 12.753841194799614,
+  "lung_rbc_over_bgsd_bin7": 2.320351105880199
+ },
+ "corr_rbc_proxy_vs_trueb_bin7": 0.9547427539698862
+}

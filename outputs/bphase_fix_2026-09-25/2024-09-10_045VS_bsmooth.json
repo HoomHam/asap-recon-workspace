@@ -1,0 +1,38 @@
+{
+ "key": "2024-09-10_045VS",
+ "dphi_raw": 54.3,
+ "dphi_new": 54.3,
+ "target_raw": "0.3935",
+ "target_new": "0.3935",
+ "raw": {
+  "static_fine_corr07_rbc": 0.9306362705903025,
+  "static_fine_corr07_tm": 0.8457140396822327,
+  "static_fine_corr07_dis": 0.5832501448568234,
+  "oow_pct_bin7": 6.842973004479824,
+  "lung_rbc_over_bgsd_bin7": 10.928692428665126
+ },
+ "new_container": {
+  "static_fine_corr07_rbc": 0.6038690559299422,
+  "static_fine_corr07_tm": 0.558935246797708,
+  "static_fine_corr07_dis": 0.5785552292333122,
+  "oow_pct_bin7": 3.986876946391993,
+  "lung_rbc_over_bgsd_bin7": 11.026121418188636
+ },
+ "offline_trueb_s2.5": {
+  "static_fine_corr07_rbc": 0.5425373040753535,
+  "static_fine_corr07_tm": 0.5446955757799793,
+  "static_fine_corr07_dis": 0.5832501448568234,
+  "oow_pct_bin7": 2.737855346645128,
+  "lung_rbc_over_bgsd_bin7": 12.721248396389365
+ },
+ "corr_aRBC_new_vs_offline_bin7": 0.9876876691685528,
+ "corr_aRBC_new_vs_raw_bin7": 0.9166337443761332,
+ "corr_aTM_new_vs_raw_bin7": 0.9902269144146714,
+ "dis_mag_relrms_new_vs_raw": 0.0024013421526614506,
+ "gas_relrms_new_vs_raw_bin7": 0.006612820543044468,
+ "gas_lungmean_ratio_new_over_raw": 1.0035367280315626,
+ "b_phase_diff_deg_in_lung": {
+  "rms": 4.252501829107487,
+  "p90_abs": 6.206032726900411
+ }
+}

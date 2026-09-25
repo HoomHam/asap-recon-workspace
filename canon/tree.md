@@ -21,17 +21,20 @@ flowchart TD
   B9["✅ ASAP→XeCS restructure (06-24)<br/>CS ops via xecs_recon.pth · originals in _delete/"]
   B10["✅ batch cohort recon (Jul→Sep 2026)<br/>104 unique sessions done · pipeline fixed (F42)"]
   B11["● diaphragm-binning study (07-17)<br/>bin() = amplitude rank (F38) · nav window MEASURED 26 (F37)<br/>bin_time recipe parked · tyger nav 26-guard added (local)"]
-  B12["⚠ aikill-atlas cohort QC (08-27)<br/>dis_atlas.py · 614-pg PDF + 119 mp4<br/>dp pages use |aRBC+i·aTP| → suspect (F47)"]
+  B12["✅ aikill-atlas cohort QC (08-27 → 09-25)<br/>dis_atlas.py (dp SUSPECT F47) → rbc_tm_atlas.py 61 ON_RBC · TE90 (F72) · trust grade A–D"]
   B13["✅ tyger-access-check (09-03)<br/>cert renewed → 2028-08 (F39) · 005JJ run 558"]
   B14["✅ leftover-recon (09-12/13)<br/>fork 472fbc9 + 40d23a4 · 21 recon'd · audit 136 folders<br/>20 no-traj 2022 (F51) · --ttl 500 (F44) · plt.show hang (F45)"]
   B15["✅ steve-provenance (09-12/13)<br/>2026_Steve_Recon plain snapshot · diffs<br/>z-flip = real deviation (F49)"]
   B16["✅ snr-table (09-13)<br/>snr_calc.py · xlsx cols I–S · max/min/EI (F52)<br/>shared to XeCS + PCA"]
-  B17["★ rbctp-split-audit (09-13→24)<br/>Steve split invalid 60/86 (F47) · whitened DP SNR (F48)<br/>CAUSE = missing 2πΔf·TE in split basis (F59) · 2steve/04,05,06 unsent<br/>next: offline re-split 86 sessions + fork patch diff"]
+  B17["✅ rbctp-split-audit (09-13→24)<br/>Steve split invalid 60/86 (F47) · whitened DP SNR (F48)<br/>CAUSE = missing 2πΔf·TE in split basis (F59) · 2steve/04,05,06 unsent<br/>next: offline re-split 86 sessions + fork patch diff"]
   B18["✅ siemens-mrd-doc (09-14)<br/>.dat→MRD v2 fork→Tyger write-up for Oxford (F53)<br/>Avanto D13 VD multi-RAID (F54) · PHI/IRB flag"]
   B19["✅ structure-rank (09-16/17)<br/>structure_rank.py · patchiness G/P (F57) · carina-slice panels<br/>16-bin videos · per-cohort panels (HC/HC_OLD/EBV/LTX/RT)"]
   B20["✅ merged-dyn (09-16)<br/>merge_dyn.py + dyn_recon --merge · 3 adopted, 025VP rejected (F56)<br/>twix audit 104/104 = k0 primary (F55) · rule in workspace/CLAUDE.md"]
   B21["● ct-overlay (09-17)<br/>CT→NIfTI · rigid Xe-on-CT (Mattes MI, no deform) · 32 keys RT/LTX/EBV<br/>Tyger grid S=−Z P=−Y L=+X (F58) · 16-bin videos · 038RL poor"]
   B22["✅ dixon-lit-review (09-24)<br/>reference/OnePointDixon_Review.md · 40 papers · Duke pipeline read<br/>F60 imaging RBC:M = spectro by construction · F59 TE term VALID"]
+  B23["✅ rbctp-resplit (09-24/25)<br/>specfit k0 basis · fork 6651591 · 68 offline re-split (F61–F71)"]
+  B24["✅ perbin-phaseref (09-25)<br/>per-bin gas ref = no effect (F77) · F74 RETRACTED<br/>FOUND: raw b phase inside mask = static RBC speckle (F79)"]
+  B25["★ prod-b44 (09-25)<br/>calcb phase low-pass σ 4.4 (F81) · fork 04f445b · 61 rerun → AIkill_Dynamic_b44<br/>speckle gone cohort-wide (F82) · atlas_b44 + trust_b44"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -45,7 +48,8 @@ flowchart TD
   B16 --> B19
   B14 --> B20
   B14 --> B21
-  B17 --> B22
+  B17 --> B22 --> B23 --> B12
+  B12 --> B24 --> B25
   B17 -.F47.-> B12
   B9 -.xecs_recon.pth.-> B10
 ```
@@ -60,28 +64,30 @@ flowchart TD
 | B7 auto-steve | C10 asap_run.py, C11 post_process.py, C12 param_gui.py |
 | B8 diaphragm | C7 tyger_recon.py, fork branch `diaphragm-recon` (F30) |
 | B10 batch | C8 batch_recon.py, C9 dyn_recon.py, C29 todo_batch.sh, C14–C17 helpers, SNR_Table_All.xlsx (F4–F16 F42–F45) |
-| B12 aikill-atlas ⚠ | C26 dis_atlas.py, outputs/aikill_atlas/dissolved_atlas.pdf (614 pg, SUSPECT_F47.md), Ext videos/ (119 mp4) |
+| B12 aikill-atlas ✅ | C26 dis_atlas.py (dp SUSPECT_F47.md), C38 te90_table.py → outputs/te90_2026-09-25/ (F72), C39 rbc_tm_atlas.py → outputs/aikill_atlas/rbc_tm_atlas.pdf (61, raw b, superseded by B25), C40 split_trust.py → outputs/split_trust_2026-09-25/ (grades; F73; F74 RETRACTED marker), C42 rbc_repro_tests.py (F75 F76) |
+| B24 perbin-phaseref ✅ | fork f5ac7c5 (gas_phase_complex) + c8366c3 (calcb_b export), C41 perbin_phaseref.py (F77), C43 bphase_fix.py, C44 bphase_confirm.py (F79 confirmed), C45 bphase_sigma.py, C46 bsmooth_compare.py (F80), C47 bsmooth_videos.py, outputs/bphase_fix_2026-09-25/, Ext tyger_{gascplx,bexport,bsmooth}_2026-09-25/ (bexport = raw b for all 61, 24 GB) (F78 F79 F80) |
+| B25 prod-b44 ★ | fork 19b7365 → 1fe07a0 → 04f445b (`results.calcb_phase_sigma` 2.5 → 5 → 4.4), C48 bphase_sigma_cohort.py → cohort_sigma.csv (F81), C49 run_prod_b44.sh + prod_b44_todo.txt, C50 mrd_to_mat.py, Ext `AIkill_Dynamic_b44/<key>/d/{output.mrd, recon.mat, tyger.log}` (61; 59 split), outputs/aikill_atlas_b44/ (PDF 679 pg + grades CSV; videos on Ext aikill_atlas_b44/), outputs/split_trust_b44/ (trust table, fine_static_b44.csv, trust_lookup_all.csv, registration21_trust_rank.csv) (F82) |
 | B13 tyger-access | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558), memory tyger_setup.md |
 | B14 leftover-recon | fork commits 472fbc9/40d23a4, C9 dyn_recon.py, C29 todo_batch.sh, outputs/roundtrip_audit_2026-09-13/, outputs/leftover_recon_2026-09-12/, Ext pipeline_runs/logs + quarantine/ (F42–F46 F51) |
 | B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
 | B16 snr-table | C28 snr_calc.py, outputs/snr_2026-09-13/snr_table.csv, SNR_Table_All.xlsx cols I–S (F48 F50 F52) |
-| B17 rbctp-split ★ | outputs/snr_2026-09-13/{rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png}, `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`, reference/DP_RBCTP_Split_Noise_Diagnostics.md (F47 F48); 2026-09-24: `2steve/05_RBCTP_Split_TE_Term.md`, `2steve/06_Calcb_Static_Structure.md`, outputs/f59_te_term_2026-09-24/, outputs/calcb_imprint_2026-09-24/, helpers/_f59_check.py, helpers/_calcb_8ch_weight.py (F59) |
+| B17 rbctp-split ✅ | outputs/snr_2026-09-13/{rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png}, `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`, reference/DP_RBCTP_Split_Noise_Diagnostics.md (F47 F48); 2026-09-24: `2steve/05_RBCTP_Split_TE_Term.md`, `2steve/06_Calcb_Static_Structure.md`, outputs/f59_te_term_2026-09-24/, outputs/calcb_imprint_2026-09-24/, helpers/_f59_check.py, helpers/_calcb_8ch_weight.py (F59) |
 | B22 dixon-lit-review ✅ | reference/OnePointDixon_Review.md (§1–8), Duke pipeline `TeamXenonDuke/xenon-gas-exchange-consortium` inspected, memory onepoint_dixon_review.md (F59 F60) |
-| B23 rbctp-resplit ★ | C36 resplit_rbctp.py (--fit steve/xecs), C37 specfit_template.py (F71), outputs/resplit_2026-09-24/ (resplit_summary{,_xecs}.csv, fit_xcheck.csv, figs), Ext d/recon_resplit{,_xecs}.mat (79/68), notes/fork_patch_2026-09-24.{diff,md} APPLIED = fork 6651591 (specfit.py vendored), Ext tyger_specfit_2026-09-24/ (045VS, 041WF), notes/calspec_package/{resplit_inputs_2026-09-24.csv, specfit.py}, `2steve/05` −13° fix (F61–F70) |
+| B23 rbctp-resplit ✅ | C36 resplit_rbctp.py (--fit steve/xecs), C37 specfit_template.py (F71), outputs/resplit_2026-09-24/ (resplit_summary{,_xecs}.csv, fit_xcheck.csv, figs), Ext d/recon_resplit{,_xecs}.mat (79/68), notes/fork_patch_2026-09-24.{diff,md} APPLIED = fork 6651591 (specfit.py vendored), Ext tyger_specfit_2026-09-24/ (045VS, 041WF), notes/calspec_package/{resplit_inputs_2026-09-24.csv, specfit.py}, `2steve/05` −13° fix (F61–F70) |
 | B18 siemens-mrd-doc | notes/Data_SiemensToMRD_Pipeline_2026-09-14.md (DRAFT; C6 C7 C9 C11 C13) (F53 F54) |
 | B19 structure-rank | C30 structure_rank.py, outputs/structure_rank/ (F57) |
 | B20 merged-dyn | C31 merge_dyn.py, C32 merged_batch.sh, C9 dyn_recon.py --merge/--ref, outputs/twix_audit_2026-09-16/, Ext AIkill_Dynamic/*_merged/ + pipeline_runs/logs/*_merged.log (F55 F56) |
 | B21 ct-overlay ● | C33 ct_to_nifti.py, C34 ct_mri_overlay.py, C35 ct_cohort_batch.py, outputs/ct_overlay/<key>/ (summary_3plane, montages, bins_video.mp4, register.json), cohort_fit_table.csv, cohort_summary.pdf (Ext, symlink), Ext `Codes/2026_ASAP_Recon/ct_overlay/` (NIfTI CT, mri_on_ct, rigid.tfm, per-slice PNG/GIF, manifest.json) (F58) |
 
-## Current position (★ B23, 2026-09-25)
+## Current position (★ B25, 2026-09-25 20:05)
 
-Session 10 (2026-09-24 20:05 → 09-25 03:00) closed the RBC/TP split problem end to end. Cause F59/F61 (t=0 basis
-angle, −13° killpts term); fit replaced by the XeCS time-domain `specfit.py` with a chemical-shift prior
-(four reasons in `reference/RBCTP_Split_SpecFit.md`, F65–F69); offline re-split of the cohort
-(`resplit_rbctp.py --fit xecs`: 68 sessions, Ext `d/recon_resplit_xecs.mat`, lung TP<0 74 % → 2 %, F62); fork
-commit 6651591 applied + image built + Tyger-validated on 045VS/041WF (F70) — container == offline maps. Maps
-are on the LUMPED ratio scale, F_lump in metadata (F66). ADC samples 0+1 are transients (F68). Template-basis
-linear solve = precision fix only (F71), fallback rule proposed, not deployed. Notes to Steve: `2steve/05` (fixed),
-`2steve/07` (new). **Next session: regenerate the dissolved atlas for ALL sessions from `recon_resplit_xecs.mat`
-(B12, F47) — then ★ → B12.** Deferred: the 15 no-cal-block sessions (magnitude-only vs prior split, Hooman);
-simulation ground truth for template vs specfit; 8-ch Σ|b| (note 06). B21 ct-overlay open.
+Session 11 built the RBC/TM atlas and trust grade (B12), then chased the non-moving structure Hooman saw in the
+RBC videos: not a smooth static field (F74 retracted), not noise (F75), not scanner-fixed (F76), but the raw
+voxel-scale phase of calcb's `b` inside its 10σ mask, multiplied into every bin and landing in the RBC channel
+(F79, confirmed with the exported b). Fix = low-pass b's phase inside the mask; cohort σ sweep (F81) → production
+σ 4.4 (fork 04f445b); the 61 clean-fit sessions re-run into Ext `AIkill_Dynamic_b44/` (59 split), speckle gone
+cohort-wide (F82); production atlas + trust table regenerated; registration-21 ranked by separation trust for XeCS.
+**Next session: "the rest" — Hooman's decision on the 43 sessions without a clean split (14 no cal block, 11 never
+in the fit table, 7 no dissolved recon, 6 offline-gated, 5 off-carrier) + 2 container-gated (020JS, 051VM); then
+2steve/06 addendum (raw phase inside the mask) and whether to retire the raw-b AIkill_Dynamic tree.** Deferred:
+physics-anchored global phase (non-circular ratio check), bmask-edge blend, 8-ch Σ|b|, template fallback, B21.

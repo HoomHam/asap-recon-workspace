@@ -522,3 +522,184 @@ session-7 header, belong to THIS session — left in place, append-only.)
   edits), pipeline/recon_codespec.yml (Jul 10 image hash), archive/* untracked exports — untouched.
 - BRANCH: rbctp-resplit (B23), parent: B17. Delivered (patch live, cohort re-split, template study); stays ★ until the
   atlas regen consumes it, then ★ → B12. B21 ct-overlay still open. B17 rbctp-split-audit: closed by B23.
+
+## 2026-09-25 · session 11 (Fable 5.1; ~01:40 → )
+- 01:40 Hooman: atlas + dissolved separation readiness check. State confirmed: 66 `recon_resplit_xecs.mat` on Ext
+  (earlier "68" counted `_merged/_REJECTED`), 7 sessions with no dissolved recon at all, 31 dissolved-but-unsplit
+  (6 gated, 14 no cal block, 11 never in the resplit table). Gas k0 contact sheet (XeCS calspec package) located;
+  RBC−TP k0 angle exists only as CSV column. Diaphragm detectability: no authoritative per-session list on our side
+  (XeCS C74 nav-vs-k0: WEAK 002JM 10-25, 037GD 11-13, 004DS 01-16; 048JJ nav FAILED F27).
+- Q&A recorded: re-split needs NO gas re-recon and NO re-binning (split is a post-gridding rotation; bins shared);
+  bad diaphragm bins would need full re-recon of both.
+- DECIDED (Hooman): atlas = RBC-carrier sessions only, no mixing with BETWEEN/ON_MEM/BELOW_MEM/ABOVE_RBC; ignore
+  sessions without inputs; TE90 comparison for all subjects. Fits and maps NOT redone (2026-09-24 outputs consumed).
+- 01:55 C38 te90_table.py → outputs/te90_2026-09-25/ (F72: 2023 ≈ 1067 µs, 2024 ≈ 935 µs vs TE 600/620).
+  Gotcha found: summary CSV TE_ms = 0.62 for all rows, calspec twix TE = 600 µs for v2 → table uses calspec t_k0.
+- 02:01 C39 rbc_tm_atlas.py written (C26 layout, kinds gp/rbc/tm, negatives clipped, appendix page); sample 045VS
+  OK; 02:05 full run over 61 sessions in background (base python, imageio-ffmpeg installed into miniforge base).
+- BRANCH: aikill-atlas (B12) re-opened, ★ → B12 (consumes B23 per session 10 plan). B23 delivered/closed.
+- 02:04 RESULT C39: rbc_tm_atlas.pdf 703 pages / 203 MB (61 sessions, 51 IDs) + 153 mp4 + rbc_tm_atlas_sessions.csv;
+  appendix page lists the 43 Ext sessions left out (7 no dissolved recon, 14+11 no cal-block fit, 6 gated, 5 off-carrier).
+  Sample pages checked (045VS single; 043AS 4 dates aligned). Eye-flags for Hooman: RBC maps carry clipped-negative
+  holes inside the lung (low RBC SNR, expected); 2024-12-05_043AS RBC = pure noise (stable=no, F_lump=1.00).
+  F47's dp-page caveat is now moot for this atlas (old dissolved_atlas.pdf left in place, marked superseded in cards).
+- 02:20 Hooman: "correlation looks right but I still see fake lung structures — the static b maps? check; and a trust
+  marker for the separation." → C40 split_trust.py.
+- 02:40 first pass with flat corner noise said 99 % of lung voxels resolvable and excess error outside the calcb
+  support — WRONG noise model: measured |z| outside the lung falls 2–4× from lung radius to the corners because the
+  Gaussian gridding envelope is never divided out (2steve/03); σ(x) must carry the envelope. Radial fit L² ≈ 8–10k vs
+  kernel theory 5066 (truncated-kernel / sidelobe contamination unresolved) → both models carried.
+- 03:20 RESULT (F73): with envelope noise, out-of-wedge error outside the static support = noise prediction in 61/61;
+  the support boundary is NOT the imprint. 2023 v2 sessions carry +5–10 % structured error everywhere (marginal angle).
+- 03:20 RESULT (F74): static-pattern test — RBC fraction corr(EI,EE) fixed > shifted in 54/58, |dissolved| shifted >
+  fixed in 53/58 → the RBC/TM ASSIGNMENT pattern sits in scanner coordinates, the dissolved magnitude moves with the
+  lung. Hooman's eye was right; the cause is a static per-voxel phase field in the split basis, not the support mask.
+- Trust grade per session (gain / rep-sd / resolvable / excess): A 18 · B 23 · C 15 · D 5 (all 2023 v2 + 036RL 11-02
+  are C/D). Merged into rbc_tm_atlas_sessions.csv. The imprint is systematic (55/58 > 0), so it is reported as its own
+  index, not inside the grade.
+- 03:45 Hooman: "I saw the issue in RBC separately, not in RBC/TM" → static test rerun on the maps themselves
+  (outputs/split_trust_2026-09-25/static_test_maps.csv): aRBC prefers FIXED voxels 51/61 (0.64 vs 0.56), aTM moves
+  with the lung 13/61 fixed (0.75 vs 0.77), |dis| 1/61, gas 14/61. The imprint is in the RBC channel: a static
+  phase error ε leaks sin ε·|z|/sin φ_k0 into RBC (ε = 5° → ~0.11|z| ≈ 30–40 % of the RBC signal) and only
+  (1 − cos ε) off TM. F74 refined: RBC map, not the ratio, is the carrier. Hooman's eye confirmed.
+- Hooman's questions answered: trust grade exists (A18/B23/C15/D5), uses the negative-voxel excess and correlates
+  with the raw negative fraction (Spearman 0.75); imaging-vs-spectroscopy ratio agreement is circular (F60) — a
+  physics-anchored global phase (cal-block gas-line phase vs swept ph_new) would make it a real check (proposed, not run).
+- XeCS caveats relayed by Hooman (lumped scale, 1/|sin| gain): both already in the atlas metadata / grade.
+- 04:00 Hooman: "let's try your fix and see" → per-bin gas phase reference (consortium-style). Needs the complex gas
+  image per bin, which recon.mat never had. Fork commit f5ac7c5 (diaphragm-recon → hooman): results.py stores F·b per
+  bin (nch = 1), tyger_recon.py streams it as NdArrayComplexFloat `gas_phase_complex` after the dissolved item
+  (readers key by meta name; post_process/plot_recon unaffected). CI build 36104295005 OK → image f5ac7c5…, spec
+  `pipeline/recon_codespec_f5ac7c5.yml`, submit script `pipeline/run_gascplx_2026-09-25.sh` (stored d/input.mrd →
+  Ext `Work/Codes/2026_ASAP_Recon/tyger_gascplx_2026-09-25/<key>/d/`). Test = `helpers/atlas/perbin_phaseref.py`:
+  un-rotate the container split, ψ_b = phase of the lung-masked Gaussian-smoothed G_b, z·e^{−iψ_b}, re-sweep to the
+  target, F74 static test before/after; variants gas σ / gas 2σ / self-reference 3σ (bound). Sessions: 045VS, 043AS
+  02-21, 000LL 2023-01-31.
+- BRANCH: perbin-phaseref (B24), parent B12 — fix attempt for F74.
+- 04:50 RESULT C41 (Tyger runs 646–648, f5ac7c5, 66–115 s each): residual per-bin gas phase in the lung 0.6–1.7°
+  median, p90 ≤ 4° → the per-bin reference changes aRBC < 1 %; imprint index unchanged; the self-reference bound
+  (all smooth dissolved phase removed, σ 9–18 vox) ALSO leaves it. The F74 mechanism (static smooth phase field) is
+  wrong. F77 recorded (per-bin referencing unnecessary here).
+- 05:00 basal-parenchyma variant (vessels excluded, base-only shift): aRBC still prefers fixed 48/61 — so not vessels.
+  corr-vs-shift curves (6 sessions): aRBC high at EVERY shift (floor 0.5–0.75), the fixed margin is +0.04–0.06 → the
+  statistic measures a large-scale envelope + noise, not a localised static pattern. F74 → RETRACTED (observation kept
+  as a weak statistic; imprint_index column stays in split_trust.csv but must not be read as an artifact).
+- 05:20 RESULT C42 — what the RBC structure IS: mirror bins 3/12 (same volume, independent data) reproduce aRBC at
+  0.75 (hp 0.55; 045VS 0.94/0.88) → signal, not noise (F75). Different subjects at the same scanner voxels: hp 0.06
+  (707 pairs) → no scanner-fixed pattern. Same subject across dates after rigid alignment: hp 0.31 median (043AS 4 dates
+  0.28–0.55; aTM 0.72) → subject-specific and stable for months (F76). A per-session b error cannot do that.
+- VERDICT for Hooman: the structure in the RBC maps is real, reproducible, subject-specific signal (looks vascular /
+  perfusion-heterogeneous in the sagittal 045VS mirror figure). No fix needed for it; the remaining RBC caveats are the
+  ones already in the trust grade (angle gain, fit stability, SNR) and the lumped scale. B24 closed (negative result,
+  productive). ★ stays B12.
+- Fork f5ac7c5 kept on diaphragm-recon (complex gas export is harmless and useful for QC); spec 6651591 remains the
+  production spec unless the QC item is wanted.
+- 05:50 Hooman: "look at 050EH_rbc.mp4, tell me what you see" (Ext was unmounted 03:18–05:45, re-plugged). Frames:
+  the whole FOV is filled with the same coarse blob texture as the lung; lung aRBC only 1.6× background sd (grade B,
+  dissolved SNR 7.3, gain 1.35). Background noise correlated between neighbouring bins (0.84/0.56/0.33, soft binning)
+  → blobs persist and morph across frames = the "structure that breathes" (F78). ph_new jumps of −φ_k0 in bins 0/6/12
+  (050EH) and ±150° alternation (041WF 09-03) = bins the OLD container left unsplit; the re-sweep absorbs the
+  rotation, maps consistent (bin 0 vs 15 background corr 0.83 like any neighbour pair) — not a bug.
+- 06:00 Hooman: "there is non-moving structure that is the same in all frames, what is that??" → per-voxel MIN over
+  16 bins of aRBC shows a voxel-scale speckle inside a SHARP lung-shaped boundary, absent outside (smooth blobs only).
+  Fine-scale (< 1.5 vox) corr between bins 0 and 7 inside the lung: aRBC 0.84, aTM 0.77, |dis| 0.47, gas 0.33,
+  background 0 — 61/61 sessions. Static, phase-only, full-resolution, lung-confined = calcb b's phase texture inside
+  its 10σ support (F79). It slipped every earlier test: F73 looked for excess at the boundary, F74's tools smoothed
+  at σ ≥ 3, the mirror-bin test shares b, the cross-subject test can't see a per-session b, the cross-date test used
+  < 6 vox. Hooman's eye right for the third time.
+- 06:20 C43 proxy fix (remove bin-invariant fine phase, re-sweep, re-split): 050EH static corr 0.82 → −0.10, 045VS
+  0.93 → 0.32; out-of-wedge 16.7 → 10.1 %, 5.3 → 2.3 %; δ median 3–4°, p90 9–12°. Fork c8366c3 exports b itself
+  (`calcb_b`), CI 36107753831 building; spec recon_codespec_c8366c3.yml, run_bexport_2026-09-25.sh → direct check
+  δ vs angle(b) fine part, then the real fix belongs in calcb (2steve/06 §4: low-pass b's phase inside the support).
+- 06:45 RESULT C44 (Tyger 649/650, image c8366c3 with `calcb_b`): F79 CONFIRMED. sin(fine phase of b)·|z| predicts the
+  observed fine aRBC at 0.91 (050EH) / 0.95 (045VS). b's fine phase inside the lung: median 1.8–2.0°, p90 7–8° — small
+  angles, RBC-sized because |z| ≫ RBC. True-b fix: static fine corr 0.82 → 0.18 / 0.93 → 0.54 (|dis| floor 0.36 /
+  0.58), out-of-wedge 18.6 → 12.8 % / 6.8 → 2.7 %. Proxy (C43) agrees with the true fix at 0.95–0.98 but overshoots
+  a little (also strips real static fine phase). Outside the support the proxy and b disagree (0.18 / 0.50) — the
+  polynomial region has no fine b phase, so there the proxy removes something else (small).
+- Where the fix belongs: calcb — low-pass b's phase inside the support (2steve/06 §4 / XeCS hybrid_b, σ ≈ 2.5 vox)
+  before it multiplies the dissolved image; gas real(F·b) also benefits marginally (cos δ). Not applied — Hooman's
+  call (fork change to Steve's algorithm; note to Steve = 2steve/06 addendum). Offline alternative for the 61 maps:
+  C43 --write (proxy) now, or 61 Tyger reruns with c8366c3 + true-b fix (~1.5 min + 388 MB each).
+- 07:10 Hooman: "even a low-pass is still a fixed structure on all bins — do it and see, I'm not sure what the REAL
+  correct thing is." σ sweep on the exported b (C45 bphase_sigma.py, 050EH/045VS): static corr(bin0,bin7) of aRBC per
+  band vs the |dis| anatomy floor — raw b: fine 0.82/0.93 (floor 0.36/0.58); σ 2.5: fine 0.18/0.54, mid 0.21/0.70
+  (floor 0.62/0.69), coarse 0.68/0.90 (floor 0.82/0.87) → at/below the floor in every band; σ ≥ 4 no further gain;
+  quadratic-everywhere worse on negatives (15.0 vs 12.7 %). Reading: the smooth fixed field that remains is coil +
+  B0 (static in scanner coordinates by physics) — the magnitude image is exactly as "static". Fork patch: calcb
+  low-passes the phase inside bmask (results.calcb_phase_sigma = 2.5, 0 = Steve's behaviour), polynomial outside
+  untouched, magnitude kept, rms removed logged. LANE: third root-fork edit this session, said to Hooman.
+- 07:50 RESULT C46 (Tyger 651–653, image 19b7365; Ext unplugged 03:46 → replugged, resubmitted): the container fix
+  matches the offline true-b fix (aRBC corr 0.976 / 0.988), removes 4.3–5.3° rms of b phase in the lung, aRBC static
+  fine corr 0.82 → 0.25 / 0.93 → 0.60 (floor 0.58), negatives 18.6 → 15.2 % / 6.8 → 4.0 %, gas 0.7 % rms change,
+  |dis| unchanged, fit/angle/target identical (F80). Frames: the sharp lung-shaped speckle is gone; what remains in
+  050EH is smooth blobs — the session's true RBC SNR (~2 per voxel). Faint residual edge at the bmask boundary.
+- OPEN for Hooman: (1) make 19b7365 the production spec and rerun the 61 (or 104) — ~1.5 min + 388 MB each on Ext,
+  then regenerate the RBC/TM atlas + trust table; (2) 2steve/06 addendum (calcb phase inside the mask); (3) σ = 2.5
+  is a measured choice on two sessions (C45), not a law; (4) the bmask-edge blend. B24 delivered.
+- 08:05 Hooman: "I still see them!! consequence of not doing this correction?" → offline comparison raw b / smooth b /
+  NO b / σ 10 (050EH, 045VS): without b a ~9° rms smooth static phase (coil + B0) enters RBC — coarse static above
+  the |dis| floor, the regional RBC pattern changes wholesale (corr 0.47 / 0.61 vs raw) → b's smooth part is needed,
+  only its fine part is poison. After the fix aRBC is LESS static than aTM in every band → what remains non-moving
+  is anatomy (most of the lung moves < 1 vox between bins). Hooman then saw the rows: "even 2.5 is good".
+- 08:10 videos: `videos/` (raw vs smooth b, 3 sessions), `videos_sigma/` (raw / σ 2.5 / σ 10 / no b; 045VS, 050EH,
+  000LL — 000LL re-run through c8366c3 for its b, Tyger 654).
+- 08:20 Hooman: "do 1, 2.5, 5, 10 and decide" → C48 cohort sweep; needs raw b for all 61 → `pipeline/bexport_batch.sh`
+  (58 sessions, 3 in flight, ~400 MB each → Ext tyger_bexport_2026-09-25/, 601 GB free). First launch killed by me
+  (10-min background cap) and relaunched detached (nohup setsid); run script made restart-safe. Dry run on 3:
+  σ 1 insufficient (fine excess +0.21), σ ≥ 2.5 at/below floor, negatives flat 12.6–13.9 %.
+- 13:11–17:20 raw-b export batch, 61/61 on Ext `tyger_bexport_2026-09-25/` (24 GB): rounds as Monitor commands
+  (30 min cap); hotspot killed round 1 (0-byte outputs, 15 min each); Ext dropped mid-round 3 ("this cable is going
+  bad" — Hooman) → mount guard + 2 in flight; one > 300 MB truncated file slipped the skip rule (EOFError, re-pulled).
+- 17:20 RESULT C48 cohort sweep (57 sessions, F81): σ 1 insufficient (42 % still speckled); 2.5 / 5 / 10 equivalent on
+  the speckle; 5 fewest negative-RBC voxels (8.3 %) and best RBC/noise; 10 erodes the regional pattern (corr 0.79); no b:
+  negatives 14.4 %, map rewritten (0.56). DECIDED (Hooman's "do 1, 2.5, 5, 10 and decide" → C): σ = 5. Fork 1fe07a0
+  default 5.0, image built, spec recon_codespec_1fe07a0.yml. Production rerun of the 61/104 + atlas regen: Hooman's go.
+- 17:30 stragglers: 039CP 03-11 and 036RL 09-27 re-pulled and swept (σ 5 fine 0.29 / 0.30 vs floor 0.58 / 0.54) →
+  cohort table = 59 sessions, medians unchanged (σ 5: fine excess −0.28, negatives 10.25 %, negRBC 8.25 %). 020JS and
+  051VM (container gate: unsplit) still fail in the sweep's fallback path (empty result, not debugged — 2/61, no
+  bearing on the decision). F81 stands.
+- 17:45 DECIDED (Hooman): production σ = 4.4 ("I like 4 a lot") — inside the flat region of F81. Fork 04f445b, image
+  building (CI 36192122624), spec recon_codespec_04f445b.yml. Scope: "first all data where we don't assume things —
+  spectroscopy present, fits clean" = the 61 atlas-set sessions (ON_RBC carrier, XeCS fit passed; the container's own
+  stability gate still applies). Output tree: Ext `AIkill_Dynamic_b44/<key>/d/` (production kept separate from the
+  raw-b AIkill_Dynamic tree until Hooman retires the old one). `pipeline/run_prod_b44.sh` (mount guard, skip on
+  complete readable output), `pipeline/prod_b44_todo.txt` (61), `pipeline/mrd_to_mat.py` (fast recon.mat without
+  figures). The rest (no cal block, off-carrier, gated) = later discussion.
+- BRANCH: prod-b44 (B25), parent B24 — production rerun with the calcb phase fix.
+- 18:00–19:40 C49 production rerun, σ 4.4 (fork 04f445b), 61/61 → Ext `AIkill_Dynamic_b44/<key>/d/` (3 Monitor
+  rounds, 2 in flight, no drive drops, no failures); recon.mat via C50 for all 61. Container gate left 2 unsplit
+  (020JS 10-16, 051VM 12-06: stability refit > 10°) → 59 split. b phase removed inside the mask: 4.4–8.8° rms
+  (median 6.0°). Atlas (C39 --root/--tag b44) and trust table (C40 --root) launched on the new tree.
+- 19:35 RESULT (F82): production atlas `outputs/aikill_atlas_b44/rbc_tm_atlas.pdf` (59 sessions, 679 pages, 192 MB;
+  videos 147 mp4 → Ext aikill_atlas_b44/videos_rbctm/, symlinked), trust table `split_trust_b44/` merged into the
+  session CSV (A 18 / B 23 / C 13 / D 5). Cohort-wide static speckle check: aRBC fine static 0.84 → 0.21, above the
+  |dis| floor in 58/59 → 0/59. B25 delivered. ★ → B25. Remaining for the "rest" discussion: 14 no-cal-block +
+  11 never-in-table + 7 no-dissolved + 6 offline-gated + 5 off-carrier + 2 container-gated (020JS, 051VM).
+- 19:50 Hooman: rank the registration session's 21 best registrations by separation trust, keep their rank, send to
+  XeCS. Built `split_trust_b44/trust_lookup_all.csv` (104 Ext sessions: b44 grade or why no separation) and
+  `registration21_trust_rank.csv`; sent to 2026-xecs-recon-24, ack to 2026-pca-registration-e4. 17/21 have a b44
+  split (A 6, B 6, C 5), 4 none (004DS 01-16 off-carrier; 005DS 02-02 / 003PM 2023-12 no cal block; 000KR no
+  dissolved). Best joint picks: 015HK, 008TP, 039CP 09-24, 014KS.
+
+## 2026-09-25 · session 11 — CLOSE (Fable 5.1; 01:40 → 20:05, with a sleep gap 04:25 → 13:11)
+- TE90 table for 88 sessions (F72); RBC/TM atlas of the 61 clean-fit sessions from the offline re-split (C39);
+  per-session trust grade (C40). Hooman's eye found a non-moving lung-shaped structure in the RBC videos.
+- Hunt: static smooth phase field (F74) — WRONG, retracted same day; vessels — no; noise — no (mirror bins, F75);
+  scanner-fixed — no (F76). Found: the voxel-scale phase of calcb's `b` inside its 10σ support, raw and unsmoothed,
+  imprinted on every bin and landing in the RBC channel as sin δ·|z| (F79, confirmed against the exported b).
+- Fix: low-pass b's phase inside the mask (fork 19b7365 → cohort σ sweep on 59 sessions → F81 → production σ 4.4,
+  fork 04f445b). Production rerun of the 61 clean-fit sessions → Ext `AIkill_Dynamic_b44/` (59 split, 2 container-
+  gated); speckle gone cohort-wide (F82); production atlas + trust table regenerated; registration-21 ranked by
+  separation trust and sent to XeCS.
+- Side facts: per-bin gas phase referencing unnecessary (F77); soft-bin neighbour noise correlation makes low-SNR
+  videos "breathe" (F78); imaging-vs-spectroscopy ratio agreement is circular (F60 reaffirmed; physics-anchored
+  global phase proposed, not run).
+- DECIDED: atlas = ON_RBC carrier + clean fit only; no mixing with other carriers; sessions without inputs ignored.
+- DECIDED: calcb phase low-pass inside bmask, σ = 4.4 vox (Hooman), fork default; production tree kept separate
+  from the raw-b tree until Hooman retires the old one.
+- DECIDED: "the rest" (43 sessions: no cal block 14 + never-in-table 11 + no dissolved 7 + offline-gated 6 +
+  off-carrier 5; plus 2 container-gated) = next discussion.
+- RETRACTION: F74 (static smooth phase field imprint) → mechanism is F79; marker dropped in outputs/split_trust_2026-09-25/.
+- BRANCH: aikill-atlas (B12) re-opened and delivered; rbctp-resplit (B23) closed; perbin-phaseref (B24, parent B12)
+  delivered (negative result → the b finding); prod-b44 (B25, parent B24) delivered ★. B21 ct-overlay still open.

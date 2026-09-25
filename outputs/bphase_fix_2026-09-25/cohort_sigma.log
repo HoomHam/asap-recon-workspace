@@ -1,0 +1,99 @@
+[sigma] 2023-01-31_000LL: floor: fine 0.15 oow nan | 0.0: fine 0.42 oow 24.7 | 1.0: fine 0.14 oow 22.8 | 2.5: fine 0.03 oow 22.0 | 5.0: fine 0.03 oow 21.0 | 10.0: fine 0.02 oow 16.6 | nob: fine 0.01 oow 12.0
+[sigma] 2023-05-02_011BA: floor: fine 0.19 oow nan | 0.0: fine 0.43 oow 30.5 | 1.0: fine 0.20 oow 29.6 | 2.5: fine 0.10 oow 29.4 | 5.0: fine 0.10 oow 28.9 | 10.0: fine 0.09 oow 26.4 | nob: fine 0.11 oow 18.6
+[sigma] 2023-05-02_012SR: floor: fine 0.25 oow nan | 0.0: fine 0.56 oow 48.8 | 1.0: fine 0.23 oow 47.9 | 2.5: fine 0.08 oow 47.8 | 5.0: fine 0.08 oow 47.2 | 10.0: fine 0.05 oow 42.3 | nob: fine 0.01 oow 26.7
+[sigma] 2023-05-15_035EK: floor: fine 0.18 oow nan | 0.0: fine 0.38 oow 43.3 | 1.0: fine 0.15 oow 42.5 | 2.5: fine 0.06 oow 42.2 | 5.0: fine 0.06 oow 41.5 | 10.0: fine 0.06 oow 38.4 | nob: fine 0.05 oow 29.4
+[sigma] 2023-05-18_000SV: floor: fine 0.19 oow nan | 0.0: fine 0.43 oow 44.7 | 1.0: fine 0.16 oow 43.5 | 2.5: fine 0.07 oow 43.6 | 5.0: fine 0.07 oow 43.4 | 10.0: fine 0.07 oow 40.6 | nob: fine 0.05 oow 27.4
+[sigma] 2023-09-25_032WS: floor: fine 0.31 oow nan | 0.0: fine 0.59 oow 35.4 | 1.0: fine 0.29 oow 32.7 | 2.5: fine 0.11 oow 32.5 | 5.0: fine 0.10 oow 31.8 | 10.0: fine 0.09 oow 28.8 | nob: fine 0.10 oow 18.8
+[sigma] 2023-11-02_036RL: floor: fine 0.21 oow nan | 0.0: fine 0.54 oow 46.7 | 1.0: fine 0.24 oow 44.0 | 2.5: fine 0.08 oow 43.6 | 5.0: fine 0.07 oow 42.8 | 10.0: fine 0.07 oow 40.7 | nob: fine 0.06 oow 36.0
+[sigma] 2023-11-17_005DS: floor: fine 0.46 oow nan | 0.0: fine 0.47 oow 46.8 | 1.0: fine 0.23 oow 45.2 | 2.5: fine 0.15 oow 45.0 | 5.0: fine 0.17 oow 44.5 | 10.0: fine 0.16 oow 42.6 | nob: fine 0.13 oow 37.2
+[sigma] 2024-02-19_037GD: floor: fine 0.40 oow nan | 0.0: fine 0.75 oow 14.7 | 1.0: fine 0.43 oow 12.8 | 2.5: fine 0.10 oow 11.9 | 5.0: fine 0.09 oow 10.3 | 10.0: fine 0.09 oow 9.4 | nob: fine 0.13 oow 12.6
+[sigma] 2024-02-21_043AS: floor: fine 0.47 oow nan | 0.0: fine 0.84 oow 7.9 | 1.0: fine 0.62 oow 5.5 | 2.5: fine 0.19 oow 4.6 | 5.0: fine 0.15 oow 3.6 | 10.0: fine 0.12 oow 3.2 | nob: fine 0.14 oow 7.4
+[sigma] 2024-02-26_029CK: floor: fine 0.43 oow nan | 0.0: fine 0.86 oow 5.1 | 1.0: fine 0.69 oow 3.7 | 2.5: fine 0.32 oow 3.2 | 5.0: fine 0.24 oow 3.1 | 10.0: fine 0.23 oow 3.2 | nob: fine 0.31 oow 7.5
+[sigma] 2024-02-27_009JT: floor: fine 0.24 oow nan | 0.0: fine 0.69 oow 29.8 | 1.0: fine 0.33 oow 22.6 | 2.5: fine 0.01 oow 21.8 | 5.0: fine -0.00 oow 22.1 | 10.0: fine 0.01 oow 23.1 | nob: fine 0.03 oow 28.0
+[sigma] 2024-03-06_030DN: floor: fine 0.38 oow nan | 0.0: fine 0.76 oow 14.9 | 1.0: fine 0.50 oow 9.4 | 2.5: fine 0.17 oow 8.7 | 5.0: fine 0.13 oow 8.4 | 10.0: fine 0.13 oow 9.3 | nob: fine 0.17 oow 14.4
+[sigma] 2024-03-11_039CP: FAILED EOFError('Unexpected EOF')
+[sigma] 2024-03-12_006KL: floor: fine 0.59 oow nan | 0.0: fine 0.87 oow 22.8 | 1.0: fine 0.66 oow 15.8 | 2.5: fine 0.28 oow 14.4 | 5.0: fine 0.27 oow 13.9 | 10.0: fine 0.27 oow 13.5 | nob: fine 0.29 oow 17.0
+[sigma] 2024-03-12_044DY: floor: fine 0.57 oow nan | 0.0: fine 0.92 oow 21.4 | 1.0: fine 0.77 oow 14.6 | 2.5: fine 0.38 oow 13.0 | 5.0: fine 0.29 oow 12.5 | 10.0: fine 0.28 oow 12.6 | nob: fine 0.31 oow 16.2
+[sigma] 2024-03-14_038RL: floor: fine 0.66 oow nan | 0.0: fine 0.89 oow 8.3 | 1.0: fine 0.75 oow 4.5 | 2.5: fine 0.30 oow 3.1 | 5.0: fine 0.27 oow 2.5 | 10.0: fine 0.28 oow 1.5 | nob: fine 0.32 oow 1.0
+[sigma] 2024-03-21_032WS: floor: fine 0.47 oow nan | 0.0: fine 0.86 oow 7.6 | 1.0: fine 0.66 oow 5.1 | 2.5: fine 0.19 oow 4.6 | 5.0: fine 0.12 oow 4.1 | 10.0: fine 0.10 oow 3.8 | nob: fine 0.13 oow 5.2
+[sigma] 2024-03-21_036RL: floor: fine 0.69 oow nan | 0.0: fine 0.90 oow 15.9 | 1.0: fine 0.76 oow 9.1 | 2.5: fine 0.36 oow 7.3 | 5.0: fine 0.27 oow 6.6 | 10.0: fine 0.26 oow 7.4 | nob: fine 0.30 oow 10.9
+[sigma] 2024-03-28_010AJ: floor: fine 0.51 oow nan | 0.0: fine 0.83 oow 30.9 | 1.0: fine 0.56 oow 24.0 | 2.5: fine 0.18 oow 22.5 | 5.0: fine 0.16 oow 21.8 | 10.0: fine 0.16 oow 22.6 | nob: fine 0.19 oow 31.6
+[sigma] 2024-04-01_008CR: floor: fine 0.59 oow nan | 0.0: fine 0.84 oow 22.9 | 1.0: fine 0.62 oow 17.3 | 2.5: fine 0.25 oow 16.0 | 5.0: fine 0.21 oow 15.7 | 10.0: fine 0.20 oow 16.0 | nob: fine 0.22 oow 20.7
+[sigma] 2024-04-03_040RP: floor: fine 0.49 oow nan | 0.0: fine 0.85 oow 30.4 | 1.0: fine 0.60 oow 24.6 | 2.5: fine 0.07 oow 23.3 | 5.0: fine 0.03 oow 22.7 | 10.0: fine 0.01 oow 22.1 | nob: fine 0.02 oow 24.5
+[sigma] 2024-04-09_019WR: floor: fine 0.60 oow nan | 0.0: fine 0.87 oow 13.8 | 1.0: fine 0.66 oow 10.0 | 2.5: fine 0.15 oow 8.9 | 5.0: fine 0.09 oow 8.4 | 10.0: fine 0.10 oow 8.1 | nob: fine 0.16 oow 8.8
+[sigma] 2024-04-22_025VP: floor: fine 0.66 oow nan | 0.0: fine 0.91 oow 15.9 | 1.0: fine 0.74 oow 13.2 | 2.5: fine 0.41 oow 12.8 | 5.0: fine 0.41 oow 12.7 | 10.0: fine 0.43 oow 12.9 | nob: fine 0.44 oow 11.7
+[sigma] 2024-05-02_023DB: floor: fine 0.52 oow nan | 0.0: fine 0.83 oow 11.4 | 1.0: fine 0.60 oow 8.1 | 2.5: fine 0.25 oow 7.1 | 5.0: fine 0.22 oow 6.1 | 10.0: fine 0.21 oow 4.4 | nob: fine 0.27 oow 13.1
+[sigma] 2024-05-06_043AS: floor: fine 0.53 oow nan | 0.0: fine 0.85 oow 12.3 | 1.0: fine 0.67 oow 9.2 | 2.5: fine 0.36 oow 8.1 | 5.0: fine 0.32 oow 6.5 | 10.0: fine 0.31 oow 5.8 | nob: fine 0.41 oow 16.9
+[sigma] 2024-05-08_012EB: floor: fine 0.63 oow nan | 0.0: fine 0.84 oow 31.6 | 1.0: fine 0.65 oow 26.4 | 2.5: fine 0.34 oow 25.3 | 5.0: fine 0.31 oow 24.9 | 10.0: fine 0.33 oow 27.8 | nob: fine 0.60 oow 46.2
+[sigma] 2024-05-13_002ZS: floor: fine 0.23 oow nan | 0.0: fine 0.87 oow 16.9 | 1.0: fine 0.61 oow 11.7 | 2.5: fine 0.04 oow 10.5 | 5.0: fine -0.02 oow 10.7 | 10.0: fine -0.01 oow 13.3 | nob: fine 0.06 oow 20.7
+[sigma] 2024-06-18_003PM: floor: fine 0.61 oow nan | 0.0: fine 0.89 oow 12.0 | 1.0: fine 0.70 oow 7.0 | 2.5: fine 0.29 oow 6.0 | 5.0: fine 0.20 oow 4.9 | 10.0: fine 0.16 oow 4.3 | nob: fine 0.20 oow 7.2
+[sigma] 2024-07-03_044DY: floor: fine 0.67 oow nan | 0.0: fine 0.91 oow 13.7 | 1.0: fine 0.77 oow 8.5 | 2.5: fine 0.43 oow 7.1 | 5.0: fine 0.37 oow 4.5 | 10.0: fine 0.34 oow 6.1 | nob: fine 0.55 oow 30.7
+[sigma] 2024-07-29_004DS: floor: fine 0.59 oow nan | 0.0: fine 0.84 oow 15.4 | 1.0: fine 0.51 oow 12.4 | 2.5: fine 0.08 oow 11.6 | 5.0: fine 0.05 oow 11.5 | 10.0: fine 0.05 oow 12.1 | nob: fine 0.07 oow 11.8
+[sigma] 2024-08-12_013VM: floor: fine 0.20 oow nan | 0.0: fine 0.69 oow 20.7 | 1.0: fine 0.36 oow 16.0 | 2.5: fine 0.05 oow 14.7 | 5.0: fine 0.04 oow 13.8 | 10.0: fine 0.05 oow 13.3 | nob: fine 0.10 oow 19.6
+[sigma] 2024-08-19_015HK: floor: fine 0.60 oow nan | 0.0: fine 0.86 oow 3.4 | 1.0: fine 0.64 oow 1.9 | 2.5: fine 0.21 oow 1.6 | 5.0: fine 0.18 oow 1.4 | 10.0: fine 0.16 oow 1.8 | nob: fine 0.19 oow 3.5
+[sigma] 2024-08-21_044DY: floor: fine 0.75 oow nan | 0.0: fine 0.94 oow 19.0 | 1.0: fine 0.80 oow 13.7 | 2.5: fine 0.37 oow 12.3 | 5.0: fine 0.31 oow 11.9 | 10.0: fine 0.32 oow 12.6 | nob: fine 0.48 oow 21.4
+[sigma] 2024-08-23_016PG: floor: fine 0.21 oow nan | 0.0: fine 0.72 oow 2.9 | 1.0: fine 0.41 oow 2.1 | 2.5: fine 0.07 oow 1.9 | 5.0: fine 0.03 oow 1.8 | 10.0: fine 0.02 oow 1.7 | nob: fine 0.06 oow 3.5
+[sigma] 2024-08-30_014KS: floor: fine 0.68 oow nan | 0.0: fine 0.92 oow 6.8 | 1.0: fine 0.79 oow 4.2 | 2.5: fine 0.39 oow 3.0 | 5.0: fine 0.32 oow 2.2 | 10.0: fine 0.29 oow 2.5 | nob: fine 0.35 oow 5.1
+[sigma] 2024-09-03_041WF: floor: fine 0.42 oow nan | 0.0: fine 0.85 oow 6.1 | 1.0: fine 0.65 oow 4.3 | 2.5: fine 0.18 oow 3.8 | 5.0: fine 0.12 oow 3.5 | 10.0: fine 0.12 oow 3.6 | nob: fine 0.19 oow 8.0
+[sigma] 2024-09-09_043AS: floor: fine 0.62 oow nan | 0.0: fine 0.89 oow 11.0 | 1.0: fine 0.72 oow 6.9 | 2.5: fine 0.31 oow 5.9 | 5.0: fine 0.25 oow 5.3 | 10.0: fine 0.21 oow 4.4 | nob: fine 0.28 oow 9.8
+[sigma] 2024-09-10_008TP: floor: fine 0.61 oow nan | 0.0: fine 0.91 oow 4.4 | 1.0: fine 0.73 oow 2.4 | 2.5: fine 0.28 oow 1.6 | 5.0: fine 0.24 oow 1.3 | 10.0: fine 0.22 oow 0.9 | nob: fine 0.27 oow 2.2
+[sigma] 2024-09-10_045VS: floor: fine 0.58 oow nan | 0.0: fine 0.93 oow 7.1 | 1.0: fine 0.85 oow 3.7 | 2.5: fine 0.54 oow 3.0 | 5.0: fine 0.41 oow 2.7 | 10.0: fine 0.42 oow 2.7 | nob: fine 0.54 oow 3.9
+[sigma] 2024-09-24_039CP: floor: fine 0.52 oow nan | 0.0: fine 0.91 oow 7.5 | 1.0: fine 0.74 oow 2.9 | 2.5: fine 0.27 oow 2.1 | 5.0: fine 0.27 oow 1.9 | 10.0: fine 0.23 oow 2.8 | nob: fine 0.23 oow 6.4
+[sigma] 2024-09-24_046AA: floor: fine 0.28 oow nan | 0.0: fine 0.82 oow 15.0 | 1.0: fine 0.66 oow 10.9 | 2.5: fine 0.24 oow 9.6 | 5.0: fine 0.13 oow 8.3 | 10.0: fine 0.14 oow 6.9 | nob: fine 0.20 oow 9.0
+[sigma] 2024-09-26_009ML: floor: fine 0.64 oow nan | 0.0: fine 0.92 oow 4.8 | 1.0: fine 0.75 oow 2.8 | 2.5: fine 0.27 oow 2.0 | 5.0: fine 0.20 oow 1.6 | 10.0: fine 0.19 oow 1.5 | nob: fine 0.20 oow 2.6
+[sigma] 2024-09-27_036RL: FAILED EOFError('Unexpected EOF')
+[sigma] 2024-10-02_011CN: floor: fine 0.55 oow nan | 0.0: fine 0.79 oow 15.1 | 1.0: fine 0.53 oow 10.9 | 2.5: fine 0.18 oow 10.3 | 5.0: fine 0.12 oow 10.0 | 10.0: fine 0.11 oow 10.1 | nob: fine 0.13 oow 11.7
+[sigma] 2024-10-02_018CS: floor: fine 0.24 oow nan | 0.0: fine 0.72 oow 12.0 | 1.0: fine 0.38 oow 9.7 | 2.5: fine 0.05 oow 9.1 | 5.0: fine 0.05 oow 9.4 | 10.0: fine 0.07 oow 10.0 | nob: fine 0.11 oow 13.2
+[sigma] 2024-10-08_009JT: floor: fine 0.23 oow nan | 0.0: fine 0.67 oow 22.8 | 1.0: fine 0.33 oow 19.0 | 2.5: fine 0.04 oow 18.4 | 5.0: fine 0.02 oow 18.6 | 10.0: fine 0.02 oow 19.3 | nob: fine 0.02 oow 23.0
+[sigma] 2024-10-10_019LR: floor: fine 0.53 oow nan | 0.0: fine 0.76 oow 20.4 | 1.0: fine 0.46 oow 17.0 | 2.5: fine 0.15 oow 15.8 | 5.0: fine 0.12 oow 14.8 | 10.0: fine 0.10 oow 14.2 | nob: fine 0.11 oow 15.4
+[sigma] 2024-10-16_020JS: FAILED KeyError('rbc_tp_dphi_deg')
+[sigma] 2024-10-16_047SS: floor: fine 0.37 oow nan | 0.0: fine 0.80 oow 16.3 | 1.0: fine 0.46 oow 11.0 | 2.5: fine 0.10 oow 10.3 | 5.0: fine 0.09 oow 10.4 | 10.0: fine 0.09 oow 10.6 | nob: fine 0.12 oow 13.4
+[sigma] 2024-10-17_048JJ: floor: fine 0.48 oow nan | 0.0: fine 0.88 oow 10.9 | 1.0: fine 0.68 oow 7.0 | 2.5: fine 0.23 oow 6.1 | 5.0: fine 0.17 oow 5.4 | 10.0: fine 0.18 oow 5.6 | nob: fine 0.26 oow 16.7
+[sigma] 2024-10-22_021CH: floor: fine 0.47 oow nan | 0.0: fine 0.71 oow 10.2 | 1.0: fine 0.36 oow 8.1 | 2.5: fine 0.08 oow 7.7 | 5.0: fine 0.07 oow 7.5 | 10.0: fine 0.08 oow 7.9 | nob: fine 0.11 oow 9.4
+[sigma] 2024-10-28_022VT: floor: fine 0.26 oow nan | 0.0: fine 0.46 oow 37.1 | 1.0: fine 0.17 oow 34.3 | 2.5: fine 0.06 oow 33.7 | 5.0: fine 0.05 oow 33.6 | 10.0: fine 0.06 oow 33.4 | nob: fine 0.08 oow 35.6
+[sigma] 2024-10-29_049WG: floor: fine 0.29 oow nan | 0.0: fine 0.84 oow 13.5 | 1.0: fine 0.56 oow 10.7 | 2.5: fine 0.08 oow 10.3 | 5.0: fine 0.04 oow 10.2 | 10.0: fine 0.04 oow 10.4 | nob: fine 0.04 oow 10.7
+[sigma] 2024-11-05_023LL: floor: fine 0.56 oow nan | 0.0: fine 0.80 oow 13.5 | 1.0: fine 0.52 oow 10.3 | 2.5: fine 0.20 oow 9.2 | 5.0: fine 0.18 oow 8.8 | 10.0: fine 0.20 oow 9.4 | nob: fine 0.27 oow 16.7
+[sigma] 2024-11-13_025JC: floor: fine 0.69 oow nan | 0.0: fine 0.92 oow 1.3 | 1.0: fine 0.79 oow 0.6 | 2.5: fine 0.52 oow 0.6 | 5.0: fine 0.47 oow 0.5 | 10.0: fine 0.47 oow 0.5 | nob: fine 0.49 oow 1.0
+[sigma] 2024-11-18_026CH: floor: fine 0.39 oow nan | 0.0: fine 0.75 oow 23.7 | 1.0: fine 0.43 oow 19.1 | 2.5: fine 0.12 oow 18.0 | 5.0: fine 0.11 oow 17.0 | 10.0: fine 0.13 oow 17.2 | nob: fine 0.19 oow 26.0
+[sigma] 2024-11-26_050EH: floor: fine 0.36 oow nan | 0.0: fine 0.82 oow 18.6 | 1.0: fine 0.57 oow 13.5 | 2.5: fine 0.18 oow 12.8 | 5.0: fine 0.16 oow 12.6 | 10.0: fine 0.16 oow 13.9 | nob: fine 0.20 oow 18.8
+[sigma] 2024-12-05_043AS: floor: fine 0.24 oow nan | 0.0: fine 0.81 oow 27.6 | 1.0: fine 0.50 oow 23.2 | 2.5: fine 0.08 oow 22.3 | 5.0: fine 0.05 oow 21.7 | 10.0: fine 0.05 oow 21.5 | nob: fine 0.11 oow 24.9
+[sigma] 2024-12-06_051VM: FAILED KeyError('rbc_tp_dphi_deg')
+[sigma] 2024-12-09_027JC: floor: fine 0.33 oow nan | 0.0: fine 0.69 oow 24.0 | 1.0: fine 0.38 oow 20.1 | 2.5: fine 0.15 oow 19.4 | 5.0: fine 0.14 oow 19.0 | 10.0: fine 0.14 oow 19.2 | nob: fine 0.18 oow 24.0
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas/bphase_sigma_cohort.py:100: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  axs[j].boxplot([ex[ex.sigma == s][col].dropna() for s in order], labels=[{'0': 'raw b', 'nob': 'no b'}.get(s, f'σ={s}') for s in order], showfliers=False)
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas/bphase_sigma_cohort.py:100: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  axs[j].boxplot([ex[ex.sigma == s][col].dropna() for s in order], labels=[{'0': 'raw b', 'nob': 'no b'}.get(s, f'σ={s}') for s in order], showfliers=False)
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas/bphase_sigma_cohort.py:100: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  axs[j].boxplot([ex[ex.sigma == s][col].dropna() for s in order], labels=[{'0': 'raw b', 'nob': 'no b'}.get(s, f'σ={s}') for s in order], showfliers=False)
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/helpers/atlas/bphase_sigma_cohort.py:100: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+  axs[j].boxplot([ex[ex.sigma == s][col].dropna() for s in order], labels=[{'0': 'raw b', 'nob': 'no b'}.get(s, f'σ={s}') for s in order], showfliers=False)
+
+medians over 57 sessions
+       fine<1.5  mid1.5-6  coarse>6  oow_pct_ei  negRBC_pct_ei  lung_rbc_over_bgsd  corr_rbc_vs_raw
+sigma                                                                                              
+0.0       0.839     0.369     0.832      15.448         14.132               3.526            1.000
+1.0       0.598     0.348     0.830      10.970         10.007               3.794            0.962
+10.0      0.133     0.328     0.830      10.449          8.360               3.704            0.788
+2.5       0.182     0.317     0.832      10.341          8.766               3.815            0.902
+5.0       0.130     0.312     0.829      10.350          8.252               3.824            0.857
+floor     0.474     0.697     0.855         NaN            NaN                 NaN              NaN
+nob       0.184     0.393     0.878      14.438         12.513               3.562            0.555
+
+median excess of aRBC static corr over the |dis| floor (>0 = phase-carried static structure):
+       fine<1.5_excess  mid1.5-6_excess  coarse>6_excess
+sigma                                                   
+0.0              0.306           -0.288           -0.032
+1.0              0.087           -0.305           -0.035
+10.0            -0.292           -0.359           -0.027
+2.5             -0.248           -0.344           -0.035
+5.0             -0.284           -0.367           -0.034
+nob             -0.235           -0.253            0.008
+
+fraction of sessions with fine excess > 0.1:
+sigma
+0.0     0.98
+1.0     0.42
+10.0    0.00
+2.5     0.00
+5.0     0.00
+nob     0.00

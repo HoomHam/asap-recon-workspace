@@ -1,0 +1,22 @@
+trust_rank,reg_rank,session,cohort,grade,separation,gain,fit_sd_deg,resolvable,neg_pct,excess_pct,snr,why
+1,1,2024-08-19_015HK,HC,A,b44 (σ4.4 container split),1.24,2.6,0.96,1.8,-1.8,12.3,"parts AAAA: gain 1.24, resolvable 0.96, excess -1.8%"
+2,7,2024-09-10_008TP,RT,A,b44 (σ4.4 container split),1.25,1.6,0.98,2.0,-1.4,15.1,"parts AAAA: gain 1.25, resolvable 0.98, excess -1.4%"
+3,5,2024-09-24_039CP,LTX,A,b44 (σ4.4 container split),1.25,2.7,0.99,2.4,-1.2,17.0,"parts AAAA: gain 1.25, resolvable 0.99, excess -1.2%"
+4,15,2024-06-18_003PM,RT,A,b44 (σ4.4 container split),1.22,3.2,0.93,7.6,-1.5,12.9,"parts AAAA: gain 1.22, resolvable 0.93, excess -1.5%"
+5,19,2024-08-23_016PG,HC,A,b44 (σ4.4 container split),1.25,2.2,0.95,1.4,-1.0,11.4,"parts AAAA: gain 1.25, resolvable 0.95, excess -1.0%"
+6,12,2024-03-11_039CP,LTX,A,b44 (σ4.4 container split),1.24,2.2,0.96,5.5,-0.3,15.8,"parts AAAA: gain 1.24, resolvable 0.96, excess -0.3%"
+7,4,2024-08-30_014KS,HC,B,b44 (σ4.4 container split),1.61,2.1,0.97,2.3,-1.9,19.4,"parts BAAA: gain 1.61, resolvable 0.97, excess -1.9%"
+8,20,2024-07-29_004DS,RT,B,b44 (σ4.4 container split),1.1,4.6,0.82,13.1,-3.7,7.2,"parts ABAA: gain 1.10, resolvable 0.82, excess -3.7%"
+9,2,2024-10-22_021CH,EBV,B,b44 (σ4.4 container split),1.15,7.6,0.81,9.2,-2.5,7.1,"parts ABAA: gain 1.15, resolvable 0.81, excess -2.5%"
+10,17,2024-03-12_006KL,EBV,B,b44 (σ4.4 container split),1.39,7.6,0.79,17.9,-2.6,8.7,"parts BBAA: gain 1.39, resolvable 0.79, excess -2.6%"
+11,8,2024-10-02_011CN,EBV,B,b44 (σ4.4 container split),1.22,5.0,0.8,12.5,-2.4,8.0,"parts ABAA: gain 1.22, resolvable 0.80, excess -2.4%"
+12,3,2024-08-12_013VM,EBV,B,b44 (σ4.4 container split),1.33,5.8,0.74,16.5,-3.1,7.0,"parts ABAA: gain 1.33, resolvable 0.74, excess -3.1%"
+13,6,2024-10-02_018CS,EBV,C,b44 (σ4.4 container split),1.34,9.0,0.78,9.3,-3.3,7.0,"parts ACAA: gain 1.34, resolvable 0.78, excess -3.3%"
+14,11,2024-12-09_027JC,EBV,C,b44 (σ4.4 container split),1.25,,0.72,21.5,-1.3,6.1,"parts ACAA: gain 1.25, resolvable 0.72, excess -1.3%"
+15,21,2024-05-08_012EB,EBV,C,b44 (σ4.4 container split),1.2,8.7,0.71,26.1,-0.4,9.7,"parts ACAA: gain 1.20, resolvable 0.71, excess -0.4%"
+16,14,2024-10-08_009JT,EBV,C,b44 (σ4.4 container split),1.19,8.1,0.64,20.9,-1.6,5.0,"parts ACAA: gain 1.19, resolvable 0.64, excess -1.6%"
+17,9,2024-04-01_008CR,EBV,C,b44 (σ4.4 container split),1.44,9.1,0.72,19.6,0.0,7.9,"parts BCAA: gain 1.44, resolvable 0.72, excess +0.0%"
+18,18,2024-01-16_004DS,RT,-,none (off-carrier),,,,,,,carrier ON_MEM 196.9 ppm
+19,10,2024-02-02_005DS,EBV,-,none (no cal block / no fit),,,,,,,no usable dissolved spectrum
+20,13,2023-04-14_000KR,UNID,-,none (no cal block / no fit),,,,,,,no usable dissolved spectrum
+21,16,2023-12-06_003PM,RT,-,none (no cal block / no fit),,,,,,,no usable dissolved spectrum

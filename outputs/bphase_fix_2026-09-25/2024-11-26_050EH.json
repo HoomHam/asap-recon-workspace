@@ -1,0 +1,49 @@
+{
+ "key": "2024-11-26_050EH",
+ "sigma": 2.5,
+ "phi_k0_deg": 47.7,
+ "delta_lung_deg": {
+  "median_abs": 3.8216049479761613,
+  "p90_abs": 12.394003100829655
+ },
+ "resweep_ph_rad": [
+  6.275,
+  6.276,
+  6.274,
+  6.275,
+  6.275,
+  6.276,
+  6.276,
+  6.277,
+  6.2780000000000005,
+  6.276,
+  6.275,
+  6.275,
+  6.274,
+  6.274,
+  6.275,
+  6.276
+ ],
+ "before": {
+  "static_fine_corr07_rbc": 0.8232324711659609,
+  "static_fine_corr312_rbc": 0.8145865567681039,
+  "static_fine_corr07_tm": 0.7750095394697046,
+  "static_fine_corr312_tm": 0.7892814465619179,
+  "static_fine_corr07_dis": 0.35783344995890926,
+  "static_fine_corr312_dis": 0.3970168113860336,
+  "oow_pct_bin7": 16.721285054260235,
+  "lung_rbc_over_bgsd_bin7": 2.205415373695448,
+  "corr_rbc_vs_before_bin7": 0.9999999999999999
+ },
+ "after": {
+  "static_fine_corr07_rbc": -0.09613900048131022,
+  "static_fine_corr312_rbc": -0.11333687849219319,
+  "static_fine_corr07_tm": 0.20573865456121196,
+  "static_fine_corr312_tm": 0.2454905413501302,
+  "static_fine_corr07_dis": 0.35783344995890926,
+  "static_fine_corr312_dis": 0.3970168113860336,
+  "oow_pct_bin7": 10.149170874968663,
+  "lung_rbc_over_bgsd_bin7": 2.2230119211242023,
+  "corr_rbc_vs_before_bin7": 0.8422641040280169
+ }
+}
