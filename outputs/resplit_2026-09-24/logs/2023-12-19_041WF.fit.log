@@ -1,0 +1,5 @@
+identified sampling pattern gas-dissolved
+TR (from metadata) = 15.000 ms, ilvperTR=2 (dual-phase)
+filtering noise spikes...
+removed 483.0 points (noise spikes) of 3482790
+removed 940.0 points (noise spikes) of 3482790

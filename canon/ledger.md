@@ -351,3 +351,174 @@ session-7 header, belong to THIS session — left in place, append-only.)
   no Tyger re-run needed for the 86 sessions; calcb imprint is NOT fixable offline (real() already applied).
 - BRANCH: dixon-lit-review (B22), parent: B17. Closed (delivered: reference/OnePointDixon_Review.md,
   2steve/05, 2steve/06, F59 VALID, F60). ★ → B17 (rbctp-split-audit reopened: resplit next). B21 stays open.
+
+## 2026-09-24 · session 10 (Fable 5.1; ~20:05 → 20:35)
+
+- Executed `handoff-directive.md` (session 9's order): offline RBC/TP re-split + reviewable fork patch.
+- 20:10 `helpers/resplit_rbctp.py` (C36): `fit` reruns Steve's spectral fit per session (CPU, unchanged
+  `raw.load_from_arr`; 2 s/session, not the 1–2 min the directive assumed — 89 sessions in 30 s at -j 8),
+  `split` inverts the saved aRBC/aTP with the old basis (2πf·TEeff), re-splits with Δφ_k0 =
+  RBCphase[0]−TPphase[0] + 2πΔf·killpts·(dt_img−dt_spec), note-04 stop (masked sum, min |R−target|, both
+  sums > 0), writes `d/recon_resplit.mat` next to `recon.mat` (never overwritten) + `outputs/resplit_2026-09-24/`.
+- FOUND: the killpts timing term is −13° (2·(5−60) µs at 330 Hz), not the "≈ −1°" written in note 05 /
+  F59 / the directive's expected values. Directive formula was right, its expectations (96/103/88°) were not:
+  validation sessions land at 82.4 / 91.0 / 73.9° (041WF / 004DS / 043AS) = first-sample Δφ − 13°. Note 05
+  line corrected in place (root `2steve/`, one line — LANE: root folder, Hooman's/2steve lane; told him).
+- RESULT (79 re-split, 10 gated of 89 logged split sessions incl. 2 merged + 025VP_REJECTED):
+  background corr(aRBC,aTP) insp bin median −0.97 → −0.50; lung voxels with aTP<0 median 70 % → 2 %;
+  sessions with TP<0 in >50 % of lung 54 → 0; R_new hits target within 0.8 % everywhere; noise gain median
+  1.16 (max 2.7). Conditioning: 65 good (|sin Δφ| ≥ 0.7), 14 marginal (0.37–0.62). Cross-tab vs note-04
+  classes: invalid 60 → 43 good / 12 marginal / 5 gated; partial 7 → 7 good; valid 19 → 13 good / 1 marginal /
+  5 GATED (Δf 0.8–4.4 kHz: their R "matched" a meaningless target — F64). Figures: `fig/cohort_before_after.png`,
+  `fig/{045VS,041WF,004DS,043AS}_before_after.png`; 045VS shown to Hooman (`show`), verdict pending.
+- Marginal cluster = 2023 218-ppm sessions (000LL ×2, 023DB, 000SK, 035EK, 000SV, 002JM, 036RL, 005DS,
+  039CP, 040RP, 025VP + 008CR 2024-04, 014KS 2024-08): Δφ_old ≈ −40…−58° → Δφ_k0 21–38°. Two independent
+  estimates (first sample; Steve's line + TE) agree within 7° there, so it is the acquisition's RF intercept
+  (≈ −50° vs ≈ −10…+10° for 2024), not code — F63 SUSPECT (sequence-version mechanism unverified).
+- Gate as implemented (loose): Δf 250–400 Hz, |fRBC − (218−DPoff)·17.67 Hz| ≤ 150 Hz, ratio 0.02–3,
+  |sin Δφ| ≥ 0.3; the strict note-05 numbers would also reject 004DS (Δf 293, fRBC 295 vs 176) which
+  re-splits cleanly — both verdicts in the CSV, Hooman to choose. 006MM (fRBC −270 Hz) is the borderline gate.
+- 20:25 Fork patch `notes/fork_patch_2026-09-24.{diff,md}` (raw.py dphiRBCTP + unwrap + dtdyn + gate;
+  results.py new basis + masked min|R−target| stop + gas |F·b| export nch=1 + split provenance dict;
+  tyger_recon.py meta rbc_tp_* + `gas_phase_magnitude` item). `git apply --check` OK vs working tree AND
+  index. NOT applied. py_compile OK. Not runnable locally (CUDA) — a Tyger rerun of 045VS is the real test.
+- Root untouched except the one-line note-05 fix; `gtypes.py`/`tyger_recon.py` uncommitted diffs = Hooman's, not touched.
+- Pending Hooman: (1) eye verdict on 045VS before/after; (2) gate set loose vs strict; (3) go/no-go to apply
+  the patch on `diaphragm-recon`, rebuild image, rerun 045VS + 041WF; (4) then regenerate atlas dp pages (B12, F47).
+- BRANCH: rbctp-resplit (B23), parent: B17 (rbctp-split-audit). Open (eye verdict + patch go pending). ★ → B23.
+- 20:45–21:30 Hooman: "what fitting did you use?" → Steve's, unchanged (raw.py:314–392). Then, on his order, a cross-session
+  exchange with the open XeCS session (2026-xecs-recon-c4) about the calspec time-domain fit (M2 gas L/RBC L/mem Voigt;
+  M3 mem L+L). Cross-check script `helpers/_fit_xcheck.py` (scratch) → `outputs/resplit_2026-09-24/fit_xcheck.csv`,
+  70 sessions in both tables, everything moved to image k0 (t = TE + 10 µs; XeCS phases are at ADC sample 0 = TE,
+  confirmed by XeCS after it first claimed t1 = TE + dwell — its docstring was wrong, code right):
+  Steve − M2 = +15.8° (MAD 8); Steve − M3 with membrane LUMPED as complex sum mem1+mem2 = +3.0° (MAD 8);
+  mem1 − mem2 = −105° (MAD 13; Robertson's ~100°). Δf XeCS − Steve = +18.5 Hz (Steve's TP pulled toward the RBC
+  shoulder; no gas line in his model + exp(−n/200) apodisation). Ratios vs Steve's area ratio: M2 ×1.35, M3 scalar
+  a_rbc/(a1+a2) ×1.15, M3 lumped a_rbc/|mem1+mem2| ×1.81 (IQR 1.57–2.26). BIC prefers M3 69/70.
+- XeCS verdicts (its messages 1–2, kept in this session's transcript): Steve's fit not fine with gates alone — the
+  4-peak picker and unbounded LM fail exactly where a chemical-shift prior + bounds succeed; its own test: unconstrained
+  two-dissolved-line fits collapse in 4/5 high-SNR blocks (RBC is a shoulder on membrane at RBC/mem 0.1–0.3), with a
+  prior (RBC 218±4, mem 197.5±4 ppm from the fitted gas line, mem FWHM ≥ 6 ppm) 5/5 physical, within-block phase SD 2–5°
+  at RBC/mem ≥ 0.2. Its pooled subjects_pooled.csv phases are UNRELIABLE where rbc_ppm_from_gas < 214 or > 221, a1/a2
+  outside 0.3–3, or snr_diss < 40 (explains my >20° outliers 043AS 12-05, 012EB, 018CS). The −105° two-membrane phase is
+  physical (Robertson at 3 T with non-selective RF; not TE evolution; same value in 70 sessions) → transfers to imaging;
+  the Spec-pulse profile phase (RF intercept) does not → k0-time evaluation is the right mechanism. RATIO: the split
+  returns a_RBC and |mem1+mem2| by construction, so the self-consistent target is the LUMPED ratio; carry
+  F_lump = (a1+a2)/|mem1+mem2| per session (≈1.6–2.3) to report on the literature scalar scale. Gates: gas-referenced
+  carrier/SNR flags, not DPoff (038RL/006MM are F0-miss days with usable spectra; 042DR usable; the 7 v2 fails have no
+  spectroscopy). v2 small angles = carrier BETWEEN the lines + TE 600 µs + weaker pulse — acquisition, not fit.
+- AGREED plan (both sessions; Hooman's go pending in each lane): keep the k0-angle mechanism; angle + ratio from the
+  XeCS prior-constrained fit (M3 lumped, M2 fallback where M3 degenerate); per-session CSV
+  `XeCS outputs/calspec/resplit_inputs_2026-09-24.csv` (columns listed in its message 2) → `resplit_rbctp.py --fit xecs`;
+  fork-patch fit = bounded time-domain two-line fit (or import calspec_fit.fit_fid). XeCS said it is running the CSV now.
+- Sign convention check: both e^{+2πift}, RBC higher f, Δφ = RBC − TP → no flip.
+- 21:35 XeCS reply 3: (i) time origin verified by construction = ADC sample 0 = TE (its docstring wrong, code right);
+  (ii) RETRACTED its "pooled phases scatter ±100°" — its own degrees-into-exp bug; recomputed: v3 M2 Δφ_TE median +44°
+  [35,48], M3 lumped +57° [52,64]; v2 M2 +32°, M3 lumped +37° → pooled M3-lumped values ARE usable except drifted fits
+  (rbc_ppm < 214: 043AS 12-05, 012EB; 026CH borderline); (iii) prior-constrained per-rep M2 at TE: 043AS +80 (SD 32),
+  030DN +52 (2), 026CH +49 (5), 020JS +51 (3), 012EB +73 (14) → Steve − these = −6/+22/+8/+17/+15, i.e. the M2-vs-lumped
+  offset, no contradiction; (iv) CSV `resplit_inputs_2026-09-24.csv` waits for Hooman's go in the XeCS lane (~10 min).
+- 21:50 Hooman: "go ahead with your picks" (XeCS-fit re-split; fork patch imports/vendors the XeCS fit; maps stored on the
+  lumped scale with F_lump in metadata, both reported) and gave XeCS the go for the CSV. Added `--fit xecs [--xecs-csv]`
+  to C36: angle = dphi_k0_deg, target = ratio_lumped from the XeCS csv, Steve's fit kept only to invert the old split
+  and as reference columns (dphi_steve_k0, ratio_steve, steve_minus_xecs); own gate = XeCS valid flag + |sin| ≥ 0.3 +
+  ratio range; outputs suffixed `_xecs` (rows_xecs/, resplit_summary_xecs.csv, Ext d/recon_resplit_xecs.mat,
+  fig/*_xecs.png). Dry-run test on a synthetic csv built from fit_xcheck (pooled M3 lumped): 045VS 60.1°, R = target
+  0.395; 043AS 12-05 104.9°; 042DR rescued (78.8°, TP<0 90 % → 0 %); no-cal-block sessions → status no_xecs_row.
+  Asked XeCS for the exact prior-fit wrapper (file/function, init, bounds, gas location without the stage-1 cache) to
+  vendor as `specfit.py` in the fork patch. Waiting on: XeCS csv path + wrapper path.
+- 22:10 XeCS delivered `resplit_inputs_2026-09-24.csv` (75 rows, 73 valid) + `specfit.py` (standalone, numpy/scipy) into
+  notes/calspec_package_2026-09-16/. Ran `resplit_rbctp.py split --fit xecs --all`: 70 re-split, 2 gated by XeCS
+  (037GD 11-13, 043AS 12-05: per-rep SD > 30°), 17 no cal block (8-ch, second dynamics, 2023 v2 fails, merged
+  keys now mapped to the base session). corr(bg) −0.97 → −0.56, lung TP<0 73 % → 2 %, TP<0>50 % sessions 51 → 0;
+  Steve k0 − XeCS k0 median +4.3° MAD 8.7 (16 > 20°: the 11 M2-fallback rows carry the known ~13° single-membrane
+  bias; 4 high-F_lump rows). Target ratio XeCS lumped / Steve area median 1.71, F_lump median 1.49 (1.00–3.49).
+  045VS rescued identically (60.0°, target 0.396); 042DR rescued (74.5°). Figures fig/*_xecs.png.
+- 22:25 Fork patch v2: `specfit.py` vendored verbatim next to raw.py; raw.py spectral block (315–438) replaced by a
+  specfit.fit_block call on the un-apodised kept FIDs (first_sample = killpts, t_k0 = killpts·dtdyn, per-rep chunks
+  of nsmpperusimg/npts lines) → fRBC, fTP (lumped centroid), RBCTPratio = ratio_lumped, dphiRBCTP, self.specfit;
+  gate = specfit valid + |sin| ≥ 0.3; sspect/sspectfit for the GUI from the model; results/tyger carry model_used,
+  ratio_scalar, F_lump, snr, rep SD in the rbc_tp_* meta. py_compile OK, `git apply --check` OK (working tree +
+  index), 642-line diff at notes/fork_patch_2026-09-24.diff. NOT applied.
+- 22:35 Smoke test of the vendored path on input.mrd (045VS/004DS/042DR) vs the CSV: 54.3 vs 60.0°, 55.3 vs 56.1°,
+  59.9 vs 74.5°; ratios 0.393/0.396, 0.270/0.382, 0.162/0.277. Traced: MRD cal lines == XeCS twix cache exactly
+  (|corr| 1.00000 at shift 0, same 780 lines); line selection irrelevant (post-arrival reps vs Steve's filter agree to
+  0.1°); the WHOLE difference is ADC SAMPLE 1, kept by the CSV run (drop_before=1) and dropped by Steve's killpts=2.
+  Sample 1 is a systematic transient: |FID| at s1 / log-linear trend of s2–5 = median 1.073 (IQR 1.03–1.18) over 94
+  blocks, > 10 % in 39 (s0 = 1.83×). One sample moves the M3 mem1/mem2 decomposition (a1/a2 1.00 → 0.57, F_lump
+  1.29 → 1.50, ±15 % on the scalar ratio) and the lumped angle by 6°. 042DR (RBC-weak) swings M2 91° / M3 61–76°,
+  F 1.85–4.84 across choices — uncertain ±15°, XeCS's degeneracy rule did not fire. Asked XeCS to rerun the CSV with
+  drop_before=2 (so CSV == Tyger path) and add a stability column (drop-1 vs drop-2 |Δdphi|, ΔF). Re-split rerun
+  waits for that CSV. 004DS: XeCS 'primary' must point at MID00057 (00056 has no xenon).
+- 22:55 XeCS reran the CSV with samples 0+1 dropped (specfit default drop_before=2 now) + stability columns
+  (stab_dphi_deg = k0-angle change when sample 2 is also dropped; 74/75 valid, 57 stable). Identity check: 045VS
+  CSV 54.3° / F 1.49 == vendored raw.py to the digit. Re-vendored specfit.py; reader gates on stab_dphi > 10°
+  (STAB_MAX_DEG); raw.py patch does the same refit internally (drop_before = killpts+1, gas fixed).
+- RESULT (--fit xecs, corrected CSV): 68 re-split, 6 gated (037GD 11-13 invalid; unstable: 042DR 31°, 021JM 21°,
+  047SS 19°, 040RP 11°, 023DB 11°), 15 no cal block. corr(bg) −0.97 → −0.61, lung TP<0 74 % → 2 %, TP<0>50 %
+  sessions 49 → 0; dphi_k0 median 50° (28–65); 54 good / 14 marginal; Steve k0 − XeCS k0 median +8.8° MAD 6.8;
+  target lumped/Steve-area median 1.64, F_lump median 1.48 (1.00–1.85). Stale _xecs.mat of the 5 newly gated
+  sessions deleted from Ext (68 files = 68 rows). Figures fig/{045VS,004DS,cohort}*_xecs.png; 045VS shown.
+- Fork patch v3 (660 lines, `git apply --check` OK, NOT applied): specfit vendored (drop_before=2 default), stability
+  refit + gate in raw.py, stab_dphi in results/tyger meta. Smoke test vs CSV: 045VS identical; 038RL 29.6 vs 28.0
+  (line set); 042DR 59.9 (Steve's lines, stab 0.9°) vs CSV 90.2 (post-arrival lines, stab 31°) — the RBC-weak block
+  is line-set dependent and the in-raw.py stability refit does NOT catch it with Steve's line filter; CSV path
+  gates it. Open: a second stability probe (line-subset split) for the Tyger path, or ratio_scalar < 0.1 → marginal.
+- Pending Hooman: eye verdict on 045VS (_xecs figure), go to apply the patch on diaphragm-recon + rebuild + rerun.
+- 2026-09-25 01:45 Hooman: "go and do 2" (apply). Root fork branch `diaphragm-recon`: `git apply` of the v3 diff, Dockerfile
+  COPY += specfit.py, commit 6651591 (raw.py, results.py, tyger_recon.py incl. Hooman's uncommitted navigator-logging
+  edits, specfit.py, Dockerfile; gtypes.py basefolder change left uncommitted, local-only), pushed to `hooman`;
+  GitHub Actions build 36083616421 → image ghcr.io/hoomham/xe-tyger-recon:6651591…; spec
+  `pipeline/recon_codespec_6651591.yml`. Test plan: dyn_recon --methods d on 045VS 2024-09-10 + 041WF 2023-12-19 into
+  Ext `Work/Codes/2026_ASAP_Recon/tyger_specfit_2026-09-24/` (mirror law), compare with the offline _xecs re-split.
+- 02:00 RESULT (the real test): Tyger runs 644 (041WF 2023-12-19) and 645 (045VS 2024-09-10), DIAPHRAGM, image
+  6651591, 92–94 s each, outputs Ext `Work/Codes/2026_ASAP_Recon/tyger_specfit_2026-09-24/<key>/d/`. Container log
+  reproduces the CSV: 045VS specfit M3, 54.3° at k0, lumped 0.394 (scalar 0.263, F 1.50), stab 1.5°; 041WF 56.8°,
+  0.254 (F 1.65). Every bin's masked R hits the target within 0.3 %. Maps vs the offline `--fit xecs` re-split
+  (`helpers/_tyger_vs_offline.py`): corr 0.998/0.9999 (aRBC/aTP) on 045VS, 0.9999/0.99996 on 041WF; rel RMS 1–9 %
+  (aRBC of 045VS 8.7 %: offline target 0.3933 from XeCS's post-arrival lines vs 0.3935 container, and Steve's
+  5×corner-mean mask vs the blob mask move the per-bin global phase slightly); gas image unchanged (rel 7e-8 / 3e-5).
+  New meta present in output.mrd (rbc_tp_dphi_deg … rbc_tp_stab_dphi_deg) and post_process reads it unchanged.
+  Figure `outputs/resplit_2026-09-24/fig/tyger_old_vs_new_6651591.png` shown to Hooman. Background corr on the new
+  container maps: 045VS −0.35 (old −0.99), 041WF −0.13 (old −0.94).
+- B23 status: patch APPLIED + pushed (fork 6651591), image built, validated on two sessions. Remaining: Hooman's eye
+  verdict on the figures; then the cohort re-run under the new image (or keep the offline _xecs maps, which are
+  equivalent) and the atlas dp pages (B12, F47). 15 sessions without a cal block stay unsplit under the new gate.
+- 02:20 Hooman: (a) note to Steve on his fit's broadening + everything else we learned → `2steve/07_Dissolved_Spectral_Fit.md`
+  (+ README row, figs 07_*). LANE: root 2steve/ folder again (his notes folder; told him). (b) reference doc for OUR
+  repo: `reference/RBCTP_Split_SpecFit.md` (what the split needs, the fit, the four reasons, ratio scale, conventions,
+  where things are, open template work). (c) XeCS session no longer needed: specfit.py, CSV and the FID cache are all
+  readable from here. (d) Template-basis linear solve (C37 `helpers/specfit_template.py`): fixed cohort shapes →
+  stability under line-subset split p90 3.3° vs specfit 6.0° on stable rows (4.8° vs 16.6° on flagged rows); agreement
+  with specfit −1.6° median, MAD 4.3°, but 19/74 differ > 10° with high residual (corr 0.54) and 22/74 hit the ±1.5 ppm
+  shift grid edge → frozen shapes misfit some subjects: stable ≠ accurate. Steve's 2-Lorentzian as third opinion does
+  not adjudicate (±25° scatter vs both). Adaptive grid (shifts ±2 ppm × RBC/mem width scales × a2/a1) running.
+- 02:50 RESULT template study, adaptive grid (shifts ±2 ppm × RBC/mem width scales 0.7–1.4 × a2/a1 0.8–2.5, still linear
+  in the coefficients): residual UNCHANGED vs fixed shapes (median 0.08, p90 0.14 on stable rows; 0.16/0.30 flagged),
+  agreement with specfit +0.4° median MAD 3.6 but still 12/56 stable rows > 10° apart, and stability got WORSE on the
+  flagged rows (odd/even p90 4.8° → 14.1°, halves 5.4° → 19.5°) — extra shape freedom re-opens the multimodality;
+  a2/a1 sits at a grid edge on 19/74, shifts at ±2 on 17/74. The 10–30° disagreements are therefore NOT a line-shape
+  misfit the grid can remove; the residual floor is the data (noise + wash-in non-stationarity + whatever the 3-line model
+  misses), and neither estimator can be called right there without ground truth. Steve's fit does not adjudicate.
+- VERDICT (F71): the template-basis linear solve with FIXED cohort shapes is a PRECISION fix (line-subset/sample
+  stability 2–4× better, 042DR 31° → 0.6°), not a proven ACCURACY fix (±4° MAD vs specfit on good blocks, 10–30°
+  apart on ~1/5 of them, unresolvable from these data). Decision rule adopted for now: specfit M3 when its own
+  stability passes (model-faithful, subject-specific shapes); fixed-shape template ONLY as a fallback where specfit is
+  flagged unstable AND the template's own odd/even + halves stability < 10° AND its relative residual < 0.2, tagged
+  `model_used = template` in provenance. On the 6 gated: rescues 042DR (72.8°, res 0.06), 021JM (36°, 0.13),
+  023DB (23°, 0.11); leaves 047SS 10-23 (res 0.32), 040RP 12-11 (0.33), 037GD (0.37, invalid) unsplit.
+  NOT implemented in the fork or the CSV yet — Hooman's call. The right next test for accuracy = SIMULATION ground
+  truth (synthetic FIDs from the cohort M3 parameters with varied RBC/mem, SNR, mem phase, wash-in; bias of both
+  estimators) — proposed, not run.
+- 03:00 /leave. Session 10 summary: directive executed end to end — offline re-split (Steve fit 79, XeCS fit 68),
+  fork patch applied (6651591) + image built + validated on Tyger (F70); cross-session fit comparison with XeCS
+  (F65–F69); template solve tested (F71); docs: reference/RBCTP_Split_SpecFit.md, 2steve/07, fork_patch md.
+- DECIDED (Hooman): fits = XeCS specfit with prior, vendored; maps on the lumped scale with F_lump in metadata;
+  patch applied on diaphragm-recon (done).
+- DECIDED (Hooman): the 15 no-cal-block sessions — decision deferred (magnitude-only vs population-prior split).
+- DECIDED (Hooman): NEXT SESSION = the dissolved atlas for ALL sessions from `recon_resplit_xecs.mat` (B12, F47),
+  using this session's notes and canon.
+- Left dirty in workspace, not this session's: handoffs/handoff-workspace-2026-06-{11,15-2,15-3}.md (Jul 1 wording
+  edits), pipeline/recon_codespec.yml (Jul 10 image hash), archive/* untracked exports — untouched.
+- BRANCH: rbctp-resplit (B23), parent: B17. Delivered (patch live, cohort re-split, template study); stays ★ until the
+  atlas regen consumes it, then ★ → B12. B21 ct-overlay still open. B17 rbctp-split-audit: closed by B23.

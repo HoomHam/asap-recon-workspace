@@ -67,19 +67,21 @@ flowchart TD
 | B16 snr-table | C28 snr_calc.py, outputs/snr_2026-09-13/snr_table.csv, SNR_Table_All.xlsx cols I–S (F48 F50 F52) |
 | B17 rbctp-split ★ | outputs/snr_2026-09-13/{rbc_tp_solve_check.csv, 04_rbctp_split_evidence.png}, `2steve/04_RBCTP_Split_PhaseStop_Conditioning.md`, reference/DP_RBCTP_Split_Noise_Diagnostics.md (F47 F48); 2026-09-24: `2steve/05_RBCTP_Split_TE_Term.md`, `2steve/06_Calcb_Static_Structure.md`, outputs/f59_te_term_2026-09-24/, outputs/calcb_imprint_2026-09-24/, helpers/_f59_check.py, helpers/_calcb_8ch_weight.py (F59) |
 | B22 dixon-lit-review ✅ | reference/OnePointDixon_Review.md (§1–8), Duke pipeline `TeamXenonDuke/xenon-gas-exchange-consortium` inspected, memory onepoint_dixon_review.md (F59 F60) |
+| B23 rbctp-resplit ★ | C36 resplit_rbctp.py (--fit steve/xecs), C37 specfit_template.py (F71), outputs/resplit_2026-09-24/ (resplit_summary{,_xecs}.csv, fit_xcheck.csv, figs), Ext d/recon_resplit{,_xecs}.mat (79/68), notes/fork_patch_2026-09-24.{diff,md} APPLIED = fork 6651591 (specfit.py vendored), Ext tyger_specfit_2026-09-24/ (045VS, 041WF), notes/calspec_package/{resplit_inputs_2026-09-24.csv, specfit.py}, `2steve/05` −13° fix (F61–F70) |
 | B18 siemens-mrd-doc | notes/Data_SiemensToMRD_Pipeline_2026-09-14.md (DRAFT; C6 C7 C9 C11 C13) (F53 F54) |
 | B19 structure-rank | C30 structure_rank.py, outputs/structure_rank/ (F57) |
 | B20 merged-dyn | C31 merge_dyn.py, C32 merged_batch.sh, C9 dyn_recon.py --merge/--ref, outputs/twix_audit_2026-09-16/, Ext AIkill_Dynamic/*_merged/ + pipeline_runs/logs/*_merged.log (F55 F56) |
 | B21 ct-overlay ● | C33 ct_to_nifti.py, C34 ct_mri_overlay.py, C35 ct_cohort_batch.py, outputs/ct_overlay/<key>/ (summary_3plane, montages, bins_video.mp4, register.json), cohort_fit_table.csv, cohort_summary.pdf (Ext, symlink), Ext `Codes/2026_ASAP_Recon/ct_overlay/` (NIfTI CT, mri_on_ct, rigid.tfm, per-slice PNG/GIF, manifest.json) (F58) |
 
-## Current position (★ B17, 2026-09-24)
+## Current position (★ B23, 2026-09-25)
 
-Session 9 was a literature + diagnosis session (B22, closed). The 1-point Dixon review
-(`reference/OnePointDixon_Review.md`) reads the Duke/consortium canon and its critics; verdict: the
-field converged on acquisition/reporting conventions, not on validating the RBC/membrane split
-(F60). Reading Steve's split against it found the cause of B17's near-singular split: the basis angle
-is the phase-vs-TE intercept (t = 0), missing 2πΔf·TE ≈ 74°; measured Δφ at TE is 88–103° (F59 VALID,
-`2steve/05`). calcb's one static b imprints the cycle-average lung on every bin (`2steve/06`; 8-ch Σ|b|
-varies ×2 across the lung on 042DR). Neither note sent. Next session (Hooman's directive): offline
-re-split of the 86 sessions with the corrected Δφ + a reviewable fork patch diff; 8-ch deferred.
-B21 ct-overlay stays open (038RL read, S1/S2 subjects). Atlas dp pages (B12) still suspect until re-split.
+Session 10 (2026-09-24 20:05 → 09-25 03:00) closed the RBC/TP split problem end to end. Cause F59/F61 (t=0 basis
+angle, −13° killpts term); fit replaced by the XeCS time-domain `specfit.py` with a chemical-shift prior
+(four reasons in `reference/RBCTP_Split_SpecFit.md`, F65–F69); offline re-split of the cohort
+(`resplit_rbctp.py --fit xecs`: 68 sessions, Ext `d/recon_resplit_xecs.mat`, lung TP<0 74 % → 2 %, F62); fork
+commit 6651591 applied + image built + Tyger-validated on 045VS/041WF (F70) — container == offline maps. Maps
+are on the LUMPED ratio scale, F_lump in metadata (F66). ADC samples 0+1 are transients (F68). Template-basis
+linear solve = precision fix only (F71), fallback rule proposed, not deployed. Notes to Steve: `2steve/05` (fixed),
+`2steve/07` (new). **Next session: regenerate the dissolved atlas for ALL sessions from `recon_resplit_xecs.mat`
+(B12, F47) — then ★ → B12.** Deferred: the 15 no-cal-block sessions (magnitude-only vs prior split, Hooman);
+simulation ground truth for template vs specfit; 8-ch Σ|b| (note 06). B21 ct-overlay open.

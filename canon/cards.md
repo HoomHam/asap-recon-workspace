@@ -42,6 +42,8 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C33 | helpers/ct/ct_to_nifti.py | ct-overlay | WORKS (RT 4D-CT → 27 NIfTI phases on Ext) |
 | C34 | helpers/ct/ct_mri_overlay.py | ct-overlay | WORKS (search/refine/overlay/video/phases; F58 orientation; rigid only) |
 | C35 | helpers/ct/ct_cohort_batch.py | ct-overlay | DONE 2026-09-17 (29 LTX+EBV keys; 038RL poor fit; S1/S2 skipped) |
+| C36 | helpers/resplit_rbctp.py | rbctp-resplit (B23) | WORKS 2026-09-24 (--fit steve: 79 re-split, 10 gated; --fit xecs: 68 re-split, 6 gated, 15 no cal block; stability gate) |
+| C37 | helpers/specfit_template.py | rbctp-resplit (B23) | DONE 2026-09-25 — precision fix, accuracy unproven (F71); fallback-only rule proposed, not deployed |
 
 ## Cards
 
@@ -321,6 +323,33 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - status: DONE 2026-09-17 05:55 — 29/29 keys ran; 1 poor fit (038RL, distorted CT anatomy), 1 unregistered input (002JM);
   S1/S2 EBV folders skipped (subject unknown). cohort_fit_table.csv + cohort_summary.pdf in outputs/ct_overlay/
 
+### C36 · helpers/resplit_rbctp.py
+- why: Hooman's directive (session 9 /handoff): re-split the RBC/TP maps of the 86 split sessions offline with the
+  k0 basis angle (F59) instead of re-running Tyger; prove the B17 near-singularity was the code artefact
+- origin: H (order) / C (design + code) · branch: rbctp-resplit (B23, parent B17) · facts: F59 F61 F62 F63 F64
+- in: Ext `AIkill_Dynamic/<key>/d/{input.mrd, recon.mat, tyger.log}`; root `raw.py`/`gtypes.py` imported unchanged
+  (CPU spectral fit); `helpers/snr_calc.py` masks (corner box, lung_mask, EXCL_DILATE) for comparability with note 04
+- out: `outputs/resplit_2026-09-24/{fits,rows,logs,fig}/`, `resplit_summary.csv`; Ext `d/recon_resplit.mat`
+  (aRBC, aTP float32 (nbins,z,y,x) + dphi_old/new, ph_new, R_new, gate flags, corr/negTP per bin) — never touches recon.mat
+- method: stages fit (parallel subprocesses) → split (invert old basis from saved aRBC/aTP, masked complex sum,
+  0.001-rad sweep, min |R−target| with both sums > 0; gate loose/strict) → summary → fig / cohort
+- gotchas: killpts term is −13° not −1° (F61); a gated session's stale .mat from an earlier run must be deleted by
+  hand (042DR was); `_merged` and `_REJECTED` folders are included by discovery — filter by key when tabulating
+- status: DONE 2026-09-24 — 79 re-split, 10 gated; 045VS figure shown; Hooman's eye verdict + patch go pending
+
+### C37 · helpers/specfit_template.py
+- why: Hooman: "try your fix for RBC-low and membrane infiltration, see if it stays stable on the good data, find a threshold" — the M3
+  two-membrane decomposition flips on RBC-weak blocks (F69); the split needs only one complex coefficient per line
+- origin: H (order) / C (design + code) · branch: rbctp-resplit (B23) · facts: F65 F66 F68 F69 (+ result rows to come)
+- in: XeCS FID cache (Ext `2026_XeCS_Recon/calspec/cache/<tag>.npz`), `notes/calspec_package_2026-09-16/{resplit_inputs_2026-09-24.csv, specfit.py}`
+- out: `outputs/resplit_2026-09-24/template_study{,_adaptive}.csv`, `template_params.json`, `fig/template_study{,_adaptive}.png`, log
+- method: cohort line shapes per protocol (median of stable M3 rows: RBC/mem1/mem2 shift + FWHM, a2/a1, −105° relative phase) →
+  basis T_gas, T_rbc, T_mem(lumped) at the block's located gas frequency; complex lstsq for 3 coefficients on a grid over
+  RBC/mem shifts (±1.5 ppm; adaptive: ±2 ppm × width scales 0.7–1.4 × a2/a1 0.8–2.5); dphi_k0 and lumped/scalar ratio
+  from the coefficients at t_k0 = 10 µs; stability = drop-2 vs drop-3, odd/even reps, first/second half; same tests on specfit
+- status: fixed shapes: stability 2–4× better than specfit, agreement −1.6° median MAD 4.3° on stable rows, but >10° off on
+  19/74 with high residual (frozen shapes misfit); adaptive grid running 2026-09-25 02:40
+
 ## Outputs index
 
 | Output dir (workspace/outputs/) | From | Facts | Status |
@@ -341,3 +370,4 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 | rt_prepost/ | C27 | — | VALID |
 | diaphragm_binning/ | C24 C25 | F37 F38 | VALID |
 | 016PG/ · 023LL/ · 025JC/ · 25JC/ · 025JC_sweep_lt/ · piston/ | ? (June backlog, pre-canon) | ? | untagged — verify before trust (reconciled 2026-09-13) |
+| resplit_2026-09-24/ | C36 C37 | F59 F61–F71 | VALID — fits/ (89 Steve refits), rows{,_xecs}/, resplit_summary{,_xecs}.csv (79 / 68 re-split), fit_xcheck.csv (Steve vs XeCS, 70), template_study{,_adaptive}.csv + template_params.json (C37), logs; fig/: cohort + per-session before/after (steve, _xecs), tyger_old_vs_new_6651591.png, template_study{,_adaptive}.png; big .mat on Ext `AIkill_Dynamic/<key>/d/recon_resplit{,_xecs}.mat` (79 / 68 × 128 MB) and Tyger validation runs Ext `Work/Codes/2026_ASAP_Recon/tyger_specfit_2026-09-24/{045VS,041WF}/d/` |

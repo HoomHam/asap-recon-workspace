@@ -1,0 +1,660 @@
+diff -ruN a/raw.py b/raw.py
+--- a/raw.py	2026-09-24 20:18:33
++++ b/raw.py	2026-09-24 21:34:42
+@@ -4,6 +4,7 @@
+ 
+ from scipy.signal import savgol_filter
+ from scipy.optimize import curve_fit
++import specfit                      # dissolved-phase spectral fit (vendored from XeCS calspec, 2026-09-24)
+ from gtypes import gvar, imgtype, graddir, bintype, species
+ 
+ 
+@@ -107,6 +108,8 @@
+         self.TR = 0.0                # TR in sec
+         self.TE = 0.0                # TE in sec
+         self.TEeff = 0.0             # TE effective in sec
++        self.dphiRBCTP = 0.0         # RBC-TP phase difference at the image k0 sample (rad), from specfit
++        self.specfit = {}            # the specfit.fit_block result (CSV fields) for the output metadata
+         self.DPoff = 0.0             # DP offset frequency in ppm
+         self.fTP = []
+         self.fRBC = []
+@@ -312,84 +315,89 @@
+                         dissphase = np.mean(self.getimg(imgtype.DPDYN)[0:4, ich, :])
+                         rawspec[:, ich, :] *= np.conj(specphase) / np.abs(specphase) * dissphase / np.abs(dissphase)
+                 if(numspec > 0):
++                    # Dissolved-phase spectral fit = specfit.py (vendored verbatim from the XeCS calspec work,
++                    # 2026-09-24): time-domain complex fit of the pooled cal-block FID with a chemical-shift
++                    # prior (gas L / RBC L / membrane Voigt [M2] or L+L [M3]), replacing the frequency-domain
++                    # two-Lorentzian fit + 15-pseudo-TE polyfit. Why: (1) the old 4-peak picker locked onto
++                    # wrong peaks on 7/89 sessions and the unbounded LM fit returned a negative ratio on one
++                    # (2steve/05 C); (2) RBC is a shoulder on the membrane line at RBC/mem 0.1-0.3, so an
++                    # unconstrained two-line fit is multimodal -- the prior is not optional; (3) the split needs
++                    # the RBC - membrane phase difference AT THE IMAGE k0 SAMPLE, which the old code did not give
++                    # (it used the t = 0 intercept, F59). specfit returns exactly that (dphiRBCTP), the ratio
++                    # a_RBC/|mem| that a two-component split reproduces by construction (RBCTPratio; the
++                    # literature's scalar ratio = RBCTPratio / F_lump), and the line frequencies. Details:
++                    # workspace/notes/fork_patch_2026-09-24.md.
++                    dt_img = dtdyn if dtdyn > 0.0 else 1 / traj.BW
++                    dwell = dtspec if dtspec > 0.0 else 1 / traj.spectBW
++                    hz_per_ppm = 17.61           # Larmor 17.612 MHz from the headers (traj.sfrq = 17.666 is nominal)
+                     for ich in range(self.nch):
+-                        fids = rawspec[:, ich, :]    # fids shape=(samples, spectral lines)
+-                        # choose fids for which the average of the first 100 points is at least 2x 
+-                        # greater than the avg of the last 100
+-                        idx = []
+-                        for ifid in range(numspec):
+-                            fids[:, ifid] *= np.exp(-np.array(range(self.npts)) / 200)
+-                            if(np.sum(np.abs(fids[:100, ifid]), axis=(0)) > \
+-                                    np.sum(np.abs(fids[(self.npts - 100):, ifid]), axis=(0)) * 2):
+-                                idx.append(ifid)
+-                        # if there are less than 5 spectra, forget it
+-                        if(len(idx) > 5):
+-                            # get summed spectrum to identify the peaks
+-                            nTE = 15
+-                            for iTE in range(nTE):
+-                                sspect = np.fft.fftshift(np.fft.fft(np.sum(fids[iTE:, :], axis = 1)))
+-                                sspect -= (np.mean(sspect[0:10]) + np.mean(sspect[(len(sspect) - 10):])) / 2
+-                                abssspect = np.abs(sspect)
+-                                if(iTE == 0):
+-                                    # find the first 4 nonconnected maxima
+-                                    maxlist = []
+-                                    while(len(maxlist) < 4):
+-                                        thismax = np.argmax(abssspect)
+-                                        abssspect[thismax] = 0.0
+-                                        if(not (abssspect[thismax - 1] == 0.0 or abssspect[thismax + 1] == 0.0)):
+-                                            maxlist.append(thismax)
+-                                    # pick the two that are closest to the center
+-                                    while(len(maxlist) > 2):
+-                                        maxlist.remove(maxlist[np.argmax((np.abs(np.array(maxlist) - 
+-                                                len(abssspect) / 2)).astype(int))])
+-                                    x0 = np.concatenate((np.array(maxlist), np.abs(sspect[maxlist]), \
+-                                            np.angle(sspect[maxlist]), np.array([1, 1])))
+-                                try:
+-                                    p, pcov = curve_fit(lorfit, np.array(range(len(sspect))), np.concatenate((np.real(sspect), \
+-                                            np.imag(sspect))), p0 = x0, method='lm', maxfev=50000)
+-                                except RuntimeError as err:
+-                                    # Non-converged RBC/TP fit: do not raise maxfev (a forced fit
+-                                    # yields a wrong dissolved image). Drop all spectral params so
+-                                    # results.dyn_recon skips DPDYN and reconstructs gas only.
+-                                    print(f'spectral fit failed at iTE={iTE} ({err}) -- discarding '
+-                                          f'RBC/TP params, dissolved recon will be skipped', file=stderr)
+-                                    self.RBCTPratio, self.fRBC, self.fTP = [], [], []
+-                                    self.sspect, self.sspectfit, self.sspectfreq = [], [], []
+-                                    self.RBCphase, self.TPphase, self.TEphase = [], [], []
+-                                    break
+-                                x0 = p.copy()
+-                                # arguments to lorfit are: t(x, f0, f1, a0, a1, ph0, ph1, w0, w1):
+-                                fitspect = lorfit(np.array(range(len(sspect))), p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7])
+-                                fitsspect = fitspect[0:int(len(fitspect) / 2 + 0.1)] + 1j * fitspect[int(len(fitspect) / 2 + 0.1):]
+-                                # comment out plots for tyger process
+-                                # plt.plot(sspect+20000*iTE, 'k')
+-                                # plt.plot(fitsspect+20000*iTE, 'r')
+-                                RBCparams = [p[1], p[3], p[5], p[7]]
+-                                TPparams = [p[0], p[2], p[4], p[6]]
+-                                if(p[1] < p[0]):
+-                                    temp = RBCparams.copy()
+-                                    RBCparams = TPparams
+-                                    TPparams = temp
+-                                # this won't work for multiple coils yet
+-                                if self.nch == 1:
+-                                    deltaph = RBCparams[2] - TPparams[2]
+-                                    self.RBCTPratio.append(RBCparams[1] * RBCparams[3] / (TPparams[1] * TPparams[3]))
+-                                    at = 1 / traj.spectBW * len(sspect)
+-                                    self.fRBC.append((RBCparams[0] - np.floor(len(sspect) / 2 + 0.1)) / at)
+-                                    self.fTP.append((TPparams[0] - np.floor(len(sspect) / 2 + 0.1)) / at)
+-                                    self.sspect.append(sspect)
+-                                    self.sspectfit.append(fitsspect)
+-                                    self.sspectfreq.append(np.fft.fftshift(np.linspace(0, (len(sspect) - 1) / at, len(sspect))))
+-                                    self.RBCphase.append(RBCparams[2])
+-                                    self.TPphase.append(TPparams[2])
+-                                    self.TEphase.append(self.TE + iTE / traj.spectBW)
+-                                    pRBC = np.polyfit(self.TEphase, self.RBCphase, 1)
+-                                    pTP = np.polyfit(self.TEphase, self.TPphase, 1)
+-                                    self.deltaphase = pRBC[1] - pTP[1]
+-                                    self.TEeff = self.deltaphase / (self.fRBC[0] - self.fTP[0]) / 2 / np.pi - \
+-                                            traj.killpts / traj.spectBW + traj.killpts / traj.BW
+-                                    self.TEeff2 = -(pRBC[1] - pTP[1]) / (pTP[0] - pRBC[0]) - \
+-                                            traj.killpts / traj.spectBW + traj.killpts / traj.BW
++                        fids = rawspec[:, ich, :]    # (samples, spectral lines); killpts already trimmed, no apodisation
++                        # keep fids whose first 100 points carry >= 2x the signal of the last 100 (xenon present)
++                        idx = [ifid for ifid in range(numspec)
++                               if np.sum(np.abs(fids[:100, ifid])) > np.sum(np.abs(fids[(self.npts - 100):, ifid])) * 2]
++                        # if there are less than 5 spectra, forget it; multi-coil spectra are not fitted (as before)
++                        if(len(idx) > 5 and self.nch == 1):
++                            kept = fids[:, idx]
++                            # per-rep means for the within-block phase SD (one rep = one navigator block of lines)
++                            nlin = int(traj.nsmpperusimg / self.npts + 0.1) or 1
++                            reps = [kept[:, i:i + nlin] for i in range(0, kept.shape[1] - nlin + 1, nlin)]
++                            try:
++                                sf = specfit.fit_block(kept, dwell, self.TE, first_sample=traj.killpts,
++                                        t_k0_offset_s=traj.killpts * dt_img, hz_per_ppm=hz_per_ppm,
++                                        reps=reps if len(reps) >= 3 else None)
++                            except Exception as err:
++                                print(f'spectral fit failed ({err}) -- no RBC/TP params, dissolved image will be '
++                                      f'kept unsplit', file=stderr)
++                                continue
++                            # stability: refit with one more leading sample dropped (gas line fixed); the M3
++                            # membrane decomposition can hinge on a single early sample on RBC-weak blocks
++                            # (042DR: 30 deg swing) -- reject when the k0 angle moves by more than 10 deg
++                            try:
++                                sf2 = specfit.fit_block(kept, dwell, self.TE, first_sample=traj.killpts,
++                                        t_k0_offset_s=traj.killpts * dt_img, hz_per_ppm=hz_per_ppm,
++                                        gas_hz=sf['gas_hz_from_carrier'], drop_before=traj.killpts + 1)
++                                stab = abs(float(np.degrees(np.angle(np.exp(1j * np.radians(
++                                        sf['dphi_k0_deg'] - sf2['dphi_k0_deg']))))))
++                            except Exception:
++                                stab = float('nan')
++                            sf['stab_dphi_deg'] = round(stab, 1)
++                            gain = 1 / max(abs(np.sin(np.radians(sf['dphi_k0_deg']))), 1e-9)
++                            why = [] if sf['valid'] == 'yes' else [sf['reason']]
++                            if stab > 10.0:
++                                why.append(f'RBC-TP phase unstable ({stab:.1f} deg change when one more leading sample is dropped)')
++                            if gain > 1 / 0.3:
++                                why.append(f'RBC-TP phase separation {sf["dphi_k0_deg"]:.1f} deg too small for a '
++                                           f'one-point split (noise gain {gain:.1f})')
++                            print(f'spectral fit ({sf["model_used"]}): gas {sf["gas_ppm_from_carrier"]:.1f} ppm from carrier, '
++                                  f'RBC {sf["rbc_ppm"]:.1f} / mem {sf["mem1_ppm"]:.1f}+{sf["mem2_ppm"]:.1f} ppm from gas, '
++                                  f'df {sf["df_hz"]:.0f} Hz, RBC/TP lumped {sf["ratio_lumped"]:.3f} (scalar '
++                                  f'{sf["ratio_scalar"]:.3f}, F_lump {sf["F_lump"]:.2f}), RBC-TP phase at k0 '
++                                  f'{sf["dphi_k0_deg"]:.1f} deg (per-rep SD {sf["dphi_rep_sd_deg"]:.1f}, drop-one-more '
++                                  f'change {stab:.1f}, noise gain {gain:.2f}), SNR {sf["snr_diss"]:.0f}', file=stderr)
++                            if why:
++                                print('spectral fit rejected: ' + '; '.join(why) + ' -- discarding RBC/TP params, '
++                                      'dissolved image will be kept unsplit', file=stderr)
++                                continue
++                            fRBC = sf['gas_hz_from_carrier'] + sf['rbc_ppm'] * hz_per_ppm
++                            self.fRBC.append(fRBC)
++                            self.fTP.append(fRBC - sf['df_hz'])          # lumped-membrane centroid
++                            self.RBCTPratio.append(sf['ratio_lumped'])
++                            self.dphiRBCTP = np.radians(sf['dphi_k0_deg'])
++                            self.specfit = {k: v for k, v in sf.items() if k != 'fits'}
++                            # spectrum + fitted model on the fitted samples, for the GUI plots (main.py)
++                            model = sf['model_used']
++                            y, t = specfit._prep(kept, dwell, traj.killpts)
++                            fitted = specfit.model_fid(sf['fits'][model]['fit']['theta'], t, specfit.MODELS[model])
++                            self.sspect.append(np.fft.fftshift(np.fft.fft(y)))
++                            self.sspectfit.append(np.fft.fftshift(np.fft.fft(fitted)))
++                            self.sspectfreq.append(np.fft.fftshift(np.fft.fftfreq(y.size, dwell)))
++                            # legacy fields (nothing downstream needs them any more; kept so old callers do not break)
++                            self.RBCphase.append(np.radians(sf['fits'][model]['tb']['rbc']['phi_deg']))
++                            self.TPphase.append(np.nan)                  # the membrane phase is the lumped phasor's
++                            self.TEphase.append(self.TE)
++                            self.deltaphase = self.dphiRBCTP
++                            self.TEeff = self.dphiRBCTP / (2 * np.pi * sf['df_hz'])   # so that 2*pi*df*TEeff == dphiRBCTP
++                            self.TEeff2 = self.TEeff
+         if(fileformat == 'bruker'):
+             BHlength = 1    # temporary init value
+             self.nch = 1
+diff -ruN a/results.py b/results.py
+--- a/results.py	2026-09-24 20:18:33
++++ b/results.py	2026-09-24 21:34:46
+@@ -36,6 +36,9 @@
+         self.bmag = []
+         self.T1RFimg = []
+         self.T1RFimgtime = []
++        self.gpdyn_magnitude = None  # |F*b| per gas bin (single-channel only), for videos/QC
++        self.rbc_tp_separated = False
++        self.rbc_tp_split = None     # basis angle / target / per-bin ph, R of the RBC/TP split
+         # allocated memory blocks to keep between calls
+         self.kspace = []
+         self.kspacenorm = []
+@@ -269,6 +272,12 @@
+             d_trajz = cuda.to_device(g_traj.gettraj(itype, graddir.Z)) if(usegpu) else g_traj.gettraj(itype, graddir.Z)
+             # bin
+             rspace = np.zeros((g.nbins, g.IS, g.IS, g.IS), dtype = 'complex' if itype == imgtype.DPDYN else 'double')
++            # single-channel gas magnitude alongside real(F*b): b is unit-magnitude for nch == 1, so
++            # |F*b| = |F| is independent of the cycle-average phase map and keeps the moving lung
++            # rim that real() attenuates outside b's fixed mask (2steve/06). Not defined for nch > 1
++            # (summing |F*b| over coils would be a different combine).
++            rspace_mag = np.zeros((g.nbins, g.IS, g.IS, g.IS), dtype = 'double') \
++                    if (itype == imgtype.GPDYN and g_raw.nch == 1) else None
+             print(f'dyn_recon: reconstructing {itype.name} over {g.nbins} bins x {g_raw.nch} channels', file=stderr)
+             for ich in range(0, g_raw.nch):
+                 rawdata = np.ascontiguousarray(np.reshape(g_raw.getimg(itype)[:, ich, :].copy(), \
+@@ -296,6 +305,8 @@
+                     # phase such that on-resonance components are all real, and scale by relative channel sensitivity
+                     thisrspace = thisrspace[g.ISLL():g.ISUL(), g.ISLL():g.ISUL(), g.ISLL():g.ISUL()] * self.b[ich, :, :, :]
+                     rspace[ibin, :, :, :] += np.real(thisrspace) if itype == imgtype.GPDYN else thisrspace
++                    if(rspace_mag is not None):
++                        rspace_mag[ibin, :, :, :] = np.abs(thisrspace)
+                     # SAVE IT FOR NOW
+                     print(f'  saving debug volume savedbin{ibin}.npy ({itype.name} bin {ibin})', file=stderr)
+                     np.save('savedbin'+str(ibin), rspace[ibin, :, :, :])
+@@ -312,37 +323,70 @@
+                     print('dyn_recon: no RBC/TP spectral params (fRBC empty) -- dissolved image '
+                           'kept as unsplit complex (magnitude valid; RBC/TP not separated)', file=stderr)
+             if(itype == imgtype.DPDYN and self.rbc_tp_separated):
+-                # mask based on gas phase
++                # Basis angle between the RBC and TP components AT THE IMAGE'S k0 SAMPLE
++                # (raw.dphiRBCTP = fitted RBCphase[0] - TPphase[0], moved from the first spectral
++                # sample to the first image sample). The previous angles 2*pi*f*TEeff were the
++                # phase-vs-TE intercepts (t = 0) and omitted the 2*pi*df*TE evolution (~74 deg at
++                # 1.5 T, TE 0.62 ms): the basis vectors sat 6-32 deg apart while the data are near
++                # quadrature, so the 2x2 inversion amplified noise by 1/|sin dphi| (x2-x10) and gave
++                # anti-correlated aRBC/aTP maps with TP negative in the lung (2steve notes 04, 05).
++                # Only the difference matters: the global phase ph absorbs the common term, so the
++                # basis is phiTP = 0, phiRBC = dphi.
++                dphi = g_raw.dphiRBCTP
++                sindphi, cosdphi = np.sin(dphi), np.cos(dphi)
++                target = g_raw.RBCTPratio[0]
++                self.rbc_tp_split = {'dphi_deg': float(np.degrees(dphi)), 'sin_dphi': float(abs(sindphi)),
++                                     'df_hz': float(g_raw.fRBC[0] - g_raw.fTP[0]), 'target': float(target),
++                                     'ph': [], 'R': [], 'lung_voxels': []}
++                # specfit provenance: model, scalar ratio and the lumping factor (maps are on the lumped scale:
++                # RBC/TP map ratio / F_lump = the literature's a_RBC/(a1+a2))
++                sfd = getattr(g_raw, 'specfit', {}) or {}
++                self.rbc_tp_split.update({k: sfd[k] for k in ('model_used', 'ratio_scalar', 'F_lump', 'snr_diss',
++                                                              'dphi_rep_sd_deg', 'stab_dphi_deg', 'rbc_ppm', 'mem1_ppm',
++                                                              'mem2_ppm') if k in sfd})
++                print(f'dyn_recon: RBC/TP split basis dphi = {np.degrees(dphi):.1f} deg at k0 '
++                      f'(noise gain 1/|sin| = {1 / abs(sindphi):.2f}), target RBC/TP = {target:.3f}', file=stderr)
++                noisethresh = np.mean(np.abs(self.getimg(imgtype.GPDYN)[:, 0:5, 0:5, 0:5])) * 5
+                 for ibin in range(0, g.nbins):
+-                    noisethresh = np.mean(np.abs(self.getimg(imgtype.GPDYN)[:, 0:5, 0:5, 0:5])) * 5
+-                    mask = (self.getimg(imgtype.GPDYN)[ibin, :, :, :].copy() > noisethresh).astype('int')
+-                    #rspace[ibin, :, :, :] *= mask
+-                    for iph in range(0, 314*2):
+-                        ph = iph / 100.0
+-                        thisrspace = rspace[ibin, :, :, :] * np.exp(1j * ph)
+-                        # split into the two (RBC, TP) frequency components
+-                        phaseRBC = g_raw.fRBC[0] * g_raw.TEeff * 2 * np.pi
+-                        phaseTP = g_raw.fTP[0] * g_raw.TEeff * 2 * np.pi
+-                        # thisrspace = aRBC * exp(1j * phaseRBC) + aTP * exp(1j * phaseTP)
+-                        # Re(thisrspace) = aRBC * cos(phaseRBC) + aTP * cos(phaseTP)
+-                        # Im(thisrspace) = aRBC * sin(phaseRBC) + aTP * sin(phaseTP)
+-                        aTP = (np.real(thisrspace) / np.cos(phaseRBC) - np.imag(thisrspace) / np.sin(phaseRBC)) / \
+-                                (np.cos(phaseTP) / np.cos(phaseRBC) - np.sin(phaseTP) / np.sin(phaseRBC))
+-                        aRBC = (np.real(thisrspace) / np.cos(phaseTP) - np.imag(thisrspace) / np.sin(phaseTP)) / \
+-                                (np.cos(phaseRBC) / np.cos(phaseTP) - np.sin(phaseRBC) / np.sin(phaseTP))
+-                        sumaTP = np.sum(aTP)
+-                        sumaRBC = np.sum(aRBC)
+-                        ratio = np.sum(aRBC*mask) / np.sum(aTP*mask)
+-                        R = sumaRBC / sumaTP
+-                        if(iph > 0 and sumaTP > 0.0 and sumaRBC > 0.0 and \
+-                                ((R - g_raw.RBCTPratio[0]) * (lastR - g_raw.RBCTPratio[0]) < 0.0)):
+-                            print(f'  DP bin {ibin}: RBC/TP phase solved at ph={ph:.2f} rad '
+-                                  f'(R={R:.3f} crossed target RBCTPratio={g_raw.RBCTPratio[0]:.3f}); '
+-                                  f'storing aRBC + 1j*aTP', file=stderr)
+-                            rspace[ibin, :, :, :] = aRBC + 1j * aTP
+-                            break
+-                        lastR = R
+-                        print(f'  DP bin {ibin} phase sweep: ph={ph:.2f} rad RBC/TP_ratio={ratio:.4f}', file=stderr)
++                    # lung mask from the gas image of the same bin
++                    mask = self.getimg(imgtype.GPDYN)[ibin, :, :, :] > noisethresh
++                    nmask = int(np.sum(mask))
++                    # The split is linear: with the basis above,
++                    #   thisrspace = aRBC * exp(1j * dphi) + aTP
++                    #   aRBC = Im(thisrspace) / sin(dphi),   aTP = Re(thisrspace) - aRBC * cos(dphi)
++                    # so the masked sums of aRBC and aTP at any global phase ph follow from the
++                    # masked complex sum S alone. Sweep ph finely and take the phase whose masked
++                    # ratio R is closest to the spectroscopic target among phases where both sums
++                    # are positive. (The old first-sign-change test on whole-volume sums fired at
++                    # the sum(aTP) = 0 pole, where R jumps from -inf to +inf, in 60 of 86 sessions.)
++                    S = np.sum(rspace[ibin, :, :, :][mask]) if nmask else np.sum(rspace[ibin, :, :, :])
++                    phs = np.arange(0.0, 2 * np.pi, 0.001)
++                    s = S * np.exp(1j * phs)
++                    sumRBC = np.imag(s) / sindphi
++                    sumTP = np.real(s) - sumRBC * cosdphi
++                    ok = (sumRBC > 0.0) & (sumTP > 0.0)
++                    if(not np.any(ok)):
++                        print(f'  DP bin {ibin}: no global phase gives positive RBC and TP sums -- '
++                              f'bin kept unsplit', file=stderr)
++                        self.rbc_tp_split['ph'].append(float('nan'))
++                        self.rbc_tp_split['R'].append(float('nan'))
++                        self.rbc_tp_split['lung_voxels'].append(nmask)
++                        continue
++                    Rs = np.full(phs.shape, np.inf)
++                    Rs[ok] = sumRBC[ok] / sumTP[ok]
++                    iph = int(np.argmin(np.abs(Rs - target)))
++                    ph, R = float(phs[iph]), float(Rs[iph])
++                    thisrspace = rspace[ibin, :, :, :] * np.exp(1j * ph)
++                    aRBC = np.imag(thisrspace) / sindphi
++                    aTP = np.real(thisrspace) - aRBC * cosdphi
++                    print(f'  DP bin {ibin}: RBC/TP phase solved at ph={ph:.3f} rad (masked R={R:.3f}, '
++                          f'target {target:.3f}, {nmask} lung voxels); storing aRBC + 1j*aTP', file=stderr)
++                    rspace[ibin, :, :, :] = aRBC + 1j * aTP
++                    self.rbc_tp_split['ph'].append(ph)
++                    self.rbc_tp_split['R'].append(R)
++                    self.rbc_tp_split['lung_voxels'].append(nmask)
++            if(itype == imgtype.GPDYN):
++                self.gpdyn_magnitude = rspace_mag
+             self.setimg(itype, rspace)
+ 
+     def register(usegpu):
+diff -ruN a/specfit.py b/specfit.py
+--- a/specfit.py	1969-12-31 19:00:00
++++ b/specfit.py	2026-09-24 21:34:24
+@@ -0,0 +1,291 @@
++#!/usr/bin/env python
++"""specfit — standalone dissolved-phase 129Xe spectral fit for the cal block (numpy + scipy only).
++
++Written 2026-09-24 (XeCS session, Hooman's go) so that the ASAP RBC/TP re-split CSV and the vendored copy
++next to Steve's raw.py (Tyger image) run IDENTICAL code. No Ext cache, no XeCS imports.
++
++Model (time domain, complex, Robertson 2017 / Bier 2019):
++    S(t) = sum_n a_n exp(i phi_n) exp(+2 pi i f_n t) exp(-pi wL_n t) [exp(-(pi wG_n t)^2 / (4 ln 2))]
++    t = (first_sample + k) * dwell for array index k  -> t = 0 is ADC SAMPLE 0 = TE, whatever was trimmed.
++    ADC samples 0 AND 1 are excluded from the residual (drop_before=2): sample 0 is a 3x dip, sample 1 overshoots
++    the log-linear decay by ~10 % (ASAP xcheck 045VS + XeCS cache-wide check 2026-09-24); with sample 1 kept the M3
++    mem1/mem2 split (F_lump +-15 %) and dphi_k0 (+-6 deg) move. Steve's raw.py drops both (killpts = 2) -> identical.
++    RBC = the higher-frequency dissolved line; dphi = phi_RBC - phi_mem, wrapped to (-180, 180].
++Ladder: M2 = gas L / RBC L / membrane Voigt (13 p);  M3 = gas L / RBC L / mem1 L + mem2 L (16 p).
++Prior (ppm from the FITTED gas line; the chemical-shift prior is NOT optional — without it the fit collapses on
++low-RBC blocks): RBC 218 +- 4, FWHM >= 6 ppm; M2 mem 197.5 +- 4, >= 6 ppm; M3 mem1 201.5 +- 3.5 (198-205), >= 8 ppm (broad,
++Robertson B1) and mem2 195.75 +- 2.25 (193.5-198), 4-14 ppm (narrow, B2); windows do NOT overlap (overlapping windows let both lines meet at ~196.5 ppm anti-phase, a cancelling local minimum seen 2026-09-24). Gas +- 2 ppm around the located line, FWHM <= 6 ppm.
++Solver: scipy least_squares, method 'trf', bounded, x_scale 'jac', residual = [Re, Im], data scaled by max|FID|.
++
++Gas-line location without a cache: candidate peaks of the magnitude spectrum; keep those with a dissolved
++partner 185-235 ppm above them; choose the NARROWEST strong one (gas T2* >= 10 ms -> ~1-2 bins; dissolved
++~9-12 ppm). Fallback: the strongest peak 150-260 ppm below the carrier.
++
++Lumped membrane at the image k0 time (t_k0 = TE + killpts*dt_img, i.e. offset 10 us for killpts 2, dt 5 us):
++    m(t_k0) = a1 e^{i(phi1 + 2 pi f1 t_k0)} + a2 e^{i(phi2 + 2 pi f2 t_k0)}
++    dphi_k0 = angle(RBC(t_k0) / m(t_k0));  ratio_lumped = a_RBC / |m|;  ratio_scalar = a_RBC / (a1 + a2);
++    F_lump = (a1 + a2) / |m|  (a two-component k0 split returns a_RBC and |m| by construction -> lumped ratio;
++    divide a map's RBC/TP by F_lump to put it on the physiological scalar scale).
++model_used = M3 unless degenerate (a1/a2 outside [0.3, 3], |f1 - f2| < 2 ppm, or per-rep SD(M3) > 2 SD(M2) + 5) -> M2.
++
++API
++    fit_block(fid, dwell, te_s, first_sample=0, t_k0_offset_s=10e-6, hz_per_ppm=17.61, reps=None, gas_hz=None)
++        fid  : complex (N,) or (N, nlines) -> averaged over lines (the pooled FID)
++        reps : optional list of (N,) or (N, nlines) arrays (one per rep) for the per-rep phase SD
++        -> dict of the CSV fields (dphi_k0_deg, ratio_lumped, ..., valid, reason) + 'fits' (raw)
++"""
++from __future__ import annotations
++
++import numpy as np
++from scipy.optimize import least_squares
++from scipy.ndimage import median_filter
++
++LN2 = np.log(2.0)
++MODELS = {
++    'M2': [('gas', 'L'), ('rbc', 'L'), ('mem', 'V')],
++    'M3': [('gas', 'L'), ('rbc', 'L'), ('mem1', 'L'), ('mem2', 'L')],
++}
++NPAR = {'L': 4, 'V': 5}
++# name -> (centre ppm from gas, half-window ppm, min FWHM ppm, max FWHM ppm)
++PRIOR = {'rbc': (218.0, 4.0, 6.0, 25.0), 'mem': (197.5, 4.0, 6.0, 25.0),
++         'mem1': (201.5, 3.5, 8.0, 25.0), 'mem2': (195.75, 2.25, 4.0, 14.0)}   # non-overlapping windows: 198-205 / 193.5-198
++GAS_WIN_PPM, GAS_WMAX_PPM = 2.0, 6.0
++
++
++def wrap(deg):
++    return float(np.degrees(np.angle(np.exp(1j * np.radians(deg)))))
++
++
++def circ_sd(deg):
++    z = np.mean(np.exp(1j * np.radians(np.asarray(deg, float))))
++    return float(np.degrees(np.sqrt(-2 * np.log(max(abs(z), 1e-9)))))
++
++
++# ----------------------------------------------------------------------------- model
++def _unpack(theta, spec):
++    out, k = [], 0
++    for name, kind in spec:
++        n = NPAR[kind]
++        out.append((name, kind, theta[k:k + n]))
++        k += n
++    return out
++
++
++def model_fid(theta, t, spec):
++    s = np.zeros(t.size, complex)
++    for name, kind, p in _unpack(theta, spec):
++        a, phi, f, wL = p[:4]
++        env = np.exp(-np.pi * wL * t)
++        if kind == 'V':
++            env = env * np.exp(-(np.pi * p[4] * t) ** 2 / (4 * LN2))
++        s += a * np.exp(1j * phi) * np.exp(2j * np.pi * f * t) * env
++    return s
++
++
++def _resid(theta, t, y, spec):
++    r = model_fid(theta, t, spec) - y
++    return np.concatenate([r.real, r.imag])
++
++
++# ----------------------------------------------------------------------------- gas line
++def locate_gas(y, dwell, hz_per_ppm, t=None):
++    """Gas-line frequency (Hz from carrier) from the magnitude spectrum of one complex FID."""
++    N = y.size
++    S = np.abs(np.fft.fftshift(np.fft.fft(y * np.hanning(N) * 2)))
++    freq = np.fft.fftshift(np.fft.fftfreq(N, dwell))
++    df = freq[1] - freq[0]
++    base = median_filter(S, 15, mode='nearest')
++    noise = np.median(np.abs(S - base)) * 1.4826 + 1e-12
++    cand = [k for k in range(2, N - 2) if S[k] > S[k - 1] and S[k] >= S[k + 1] and S[k] > base[k] + 8 * noise]
++    best, best_w = None, np.inf
++    for k in cand:
++        c = freq[k]
++        lo, hi = c + 185 * hz_per_ppm, c + 235 * hz_per_ppm
++        sel = (freq > lo) & (freq < hi)
++        if not sel.any() or (S[sel] - base[sel]).max() < 5 * noise:
++            continue
++        half = S[k] / 2
++        i0 = k
++        while i0 > 0 and S[i0] > half:
++            i0 -= 1
++        i1 = k
++        while i1 < N - 1 and S[i1] > half:
++            i1 += 1
++        w = (i1 - i0) * df / hz_per_ppm
++        if w < best_w and w < 8.0:
++            best, best_w = c, w
++    if best is None:
++        sel = (freq > -260 * hz_per_ppm) & (freq < -150 * hz_per_ppm)
++        best = float(freq[sel][np.argmax(S[sel])]) if sel.any() else float(freq[np.argmax(S)])
++    return float(best)
++
++
++# ----------------------------------------------------------------------------- init + fit
++def init_guess(y, t, dwell, hz_per_ppm, spec, gas_hz):
++    N = y.size
++    S = np.abs(np.fft.fftshift(np.fft.fft(y)))
++    freq = np.fft.fftshift(np.fft.fftfreq(N, dwell))
++    base = median_filter(S, 7, mode='nearest')
++    amp_at = lambda f: float(base[np.argmin(np.abs(freq - f))])
++    w_gas = 25.0
++    theta, lo, hi = [], [], []
++    for name, kind in spec:
++        if name == 'gas':
++            f, w = gas_hz, w_gas
++            a = float(S[np.argmin(np.abs(freq - f))]) * np.pi * w / N
++            flo, fhi, wmin, wmax = f - GAS_WIN_PPM * hz_per_ppm, f + GAS_WIN_PPM * hz_per_ppm, 2.0, GAS_WMAX_PPM * hz_per_ppm
++        else:
++            c, win, wmin_ppm, wmax_ppm = PRIOR[name]
++            f = gas_hz + c * hz_per_ppm
++            w = max(12.0 * hz_per_ppm, 1.2 * wmin_ppm * hz_per_ppm)
++            a = amp_at(f) * np.pi * w / N * (0.6 if name == 'mem1' else 0.5 if name == 'mem2' else 1.0)
++            flo, fhi, wmin, wmax = f - win * hz_per_ppm, f + win * hz_per_ppm, wmin_ppm * hz_per_ppm, wmax_ppm * hz_per_ppm
++        # phase init: project the data on the component frequency
++        phi = float(np.angle(np.sum(y * np.exp(-2j * np.pi * f * t))))
++        theta += [a, phi, f, w]
++        lo += [0.0, -2 * np.pi, flo, wmin]
++        hi += [np.inf, 2 * np.pi, fhi, wmax]
++        if kind == 'V':
++            theta += [0.5 * w]
++            lo += [0.0]
++            hi += [wmax]
++    return np.array(theta), (np.array(lo), np.array(hi))
++
++
++def fit_fid(y, t, spec, theta0, bounds):
++    scale = float(np.abs(y).max()) or 1.0
++    th0 = theta0.copy()
++    idx_a, k = [], 0
++    for _, kind in spec:
++        idx_a.append(k)
++        k += NPAR[kind]
++    th0[idx_a] = th0[idx_a] / scale
++    r = least_squares(_resid, th0, bounds=bounds, args=(t, y / scale, spec), method='trf', x_scale='jac', max_nfev=4000)
++    theta = r.x.copy()
++    theta[idx_a] = theta[idx_a] * scale
++    res = _resid(theta, t, y, spec)
++    n_obs = 2 * y.size
++    rss = float(np.sum(res ** 2))
++    return dict(theta=theta, rss=rss, bic=n_obs * np.log(rss / n_obs) + theta.size * np.log(n_obs), nfev=r.nfev,
++                status=r.status, spec=spec)
++
++
++def params_table(theta, spec, hz_per_ppm, te_s=None):
++    comps = _unpack(theta, spec)
++    gas_f = [p[2] for n, k, p in comps if n == 'gas'][0]
++    rows = {}
++    for name, kind, p in comps:
++        a, phi, f, wL = p[:4]
++        wG = p[4] if kind == 'V' else 0.0
++        fwhm = 0.5346 * wL + np.sqrt(0.2166 * wL ** 2 + wG ** 2) if kind == 'V' else wL
++        row = dict(a=float(a), phi_deg=float(np.degrees(phi)), f_hz=float(f), ppm_from_gas=float((f - gas_f) / hz_per_ppm),
++                   fwhm_hz=float(fwhm), fwhm_ppm=float(fwhm / hz_per_ppm), T2s_ms=float(1e3 / (np.pi * fwhm)) if fwhm > 0 else np.nan)
++        if te_s is not None:
++            row['a_te'] = float(a * np.exp(te_s * np.pi * fwhm))
++        rows[name] = row
++    return rows
++
++
++def lumped(tb, model, t_k0):
++    """RBC vs lumped-membrane phasors at absolute time t_k0 (s after sample 0 = TE)."""
++    ph = lambda r: r['a'] * np.exp(1j * (np.radians(r['phi_deg']) + 2 * np.pi * r['f_hz'] * t_k0))
++    rbc = ph(tb['rbc'])
++    if model == 'M3':
++        m = ph(tb['mem1']) + ph(tb['mem2'])
++        a_sum = tb['mem1']['a'] + tb['mem2']['a']
++        fc = (tb['mem1']['a'] * tb['mem1']['f_hz'] + tb['mem2']['a'] * tb['mem2']['f_hz']) / a_sum
++        a_sum_te = tb['mem1'].get('a_te', np.nan) + tb['mem2'].get('a_te', np.nan)
++    else:
++        m = ph(tb['mem'])
++        a_sum, fc, a_sum_te = tb['mem']['a'], tb['mem']['f_hz'], tb['mem'].get('a_te', np.nan)
++    return dict(dphi=wrap(np.degrees(np.angle(rbc / m))), ratio_lumped=tb['rbc']['a'] / abs(m),
++                ratio_scalar=tb['rbc']['a'] / a_sum, F_lump=a_sum / abs(m), df_hz=tb['rbc']['f_hz'] - fc,
++                ratio_scalar_te=tb['rbc'].get('a_te', np.nan) / a_sum_te)
++
++
++def dissolved_snr(y, t, hz_per_ppm, gas_hz):
++    N = y.size
++    S = np.abs(np.fft.fftshift(np.fft.fft(y)))
++    freq = np.fft.fftshift(np.fft.fftfreq(N, t[1] - t[0]))
++    diss = (freq > gas_hz + 185 * hz_per_ppm) & (freq < gas_hz + 235 * hz_per_ppm)
++    noise_sel = (freq > gas_hz + 60 * hz_per_ppm) & (freq < gas_hz + 150 * hz_per_ppm)
++    if not noise_sel.any():
++        noise_sel = (freq < gas_hz - 60 * hz_per_ppm)
++    return float(S[diss].max() / (np.std(S[noise_sel]) + 1e-12))
++
++
++def _prep(fid, dwell, first_sample, drop_before=1):
++    y = np.asarray(fid)
++    if y.ndim == 2:
++        y = y.mean(axis=1)
++    idx = first_sample + np.arange(y.size)
++    keep = idx >= drop_before
++    return y[keep].astype(complex), idx[keep] * dwell
++
++
++def fit_block(fid, dwell, te_s, first_sample=0, t_k0_offset_s=10e-6, hz_per_ppm=17.61, reps=None, gas_hz=None,
++              drop_before=2):
++    """See module docstring. Returns the CSV fields + 'fits'."""
++    y, t = _prep(fid, dwell, first_sample, drop_before)
++    if gas_hz is None:
++        gas_hz = locate_gas(y, dwell, hz_per_ppm)
++    snr = dissolved_snr(y, t, hz_per_ppm, gas_hz)
++    res = {}
++    for m in ('M2', 'M3'):
++        th0, bnd = init_guess(y, t, dwell, hz_per_ppm, MODELS[m], gas_hz)
++        f = fit_fid(y, t, MODELS[m], th0, bnd)
++        tb = params_table(f['theta'], MODELS[m], hz_per_ppm, te_s=te_s)
++        res[m] = dict(fit=f, tb=tb, lump=lumped(tb, m, t_k0_offset_s))
++    sd = {'M2': np.nan, 'M3': np.nan}
++    n_reps = 0
++    if reps:
++        for m in ('M2', 'M3'):
++            d = []
++            for rr in reps:
++                yr, tr = _prep(rr, dwell, first_sample, drop_before)
++                th0, bnd = init_guess(yr, tr, dwell, hz_per_ppm, MODELS[m], gas_hz)
++                fr = fit_fid(yr, tr, MODELS[m], th0, bnd)
++                d.append(lumped(params_table(fr['theta'], MODELS[m], hz_per_ppm), m, t_k0_offset_s)['dphi'])
++            sd[m] = circ_sd(d) if len(d) >= 2 else np.nan
++            n_reps = len(d)
++    t3 = res['M3']['tb']
++    a1, a2 = t3['mem1']['a'], t3['mem2']['a']
++    ratio12 = a1 / a2 if a2 > 0 else np.inf
++    sep12 = abs(t3['mem1']['ppm_from_gas'] - t3['mem2']['ppm_from_gas'])
++    degenerate = (not (0.3 <= ratio12 <= 3.0)) or sep12 < 2.0 or \
++        (np.isfinite(sd['M3']) and np.isfinite(sd['M2']) and sd['M3'] > 2 * sd['M2'] + 5)
++    model = 'M2' if degenerate else 'M3'
++    L, tb = res[model]['lump'], res[model]['tb']
++    reasons = []
++    if snr < 20:
++        reasons.append('snr<20')
++    if L['ratio_scalar'] < 0.05:
++        reasons.append('rbc/mem<0.05')
++    if np.isfinite(sd[model]) and sd[model] > 30:
++        reasons.append('rep_sd>30')
++    valid = 'no' if reasons else 'yes'
++    out = dict(snr_diss=round(snr, 1), gas_hz_from_carrier=round(gas_hz, 1), gas_ppm_from_carrier=round(gas_hz / hz_per_ppm, 1),
++               TE_us=round(te_s * 1e6, 1), t_k0_us=round((te_s + t_k0_offset_s) * 1e6, 1), model_used=model,
++               dphi_k0_deg=round(L['dphi'], 1), dphi_k0_m3_lumped_deg=round(res['M3']['lump']['dphi'], 1),
++               dphi_k0_m2_deg=round(res['M2']['lump']['dphi'], 1),
++               dphi_rep_sd_deg=round(sd[model], 1), dphi_rep_sd_m3_deg=round(sd['M3'], 1), dphi_rep_sd_m2_deg=round(sd['M2'], 1),
++               n_reps=n_reps,
++               ratio_lumped=round(L['ratio_lumped'], 4), ratio_scalar=round(L['ratio_scalar'], 4), F_lump=round(L['F_lump'], 3),
++               ratio_m2=round(res['M2']['lump']['ratio_scalar'], 4), ratio_scalar_te=round(L['ratio_scalar_te'], 4),
++               df_hz=round(L['df_hz'], 1),
++               rbc_ppm=round(tb['rbc']['ppm_from_gas'], 2), rbc_fwhm_ppm=round(tb['rbc']['fwhm_ppm'], 2),
++               mem1_ppm=round(t3['mem1']['ppm_from_gas'], 2), mem2_ppm=round(t3['mem2']['ppm_from_gas'], 2),
++               mem1_fwhm_ppm=round(t3['mem1']['fwhm_ppm'], 2), mem2_fwhm_ppm=round(t3['mem2']['fwhm_ppm'], 2),
++               a1_over_a2=round(ratio12, 3), mem12_dphi_deg=round(wrap(t3['mem1']['phi_deg'] - t3['mem2']['phi_deg']), 1),
++               mem_m2_ppm=round(res['M2']['tb']['mem']['ppm_from_gas'], 2), mem_m2_fwhm_ppm=round(res['M2']['tb']['mem']['fwhm_ppm'], 2),
++               bic_m2=round(res['M2']['fit']['bic'], 1), bic_m3=round(res['M3']['fit']['bic'], 1),
++               valid=valid, reason=';'.join(reasons))
++    out['fits'] = res
++    return out
++
++
++CSV_FIELDS = ['snr_diss', 'gas_hz_from_carrier', 'gas_ppm_from_carrier', 'TE_us', 't_k0_us', 'model_used',
++              'dphi_k0_deg', 'dphi_k0_m3_lumped_deg', 'dphi_k0_m2_deg', 'dphi_rep_sd_deg', 'dphi_rep_sd_m3_deg',
++              'dphi_rep_sd_m2_deg', 'n_reps', 'ratio_lumped', 'ratio_scalar', 'F_lump', 'ratio_m2', 'ratio_scalar_te',
++              'df_hz', 'rbc_ppm', 'rbc_fwhm_ppm', 'mem1_ppm', 'mem2_ppm', 'mem1_fwhm_ppm', 'mem2_fwhm_ppm',
++              'a1_over_a2', 'mem12_dphi_deg', 'mem_m2_ppm', 'mem_m2_fwhm_ppm', 'bic_m2', 'bic_m3', 'valid', 'reason']
+diff -ruN a/tyger_recon.py b/tyger_recon.py
+--- a/tyger_recon.py	2026-09-24 20:18:33
++++ b/tyger_recon.py	2026-09-24 21:34:48
+@@ -122,13 +122,33 @@
+         items.append(mrd.StreamItem.NdArrayFloat(
+             mrd.NdArray(data=g_res.getimg(imgtype.GPDYN).astype('float32'),
+                         meta={'gas_phase_image': [mrd.ArrayMetaValue.String('1')]})))
++        gmag = getattr(g_res, 'gpdyn_magnitude', None)
++        if gmag is not None:
++            # |F*b| per bin, single-channel only: for videos/QC. real(F*b) above stays the
++            # quantitative image (2steve/06: real() attenuates the moving rim outside b's mask).
++            items.append(mrd.StreamItem.NdArrayFloat(
++                mrd.NdArray(data=np.asarray(gmag).astype('float32'),
++                            meta={'gas_phase_magnitude': [mrd.ArrayMetaValue.String('1')]})))
+     if g_res.hasimg(imgtype.DPDYN):
++        dpmeta = {'dissolved_phase_image': [mrd.ArrayMetaValue.String('1')],
++                  # '1': stored as aRBC + 1j*aTP; '0': unsplit complex (magnitude only)
++                  'rbc_tp_separated': [mrd.ArrayMetaValue.String(
++                      '1' if getattr(g_res, 'rbc_tp_separated', True) else '0')]}
++        split = getattr(g_res, 'rbc_tp_split', None)
++        if split:
++            # basis angle, conditioning, spectral target and the per-bin solved phase / masked
++            # ratio (nan = bin kept unsplit), so the maps can be judged without the log
++            dpmeta['rbc_tp_dphi_deg'] = [mrd.ArrayMetaValue.String(f'{split["dphi_deg"]:.2f}')]
++            dpmeta['rbc_tp_sin_dphi'] = [mrd.ArrayMetaValue.String(f'{split["sin_dphi"]:.3f}')]
++            dpmeta['rbc_tp_df_hz'] = [mrd.ArrayMetaValue.String(f'{split["df_hz"]:.1f}')]
++            dpmeta['rbc_tp_target'] = [mrd.ArrayMetaValue.String(f'{split["target"]:.4f}')]
++            dpmeta['rbc_tp_ph_rad'] = [mrd.ArrayMetaValue.String(' '.join(f'{v:.3f}' for v in split['ph']))]
++            dpmeta['rbc_tp_R'] = [mrd.ArrayMetaValue.String(' '.join(f'{v:.4f}' for v in split['R']))]
++            for k in ('model_used', 'ratio_scalar', 'F_lump', 'snr_diss', 'dphi_rep_sd_deg', 'stab_dphi_deg'):
++                if k in split:
++                    dpmeta[f'rbc_tp_{k}'] = [mrd.ArrayMetaValue.String(str(split[k]))]
+         items.append(mrd.StreamItem.NdArrayComplexFloat(
+-            mrd.NdArray(data=g_res.getimg(imgtype.DPDYN).astype('complex64'),
+-                        meta={'dissolved_phase_image': [mrd.ArrayMetaValue.String('1')],
+-                              # '1': stored as aRBC + 1j*aTP; '0': unsplit complex (magnitude only)
+-                              'rbc_tp_separated': [mrd.ArrayMetaValue.String(
+-                                  '1' if getattr(g_res, 'rbc_tp_separated', True) else '0')]})))
++            mrd.NdArray(data=g_res.getimg(imgtype.DPDYN).astype('complex64'), meta=dpmeta)))
+     if nav is not None:
+         for key, arr in nav.items():
+             if arr is None or np.asarray(arr).size == 0:

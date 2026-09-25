@@ -1,0 +1,90 @@
+xecs fit table: /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/notes/calspec_package_2026-09-16/resplit_inputs_2026-09-24.csv (74 sessions)
+  2023-01-31_000LL: dphi  -41.0 ->   34.5 deg  corr(bg) -0.73 -> -0.85  TP<0 lung   57% ->    7%  R 0.730 (target 0.730)  1 s
+  2023-04-07_030DN: no_xecs_row [df=4403Hz;fRBC=1652Hz(exp0);|sin dphi|=0.25 session has no usable cal block in the XeCS table]
+  2023-04-18_021JM: gated [unstable: dphi moves 20.8 deg when one more sample is dropped unstable_drop3]
+  2023-04-26_023DB: gated [unstable: dphi moves 10.9 deg when one more sample is dropped unstable_drop3]
+  2023-05-02_011BA: dphi  -21.0 ->   40.4 deg  corr(bg) -0.92 -> -0.72  TP<0 lung   61% ->    5%  R 0.403 (target 0.403)  1 s
+  2023-05-02_012SR: dphi  -25.3 ->   33.9 deg  corr(bg) -0.89 -> -0.80  TP<0 lung   61% ->   13%  R 0.298 (target 0.297)  1 s
+  2023-05-04_034LR: no_xecs_row [df=991Hz;fRBC=-741Hz(exp0) session has no usable cal block in the XeCS table]
+  2023-05-15_000SK: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2023-05-15_035EK: dphi  -52.3 ->   33.8 deg  corr(bg) -0.65 -> -0.84  TP<0 lung   49% ->   15%  R 0.425 (target 0.426)  1 s
+  2023-05-18_000SV: dphi  -38.7 ->   32.5 deg  corr(bg) -0.86 -> -0.89  TP<0 lung   60% ->   14%  R 0.376 (target 0.374)  1 s
+  2023-08-24_030DN: no_xecs_row [df=1460Hz;fRBC=1160Hz(exp0) session has no usable cal block in the XeCS table]
+  2023-09-25_032WS: dphi   -3.5 ->   41.4 deg  corr(bg) -1.00 -> -0.67  TP<0 lung   71% ->    2%  R 0.254 (target 0.253)  1 s
+  2023-10-10_002BB: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2023-10-20_001JM: no_xecs_row [df=3624Hz;fRBC=-871Hz(exp0) session has no usable cal block in the XeCS table]
+  2023-10-25_002JM: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2023-10-27_000LL: dphi  -41.9 ->   33.3 deg  corr(bg) -0.75 -> -0.85  TP<0 lung   50% ->   13%  R 0.743 (target 0.741)  1 s
+  2023-10-31_003KH: no_xecs_row [df=836Hz;fRBC=429Hz(exp0) session has no usable cal block in the XeCS table]
+  2023-11-02_025VP_merged_REJECTED: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2023-11-02_036RL: dphi  -41.8 ->   33.6 deg  corr(bg) -0.78 -> -0.80  TP<0 lung   62% ->   12%  R 0.298 (target 0.298)  1 s
+  2023-11-06_002ZS: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2023-11-13_037GD: gated [xecs invalid: rep_sd>30;unstable_drop3;unstable: dphi moves 10.3 deg when one more sample is dropped;|sin dphi|=0.22 rep_sd>30;unstable_drop3]
+  2023-11-16_038RL: dphi  -31.2 ->   28.0 deg  corr(bg) -0.85 -> -0.88  TP<0 lung   32% ->   34%  R 0.363 (target 0.363)  1 s
+  2023-11-17_005DS: dphi  -58.0 ->   33.4 deg  corr(bg) -0.56 -> -0.87  TP<0 lung   58% ->   18%  R 0.434 (target 0.434)  1 s
+  2023-11-21_039CP: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2023-12-06_003PM: no_xecs_row [df=177Hz;fRBC=-356Hz(exp0);|sin dphi|=0.02 session has no usable cal block in the XeCS table]
+  2023-12-11_040RP: gated [unstable: dphi moves 11.1 deg when one more sample is dropped unstable_drop3]
+  2023-12-15_003KH: no_xecs_row [df=3485Hz;fRBC=-357Hz(exp0);|sin dphi|=0.15 session has no usable cal block in the XeCS table]
+  2023-12-19_041WF: dphi   20.5 ->   56.4 deg  corr(bg) -0.94 -> -0.55  TP<0 lung   13% ->    1%  R 0.258 (target 0.258)  1 s
+  2024-01-16_004DS: dphi   32.3 ->   59.7 deg  corr(bg) -0.80 -> -0.38  TP<0 lung   22% ->   12%  R 0.308 (target 0.307)  1 s
+  2024-02-19_037GD: dphi   13.4 ->   51.5 deg  corr(bg) -0.99 -> -0.79  TP<0 lung    3% ->    0%  R 0.266 (target 0.266)  1 s
+  2024-02-21_043AS: dphi   -4.2 ->   50.9 deg  corr(bg) -1.00 -> -0.67  TP<0 lung   79% ->    0%  R 0.319 (target 0.320)  1 s
+  2024-02-26_029CK: dphi   -3.0 ->   58.4 deg  corr(bg) -1.00 -> -0.36  TP<0 lung   82% ->    0%  R 0.483 (target 0.482)  1 s
+  2024-02-27_009JT: dphi   -2.2 ->   39.0 deg  corr(bg) -1.00 -> -0.78  TP<0 lung   75% ->    5%  R 0.386 (target 0.385)  1 s
+  2024-03-06_030DN: dphi   12.0 ->   49.5 deg  corr(bg) -0.98 -> -0.69  TP<0 lung    6% ->    2%  R 0.364 (target 0.364)  1 s
+  2024-03-06_030DN_merged: dphi   12.0 ->   49.5 deg  corr(bg) -0.98 -> -0.67  TP<0 lung    6% ->    2%  R 0.364 (target 0.364)  1 s
+  2024-03-11_039CP: dphi   -5.8 ->   53.7 deg  corr(bg) -0.99 -> -0.52  TP<0 lung   82% ->    2%  R 0.368 (target 0.368)  1 s
+  2024-03-12_006KL: dphi   33.0 ->   45.9 deg  corr(bg) -0.82 -> -0.72  TP<0 lung    2% ->    3%  R 0.268 (target 0.269)  1 s
+  2024-03-12_044DY: dphi    5.0 ->   46.7 deg  corr(bg) -1.00 -> -0.66  TP<0 lung   15% ->    5%  R 0.265 (target 0.265)  1 s
+  2024-03-14_038RL: dphi  -14.0 ->   53.9 deg  corr(bg) -0.97 -> -0.65  TP<0 lung   67% ->    2%  R 0.515 (target 0.516)  1 s
+  2024-03-21_032WS: dphi   13.2 ->   58.5 deg  corr(bg) -0.98 -> -0.56  TP<0 lung    4% ->    0%  R 0.283 (target 0.283)  1 s
+  2024-03-21_036RL: dphi   -6.0 ->   46.9 deg  corr(bg) -1.00 -> -0.81  TP<0 lung   82% ->    2%  R 0.278 (target 0.278)  1 s
+  2024-03-28_010AJ: dphi  -28.1 ->   41.2 deg  corr(bg) -0.86 -> -0.72  TP<0 lung   77% ->    8%  R 0.292 (target 0.292)  1 s
+  2024-04-01_008CR: dphi  -55.2 ->   46.0 deg  corr(bg) -0.46 -> -0.62  TP<0 lung   77% ->    2%  R 0.316 (target 0.316)  1 s
+  2024-04-03_040RP: dphi   34.8 ->   56.2 deg  corr(bg) -0.79 -> -0.52  TP<0 lung    7% ->    7%  R 0.233 (target 0.234)  1 s
+  2024-04-09_019WR: dphi   -8.0 ->   48.4 deg  corr(bg) -0.98 -> -0.51  TP<0 lung   82% ->    1%  R 0.404 (target 0.405)  1 s
+  2024-04-22_025VP: dphi  -18.8 ->   47.9 deg  corr(bg) -0.97 -> -0.74  TP<0 lung   76% ->    2%  R 0.502 (target 0.500)  1 s
+  2024-04-25_042DR: gated [unstable: dphi moves 31.2 deg when one more sample is dropped unstable_drop3]
+  2024-05-02_023DB: dphi  -17.0 ->   55.9 deg  corr(bg) -0.95 -> -0.50  TP<0 lung   82% ->    1%  R 0.314 (target 0.315)  1 s
+  2024-05-06_043AS: dphi   11.6 ->   55.9 deg  corr(bg) -0.97 -> -0.52  TP<0 lung    5% ->    0%  R 0.251 (target 0.250)  1 s
+  2024-05-08_012EB: dphi   32.1 ->   55.8 deg  corr(bg) -0.80 -> -0.45  TP<0 lung   12% ->   10%  R 0.240 (target 0.241)  1 s
+  2024-05-13_002ZS: dphi  -13.3 ->   57.8 deg  corr(bg) -0.97 -> -0.44  TP<0 lung   81% ->    2%  R 0.322 (target 0.321)  1 s
+  2024-05-13_005JJ: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2024-06-18_003PM: dphi   -4.9 ->   54.5 deg  corr(bg) -0.99 -> -0.45  TP<0 lung   81% ->    1%  R 0.319 (target 0.319)  1 s
+  2024-07-03_044DY: dphi   -5.7 ->   47.5 deg  corr(bg) -1.00 -> -0.78  TP<0 lung   81% ->    1%  R 0.287 (target 0.287)  1 s
+  2024-07-29_004DS: dphi  -31.7 ->   64.5 deg  corr(bg) -0.77 -> -0.24  TP<0 lung   72% ->    2%  R 0.337 (target 0.336)  1 s
+  2024-08-12_013VM: dphi  -13.0 ->   49.6 deg  corr(bg) -0.97 -> -0.58  TP<0 lung   80% ->    2%  R 0.292 (target 0.291)  1 s
+  2024-08-12_013VM_merged: dphi  -18.6 ->   49.6 deg  corr(bg) -0.93 -> -0.56  TP<0 lung   82% ->    2%  R 0.291 (target 0.291)  1 s
+  2024-08-15_006MM: dphi  -23.8 ->   42.0 deg  corr(bg) -0.91 -> -0.75  TP<0 lung   72% ->    5%  R 0.380 (target 0.380)  1 s
+  2024-08-19_015HK: dphi  -17.3 ->   53.5 deg  corr(bg) -0.95 -> -0.60  TP<0 lung   75% ->    0%  R 0.474 (target 0.473)  1 s
+  2024-08-21_044DY: dphi   -7.7 ->   48.6 deg  corr(bg) -0.99 -> -0.61  TP<0 lung   78% ->    6%  R 0.316 (target 0.317)  1 s
+  2024-08-23_016PG: dphi  -26.3 ->   53.1 deg  corr(bg) -0.90 -> -0.61  TP<0 lung   65% ->    1%  R 0.789 (target 0.789)  1 s
+  2024-08-30_014KS: dphi  -36.1 ->   38.5 deg  corr(bg) -0.83 -> -0.80  TP<0 lung   78% ->    1%  R 0.476 (target 0.476)  1 s
+  2024-09-03_041WF: dphi   -0.4 ->   58.3 deg  corr(bg) -1.00 -> -0.59  TP<0 lung   85% ->    1%  R 0.377 (target 0.376)  1 s
+  2024-09-09_043AS: dphi    5.2 ->   55.5 deg  corr(bg) -1.00 -> -0.52  TP<0 lung   12% ->    1%  R 0.269 (target 0.269)  1 s
+  2024-09-10_008TP: dphi  -21.9 ->   53.1 deg  corr(bg) -0.88 -> -0.42  TP<0 lung   77% ->    0%  R 0.445 (target 0.445)  1 s
+  2024-09-10_045VS: dphi   -5.7 ->   54.3 deg  corr(bg) -0.99 -> -0.53  TP<0 lung   87% ->    1%  R 0.392 (target 0.393)  1 s
+  2024-09-24_039CP: dphi   -7.6 ->   53.3 deg  corr(bg) -0.99 -> -0.60  TP<0 lung   85% ->    0%  R 0.387 (target 0.387)  1 s
+  2024-09-24_046AA: dphi   -7.9 ->   53.5 deg  corr(bg) -0.99 -> -0.64  TP<0 lung   80% ->    1%  R 0.311 (target 0.311)  1 s
+  2024-09-25_017ED: no_xecs_row [pass session has no usable cal block in the XeCS table]
+  2024-09-26_009ML: dphi  -12.1 ->   50.4 deg  corr(bg) -0.97 -> -0.53  TP<0 lung   79% ->    0%  R 0.388 (target 0.387)  1 s
+  2024-09-27_036RL: dphi    8.9 ->   49.5 deg  corr(bg) -0.99 -> -0.71  TP<0 lung    7% ->    1%  R 0.230 (target 0.230)  1 s
+  2024-10-02_011CN: dphi   -9.3 ->   55.8 deg  corr(bg) -0.99 -> -0.64  TP<0 lung   79% ->    3%  R 0.397 (target 0.397)  1 s
+  2024-10-02_018CS: dphi  -21.8 ->   46.6 deg  corr(bg) -0.87 -> -0.45  TP<0 lung   74% ->    3%  R 0.575 (target 0.575)  1 s
+  2024-10-08_009JT: dphi  -12.0 ->   57.7 deg  corr(bg) -0.98 -> -0.55  TP<0 lung   77% ->    5%  R 0.375 (target 0.376)  1 s
+  2024-10-10_019LR: dphi  -30.6 ->   46.1 deg  corr(bg) -0.83 -> -0.51  TP<0 lung   76% ->    6%  R 0.362 (target 0.361)  1 s
+  2024-10-16_020JS: dphi   11.7 ->   57.7 deg  corr(bg) -0.97 -> -0.46  TP<0 lung   14% ->    6%  R 0.239 (target 0.238)  1 s
+  2024-10-16_047SS: dphi    2.1 ->   55.3 deg  corr(bg) -1.00 -> -0.60  TP<0 lung   15% ->    1%  R 0.322 (target 0.323)  1 s
+  2024-10-17_048JJ: dphi   -6.1 ->   49.1 deg  corr(bg) -1.00 -> -0.78  TP<0 lung   80% ->    2%  R 0.390 (target 0.391)  1 s
+  2024-10-22_021CH: dphi  -13.7 ->   61.1 deg  corr(bg) -0.96 -> -0.36  TP<0 lung   79% ->    3%  R 0.504 (target 0.504)  1 s
+  2024-10-23_047SS: gated [unstable: dphi moves 18.5 deg when one more sample is dropped unstable_drop3]
+  2024-10-28_022VT: dphi   -4.5 ->   48.8 deg  corr(bg) -1.00 -> -0.61  TP<0 lung   74% ->   10%  R 0.322 (target 0.323)  1 s
+  2024-10-29_049WG: dphi   -7.7 ->   55.3 deg  corr(bg) -0.99 -> -0.68  TP<0 lung   77% ->    2%  R 0.415 (target 0.415)  1 s
+  2024-11-05_023LL: dphi  -17.5 ->   49.5 deg  corr(bg) -0.93 -> -0.52  TP<0 lung   83% ->    3%  R 0.478 (target 0.478)  1 s
+  2024-11-13_025JC: dphi  -27.4 ->   51.5 deg  corr(bg) -0.83 -> -0.48  TP<0 lung   61% ->    1%  R 1.347 (target 1.348)  1 s
+  2024-11-18_026CH: dphi  -14.3 ->   63.3 deg  corr(bg) -0.98 -> -0.57  TP<0 lung   72% ->    4%  R 0.327 (target 0.328)  1 s
+  2024-11-26_050EH: dphi   -0.5 ->   47.7 deg  corr(bg) -1.00 -> -0.53  TP<0 lung   80% ->    4%  R 0.318 (target 0.318)  1 s
+  2024-12-05_043AS: dphi    8.6 ->   59.4 deg  corr(bg) -0.99 -> -0.61  TP<0 lung    8% ->    1%  R 0.154 (target 0.154)  1 s
+  2024-12-06_051VM: dphi   -7.2 ->   47.6 deg  corr(bg) -0.99 -> -0.74  TP<0 lung   71% ->    8%  R 0.165 (target 0.164)  1 s
+  2024-12-09_027JC: dphi  -14.5 ->   50.3 deg  corr(bg) -0.97 -> -0.62  TP<0 lung   75% ->    5%  R 0.368 (target 0.367)  1 s

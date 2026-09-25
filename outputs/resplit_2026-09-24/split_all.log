@@ -1,0 +1,89 @@
+  2023-01-31_000LL: dphi  -41.0 ->   35.2 deg  corr(bg) -0.73 -> -0.84  TP<0 lung   57% ->    4%  R 0.513 (target 0.515)  1 s
+  2023-04-07_030DN: gated [df=4403Hz;fRBC=1652Hz(exp0);|sin dphi|=0.25]
+  2023-04-18_021JM: dphi  -29.8 ->   47.0 deg  corr(bg) -0.84 -> -0.61  TP<0 lung   59% ->   12%  R 0.266 (target 0.266)  1 s
+  2023-04-26_023DB: dphi  -47.4 ->   32.6 deg  corr(bg) -0.74 -> -0.87  TP<0 lung   62% ->    8%  R 0.156 (target 0.157)  1 s
+  2023-05-02_011BA: dphi  -21.0 ->   46.5 deg  corr(bg) -0.92 -> -0.63  TP<0 lung   61% ->    3%  R 0.255 (target 0.255)  1 s
+  2023-05-02_012SR: dphi  -25.3 ->   46.7 deg  corr(bg) -0.89 -> -0.65  TP<0 lung   61% ->    4%  R 0.175 (target 0.176)  1 s
+  2023-05-04_034LR: gated [df=991Hz;fRBC=-741Hz(exp0)]
+  2023-05-15_000SK: dphi  -48.4 ->   37.1 deg  corr(bg) -0.52 -> -0.68  TP<0 lung   48% ->   25%  R 0.473 (target 0.472)  1 s
+  2023-05-15_035EK: dphi  -52.3 ->   29.2 deg  corr(bg) -0.65 -> -0.88  TP<0 lung   49% ->   16%  R 0.266 (target 0.266)  1 s
+  2023-05-18_000SV: dphi  -38.7 ->   38.1 deg  corr(bg) -0.86 -> -0.85  TP<0 lung   60% ->    8%  R 0.206 (target 0.206)  1 s
+  2023-08-24_030DN: gated [df=1460Hz;fRBC=1160Hz(exp0)]
+  2023-09-25_032WS: dphi   -3.5 ->   64.1 deg  corr(bg) -1.00 -> -0.36  TP<0 lung   71% ->    0%  R 0.140 (target 0.140)  1 s
+  2023-10-10_002BB: dphi  -28.9 ->   52.2 deg  corr(bg) -0.89 -> -0.66  TP<0 lung   56% ->    7%  R 0.166 (target 0.166)  1 s
+  2023-10-20_001JM: gated [df=3624Hz;fRBC=-871Hz(exp0)]
+  2023-10-25_002JM: dphi  -47.4 ->   22.1 deg  corr(bg) -0.78 -> -0.95  TP<0 lung   58% ->   41%  R 0.336 (target 0.337)  1 s
+  2023-10-27_000LL: dphi  -41.9 ->   35.4 deg  corr(bg) -0.75 -> -0.83  TP<0 lung   50% ->    9%  R 0.578 (target 0.577)  1 s
+  2023-10-31_003KH: gated [df=836Hz;fRBC=429Hz(exp0)]
+  2023-11-02_025VP_merged_REJECTED: dphi  -38.2 ->   28.0 deg  corr(bg) -0.83 -> -0.90  TP<0 lung   58% ->   12%  R 0.304 (target 0.304)  1 s
+  2023-11-02_036RL: dphi  -41.8 ->   34.1 deg  corr(bg) -0.78 -> -0.81  TP<0 lung   62% ->    9%  R 0.134 (target 0.133)  1 s
+  2023-11-06_002ZS: dphi   -4.3 ->   59.2 deg  corr(bg) -1.00 -> -0.42  TP<0 lung   70% ->    5%  R 0.214 (target 0.214)  1 s
+  2023-11-13_037GD: dphi -149.7 ->   52.4 deg  corr(bg) +0.89 -> -0.69  TP<0 lung    9% ->   11%  R 0.248 (target 0.248)  1 s
+  2023-11-16_038RL: gated [fRBC=756Hz(exp0)]
+  2023-11-17_005DS: dphi  -58.0 ->   21.4 deg  corr(bg) -0.56 -> -0.94  TP<0 lung   58% ->   25%  R 0.232 (target 0.231)  1 s
+  2023-11-21_039CP: dphi  -55.2 ->   22.9 deg  corr(bg) -0.64 -> -0.93  TP<0 lung   48% ->   20%  R 0.200 (target 0.201)  1 s
+  2023-12-06_003PM: gated [df=177Hz;fRBC=-356Hz(exp0);|sin dphi|=0.02]
+  2023-12-11_040RP: dphi   23.4 ->   38.5 deg  corr(bg) -0.91 -> -0.75  TP<0 lung   11% ->    8%  R 0.128 (target 0.128)  1 s
+  2023-12-15_003KH: gated [df=3485Hz;fRBC=-357Hz(exp0);|sin dphi|=0.15]
+  2023-12-19_041WF: dphi   20.5 ->   82.4 deg  corr(bg) -0.94 -> -0.13  TP<0 lung   13% ->    1%  R 0.151 (target 0.152)  1 s
+  2024-01-16_004DS: dphi   32.3 ->   91.0 deg  corr(bg) -0.80 -> +0.16  TP<0 lung   22% ->    7%  R 0.082 (target 0.082)  1 s
+  2024-02-19_037GD: dphi   13.4 ->   75.5 deg  corr(bg) -0.99 -> -0.50  TP<0 lung    3% ->    0%  R 0.149 (target 0.149)  1 s
+  2024-02-21_043AS: dphi   -4.2 ->   64.2 deg  corr(bg) -1.00 -> -0.51  TP<0 lung   79% ->    0%  R 0.184 (target 0.184)  1 s
+  2024-02-26_029CK: dphi   -3.0 ->   67.0 deg  corr(bg) -1.00 -> -0.20  TP<0 lung   82% ->    0%  R 0.320 (target 0.321)  1 s
+  2024-02-27_009JT: dphi   -2.2 ->   58.4 deg  corr(bg) -1.00 -> -0.49  TP<0 lung   75% ->    1%  R 0.216 (target 0.217)  1 s
+  2024-03-06_030DN: dphi   12.0 ->   74.1 deg  corr(bg) -0.98 -> -0.33  TP<0 lung    6% ->    1%  R 0.205 (target 0.204)  1 s
+  2024-03-06_030DN_merged: dphi   12.0 ->   74.1 deg  corr(bg) -0.98 -> -0.30  TP<0 lung    6% ->    0%  R 0.205 (target 0.204)  1 s
+  2024-03-11_039CP: dphi   -5.8 ->   63.3 deg  corr(bg) -0.99 -> -0.41  TP<0 lung   82% ->    2%  R 0.238 (target 0.238)  1 s
+  2024-03-12_006KL: dphi   33.0 ->   82.2 deg  corr(bg) -0.82 -> -0.01  TP<0 lung    2% ->    1%  R 0.167 (target 0.166)  1 s
+  2024-03-12_044DY: dphi    5.0 ->   67.9 deg  corr(bg) -1.00 -> -0.24  TP<0 lung   15% ->    3%  R 0.153 (target 0.153)  1 s
+  2024-03-14_038RL: dphi  -14.0 ->   59.3 deg  corr(bg) -0.97 -> -0.55  TP<0 lung   67% ->    1%  R 0.338 (target 0.338)  1 s
+  2024-03-21_032WS: dphi   13.2 ->   78.2 deg  corr(bg) -0.98 -> -0.26  TP<0 lung    4% ->    0%  R 0.178 (target 0.178)  1 s
+  2024-03-21_036RL: dphi   -6.0 ->   61.6 deg  corr(bg) -1.00 -> -0.61  TP<0 lung   82% ->    1%  R 0.156 (target 0.155)  1 s
+  2024-03-28_010AJ: dphi  -28.1 ->   47.1 deg  corr(bg) -0.86 -> -0.64  TP<0 lung   77% ->    6%  R 0.208 (target 0.208)  1 s
+  2024-04-01_008CR: dphi  -55.2 ->   30.1 deg  corr(bg) -0.46 -> -0.83  TP<0 lung   77% ->    5%  R 0.217 (target 0.218)  1 s
+  2024-04-03_040RP: dphi   34.8 ->   88.5 deg  corr(bg) -0.79 -> +0.15  TP<0 lung    7% ->    6%  R 0.143 (target 0.142)  1 s
+  2024-04-09_019WR: dphi   -8.0 ->   61.8 deg  corr(bg) -0.98 -> -0.25  TP<0 lung   82% ->    0%  R 0.249 (target 0.250)  1 s
+  2024-04-22_025VP: dphi  -18.8 ->   51.9 deg  corr(bg) -0.97 -> -0.72  TP<0 lung   76% ->    1%  R 0.327 (target 0.327)  1 s
+  2024-04-25_042DR: gated [ratio=-0.118]
+  2024-05-02_023DB: dphi  -17.0 ->   52.2 deg  corr(bg) -0.95 -> -0.57  TP<0 lung   82% ->    1%  R 0.168 (target 0.167)  1 s
+  2024-05-06_043AS: dphi   11.6 ->   74.6 deg  corr(bg) -0.97 -> -0.32  TP<0 lung    5% ->    0%  R 0.146 (target 0.146)  1 s
+  2024-05-08_012EB: dphi   32.1 ->   88.0 deg  corr(bg) -0.80 -> +0.10  TP<0 lung   12% ->    8%  R 0.113 (target 0.113)  1 s
+  2024-05-13_002ZS: dphi  -13.3 ->   59.7 deg  corr(bg) -0.97 -> -0.42  TP<0 lung   81% ->    2%  R 0.196 (target 0.195)  1 s
+  2024-05-13_005JJ: dphi   35.2 ->   76.0 deg  corr(bg) -0.87 -> -0.40  TP<0 lung    3% ->    2%  R 0.115 (target 0.115)  1 s
+  2024-06-18_003PM: dphi   -4.9 ->   63.1 deg  corr(bg) -0.99 -> -0.34  TP<0 lung   81% ->    0%  R 0.194 (target 0.194)  1 s
+  2024-07-03_044DY: dphi   -5.7 ->   62.7 deg  corr(bg) -1.00 -> -0.63  TP<0 lung   81% ->    0%  R 0.173 (target 0.173)  1 s
+  2024-07-29_004DS: dphi  -31.7 ->   49.3 deg  corr(bg) -0.77 -> -0.53  TP<0 lung   72% ->    3%  R 0.257 (target 0.256)  1 s
+  2024-08-12_013VM: dphi  -13.0 ->   55.2 deg  corr(bg) -0.97 -> -0.50  TP<0 lung   80% ->    1%  R 0.145 (target 0.146)  1 s
+  2024-08-12_013VM_merged: dphi  -18.6 ->   53.3 deg  corr(bg) -0.93 -> -0.50  TP<0 lung   82% ->    1%  R 0.150 (target 0.151)  1 s
+  2024-08-15_006MM: gated [fRBC=-270Hz(exp0)]
+  2024-08-19_015HK: dphi  -17.3 ->   55.5 deg  corr(bg) -0.95 -> -0.56  TP<0 lung   75% ->    0%  R 0.318 (target 0.318)  1 s
+  2024-08-21_044DY: dphi   -7.7 ->   60.7 deg  corr(bg) -0.99 -> -0.45  TP<0 lung   78% ->    4%  R 0.204 (target 0.204)  1 s
+  2024-08-23_016PG: dphi  -26.3 ->   49.4 deg  corr(bg) -0.90 -> -0.66  TP<0 lung   65% ->    1%  R 0.585 (target 0.584)  1 s
+  2024-08-30_014KS: dphi  -36.1 ->   38.4 deg  corr(bg) -0.83 -> -0.80  TP<0 lung   78% ->    1%  R 0.338 (target 0.338)  1 s
+  2024-09-03_041WF: dphi   -0.4 ->   69.1 deg  corr(bg) -1.00 -> -0.41  TP<0 lung   85% ->    1%  R 0.254 (target 0.254)  1 s
+  2024-09-09_043AS: dphi    5.2 ->   71.6 deg  corr(bg) -1.00 -> -0.29  TP<0 lung   12% ->    0%  R 0.158 (target 0.158)  1 s
+  2024-09-10_008TP: dphi  -21.9 ->   52.4 deg  corr(bg) -0.88 -> -0.42  TP<0 lung   77% ->    0%  R 0.310 (target 0.311)  1 s
+  2024-09-10_045VS: dphi   -5.7 ->   64.4 deg  corr(bg) -0.99 -> -0.35  TP<0 lung   87% ->    0%  R 0.294 (target 0.293)  1 s
+  2024-09-24_039CP: dphi   -7.6 ->   62.4 deg  corr(bg) -0.99 -> -0.40  TP<0 lung   85% ->    0%  R 0.259 (target 0.258)  1 s
+  2024-09-24_046AA: dphi   -7.9 ->   65.3 deg  corr(bg) -0.99 -> -0.51  TP<0 lung   80% ->    0%  R 0.205 (target 0.205)  1 s
+  2024-09-25_017ED: dphi    3.1 ->   57.7 deg  corr(bg) -1.00 -> -0.35  TP<0 lung   29% ->   11%  R 0.276 (target 0.276)  1 s
+  2024-09-26_009ML: dphi  -12.1 ->   58.0 deg  corr(bg) -0.97 -> -0.35  TP<0 lung   79% ->    0%  R 0.249 (target 0.250)  1 s
+  2024-09-27_036RL: dphi    8.9 ->   73.5 deg  corr(bg) -0.99 -> -0.44  TP<0 lung    7% ->    0%  R 0.113 (target 0.113)  1 s
+  2024-10-02_011CN: dphi   -9.3 ->   61.1 deg  corr(bg) -0.99 -> -0.59  TP<0 lung   79% ->    3%  R 0.251 (target 0.251)  1 s
+  2024-10-02_018CS: dphi  -21.8 ->   52.9 deg  corr(bg) -0.87 -> -0.33  TP<0 lung   74% ->    1%  R 0.345 (target 0.345)  1 s
+  2024-10-08_009JT: dphi  -12.0 ->   53.9 deg  corr(bg) -0.98 -> -0.57  TP<0 lung   77% ->    4%  R 0.201 (target 0.201)  1 s
+  2024-10-10_019LR: dphi  -30.6 ->   46.4 deg  corr(bg) -0.83 -> -0.54  TP<0 lung   76% ->    5%  R 0.203 (target 0.203)  1 s
+  2024-10-16_020JS: dphi   11.7 ->   68.3 deg  corr(bg) -0.97 -> -0.29  TP<0 lung   14% ->    5%  R 0.191 (target 0.191)  1 s
+  2024-10-16_047SS: dphi    2.1 ->   67.4 deg  corr(bg) -1.00 -> -0.36  TP<0 lung   15% ->    0%  R 0.171 (target 0.172)  1 s
+  2024-10-17_048JJ: dphi   -6.1 ->   63.5 deg  corr(bg) -1.00 -> -0.64  TP<0 lung   80% ->    1%  R 0.228 (target 0.228)  1 s
+  2024-10-22_021CH: dphi  -13.7 ->   58.1 deg  corr(bg) -0.96 -> -0.39  TP<0 lung   79% ->    2%  R 0.331 (target 0.331)  1 s
+  2024-10-23_047SS: dphi   28.9 ->   73.5 deg  corr(bg) -0.89 -> -0.33  TP<0 lung    8% ->    2%  R 0.244 (target 0.244)  1 s
+  2024-10-28_022VT: dphi   -4.5 ->   59.7 deg  corr(bg) -1.00 -> -0.40  TP<0 lung   74% ->    7%  R 0.180 (target 0.180)  1 s
+  2024-10-29_049WG: dphi   -7.7 ->   63.9 deg  corr(bg) -0.99 -> -0.57  TP<0 lung   77% ->    1%  R 0.279 (target 0.278)  1 s
+  2024-11-05_023LL: dphi  -17.5 ->   53.6 deg  corr(bg) -0.93 -> -0.44  TP<0 lung   83% ->    2%  R 0.250 (target 0.251)  1 s
+  2024-11-13_025JC: dphi  -27.4 ->   45.9 deg  corr(bg) -0.83 -> -0.56  TP<0 lung   61% ->    1%  R 0.930 (target 0.930)  1 s
+  2024-11-18_026CH: dphi  -14.3 ->   57.0 deg  corr(bg) -0.98 -> -0.65  TP<0 lung   72% ->    4%  R 0.146 (target 0.145)  1 s
+  2024-11-26_050EH: dphi   -0.5 ->   67.4 deg  corr(bg) -1.00 -> -0.05  TP<0 lung   80% ->    2%  R 0.200 (target 0.199)  1 s
+  2024-12-05_043AS: dphi    8.6 ->   73.9 deg  corr(bg) -0.99 -> -0.41  TP<0 lung    8% ->    0%  R 0.118 (target 0.119)  1 s
+  2024-12-06_051VM: dphi   -7.2 ->   54.8 deg  corr(bg) -0.99 -> -0.66  TP<0 lung   71% ->    6%  R 0.145 (target 0.145)  1 s
+  2024-12-09_027JC: dphi  -14.5 ->   63.5 deg  corr(bg) -0.97 -> -0.40  TP<0 lung   75% ->    3%  R 0.186 (target 0.186)  1 s
