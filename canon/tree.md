@@ -35,6 +35,7 @@ flowchart TD
   B23["✅ rbctp-resplit (09-24/25)<br/>specfit k0 basis · fork 6651591 · 68 offline re-split (F61–F71)"]
   B24["✅ perbin-phaseref (09-25)<br/>per-bin gas ref = no effect (F77) · F74 RETRACTED<br/>FOUND: raw b phase inside mask = static RBC speckle (F79)"]
   B25["★ prod-b44 (09-25)<br/>calcb phase low-pass σ 4.4 (F81) · fork 04f445b · 61 rerun → AIkill_Dynamic_b44<br/>speckle gone cohort-wide (F82) · atlas_b44 + trust_b44"]
+  B26["✅ noise-consult for PCA (09-26)<br/>Tyger bg signed Gaussian · ACF · per-bin σ · PSF ≈ 2.2 vox (F83)<br/>Faraz bg self-referenced (F84) · legacy PF/P1 (F85 SUSPECT)"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -50,6 +51,7 @@ flowchart TD
   B14 --> B21
   B17 --> B22 --> B23 --> B12
   B12 --> B24 --> B25
+  B25 --> B26
   B17 -.F47.-> B12
   B9 -.xecs_recon.pth.-> B10
 ```
@@ -67,6 +69,7 @@ flowchart TD
 | B12 aikill-atlas ✅ | C26 dis_atlas.py (dp SUSPECT_F47.md), C38 te90_table.py → outputs/te90_2026-09-25/ (F72), C39 rbc_tm_atlas.py → outputs/aikill_atlas/rbc_tm_atlas.pdf (61, raw b, superseded by B25), C40 split_trust.py → outputs/split_trust_2026-09-25/ (grades; F73; F74 RETRACTED marker), C42 rbc_repro_tests.py (F75 F76) |
 | B24 perbin-phaseref ✅ | fork f5ac7c5 (gas_phase_complex) + c8366c3 (calcb_b export), C41 perbin_phaseref.py (F77), C43 bphase_fix.py, C44 bphase_confirm.py (F79 confirmed), C45 bphase_sigma.py, C46 bsmooth_compare.py (F80), C47 bsmooth_videos.py, outputs/bphase_fix_2026-09-25/, Ext tyger_{gascplx,bexport,bsmooth}_2026-09-25/ (bexport = raw b for all 61, 24 GB) (F78 F79 F80) |
 | B25 prod-b44 ★ | fork 19b7365 → 1fe07a0 → 04f445b (`results.calcb_phase_sigma` 2.5 → 5 → 4.4), C48 bphase_sigma_cohort.py → cohort_sigma.csv (F81), C49 run_prod_b44.sh + prod_b44_todo.txt, C50 mrd_to_mat.py, Ext `AIkill_Dynamic_b44/<key>/d/{output.mrd, recon.mat, tyger.log}` (61; 59 split), outputs/aikill_atlas_b44/ (PDF 679 pg + grades CSV; videos on Ext aikill_atlas_b44/), outputs/split_trust_b44/ (trust table, fine_static_b44.csv, trust_lookup_all.csv, registration21_trust_rank.csv) (F82) |
+| B26 noise-consult ✅ | helpers/_noise_char.py (scratch; bg Gaussianity, corner/near-lung σ, spatial ACF, per-bin σ, inter-bin corr on b44 d/recon.mat), 2 cross-session replies to 2026-pca-registration-e4 (F83 F84 F85) |
 | B13 tyger-access | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558), memory tyger_setup.md |
 | B14 leftover-recon | fork commits 472fbc9/40d23a4, C9 dyn_recon.py, C29 todo_batch.sh, outputs/roundtrip_audit_2026-09-13/, outputs/leftover_recon_2026-09-12/, Ext pipeline_runs/logs + quarantine/ (F42–F46 F51) |
 | B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
@@ -91,3 +94,6 @@ cohort-wide (F82); production atlas + trust table regenerated; registration-21 r
 in the fit table, 7 no dissolved recon, 6 offline-gated, 5 off-carrier) + 2 container-gated (020JS, 051VM); then
 2steve/06 addendum (raw phase inside the mask) and whether to retire the raw-b AIkill_Dynamic tree.** Deferred:
 physics-anchored global phase (non-circular ratio check), bmask-edge blend, 8-ch Σ|b|, template fallback, B21.
+
+Session 12 (2026-09-26) was a side consult (B26) for the PCA registration benchmark: noise, PSF and legacy-input facts
+F83–F85, no code or data changed. ★ unchanged.

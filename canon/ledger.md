@@ -703,3 +703,22 @@ session-7 header, belong to THIS session — left in place, append-only.)
 - RETRACTION: F74 (static smooth phase field imprint) → mechanism is F79; marker dropped in outputs/split_trust_2026-09-25/.
 - BRANCH: aikill-atlas (B12) re-opened and delivered; rbctp-resplit (B23) closed; perbin-phaseref (B24, parent B12)
   delivered (negative result → the b finding); prod-b44 (B25, parent B24) delivered ★. B21 ct-overlay still open.
+
+## 2026-09-26 · session 12 (Opus 5.5; ~15:00 → 16:00) — cross-session consult for PCA registration
+- The 2026-pca-registration-e4 session asked for recon knowledge for its registration ground-truth benchmark (synthetic
+  16-bin stacks with realistic noise and resolution). Answered from code plus a measurement on the b44 production tree
+  (`helpers/_noise_char.py`, 045VS / 050EH / 005DS 2023-11-17) → F83. Tyger gas bg = signed zero-mean Gaussian,
+  stationary far from the lung; near-lung σ 1.7× = aliasing; spatial ACF lag-1 0.77; per-bin σ ±25 %; inter-bin corr
+  0.83/0.53/0.3 (soft bins); effective PSF ≈ 2.2 vox (7.6 mm), not 3.5 mm. The PCA session's own corners agree.
+- Hooman asked whether Tyger keeps the bg Gaussian while CG / Faraz give Rician. Tyger yes (real(F·b), polynomial b
+  phase outside the mask); CG Rician only because its output is |x|; Faraz has NO abs(): his Bydder combine with
+  b = Σimg/Σ|img| self-references the bg noise → bg shrunk ~1/√N and biased positive (F84).
+- Legacy `rspace_gas.mat` (PCA's old input, built by its CLAHE.m) traced to Steve's 2024 code: signed, same gridder.
+  PF/P1 = with / without partial Fourier (Hooman, relayed); likely path = 2024 recon.py oldway=0 Hermitian branch →
+  static cos δ field in the average (F85, SUSPECT until the PF runs are confirmed to use that branch).
+- Forward-sim pointer: XeCS's Tyger-exact port (`tyger/vendor/acr/steve_kernel_numpy.py` + `recon/selftest_steve_
+  tyger.py::{calcb_numpy, bin_sample_weight}` + finufft `recon/asap_recon.py::forward`); Digital_Phantom's world 3 is
+  parked. PCA will use an image-domain v1 benchmark now and ask XeCS for v2 (their lane). Caveats sent: temporal soft-
+  bin blur must hit the truth signal, and v1 without the near-lung aliasing term is optimistic at the lung edge.
+- DECIDED: none (consult only; no code or data changes in the fork or the production tree).
+- BRANCH: noise-consult (B26), parent B25 — delivered ✅. ★ stays on B25 ("the rest" discussion).
