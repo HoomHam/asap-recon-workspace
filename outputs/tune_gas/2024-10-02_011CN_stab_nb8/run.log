@@ -1,0 +1,17 @@
+04:47:57 GAS 2024-10-02_011CN: MS=240 IS=100 nbins=8 gplb=300 npts=510 nilv=6581 nuniq=424320 (832 ilv, 7.91 repeats) dtdyn=5.00 us TE=0.620 ms kmax=40.36 dk; kept 0.8835
+04:47:57 min |data| kept 0.000166: LB >= 96 keeps every sample (EPS rule); last kept sample index 509
+04:47:59 collapsed sums done; bin weight totals {'all': 5814.0, 0: 1808.4, 2: 1808.4, 4: 1808.4, 6: 1808.4}
+04:47:59 building production kernel ...
+04:48:05 non-production binning (nbins 8, bindist0sq 2): no Tyger rebuild check
+04:48:05 object: lung 37418 vox, T lung mean 0.001681; corner 509593 vox
+04:48:06 CHECK finufft axis/sign mapping vs analytic delta: max err 7.7e-11
+04:48:07 probe points (z,y,x): [(42, 63, 25), (43, 56, 38), (67, 54, 22), (68, 50, 37)]
+04:48:07 per-sample noise sigma (each of re/im) = 1.187 (given)
+04:48:08 object T (obj LB 0) carries noise sd 0.063 of its lung mean as fake detail
+04:48:38 prod       MS=240 kd2=0.2 (sigma 0.132 dk) gplb=300: FWHM all 2.67 bin0 2.68 vox | blur 0.155 alias 0.008 noise 0.046 total 0.167 | holes 0.515 | real SNR 23.2 (29 s)
+04:49:11 gplb200    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=200: FWHM all 3.14 bin0 3.15 vox | blur 0.189 alias 0.007 noise 0.031 total 0.196 | holes 0.515 | real SNR 26.9 (33 s)
+04:50:03 gplb450    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=450: FWHM all 2.43 bin0 2.44 vox | blur 0.134 alias 0.009 noise 0.062 total 0.153 | holes 0.515 | real SNR 20.2 (53 s)
+04:50:34 MS160      MS=160 kd2=0.2 (sigma 0.198 dk) gplb=300: FWHM all 2.59 bin0 2.60 vox | blur 0.158 alias 0.005 noise 0.061 total 0.171 | holes 0.275 | real SNR 22.2 (30 s)
+04:51:09 MS200      MS=200 kd2=0.2 (sigma 0.158 dk) gplb=300: FWHM all 2.63 bin0 2.64 vox | blur 0.147 alias 0.006 noise 0.054 total 0.160 | holes 0.400 | real SNR 22.8 (36 s)
+04:51:13 image stacks -> /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tune_gas/2024-10-02_011CN_stab_nb8
+04:51:15 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/tune_gas/2024-10-02_011CN_stab_nb8

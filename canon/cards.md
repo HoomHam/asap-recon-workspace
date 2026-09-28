@@ -57,6 +57,8 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C49 | pipeline/run_prod_b44.sh + prod_b44_todo.txt | prod-b44 (B25) | DONE 2026-09-25 — 61/61, σ 4.4 (fork 04f445b) → Ext AIkill_Dynamic_b44/; 59 split, 2 container-gated (F82) |
 | C50 | pipeline/mrd_to_mat.py | prod-b44 (B25) | WORKS 2026-09-25 — output.mrd → recon.mat (gas, |gas|, aRBC/aTP, |dis|, calcb_b, rbc_tp_* meta, nav), no figures |
 | C51 | helpers/pf_p1_check.py | pf-p1 (B27) | WORKS 2026-09-26 — legacy dat/PF vs dat/P1: DC-zero test (PF = oldway 0), geometry, bg σ/corr, Bin_* agreement → outputs/pf_p1_check/ |
+| C55 | pipeline/deapod_tree.py | deapod-prod (B30) | WORKS 2026-09-28 — offline deapodised copy of the b44 tree (images / A(r)); == Tyger fork ee3c91f; → Ext Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d/ |
+| C54 | helpers/tune_gas.py | tyger-tuning (B29) | WORKS 2026-09-27 — gas knob sweep (MS, kdist0sq/box, gplb, deapod) against a known lung object sampled at the real trajectory points; blur/alias/noise/total + PSF per bin; --obj-gplb bracket, --cg-control (LS CG on same samples), --dp, --set stab/snr/reg (soft-bin, noise ×, registration proxies) → outputs/tune_gas/<key>[_dp/_obj300/_reg/_stab_*/_snr_*]/ (F90–F98) |
 | C53 | helpers/pf_inlung.py | pf-merit (B28) | DONE 2026-09-27 — in-lung error vs a truth resampled through each bin's real hole pattern; flags --truth-bin/--b-raw/--b-self/--synth-real/--lung-only; real data P1 1–2 % vs PF 7–10 %, ideal object P1 8 % vs PF 0.7–1.2 % (F89: ghost of out-of-crop energy; code verified) |
 | C52 | helpers/pf_test.py | pf-merit (B28) | DONE 2026-09-26 — Tyger-exact rebuild (relerr 1e-6) of 021CH; P1 / PFs (oldway 0) / PFs+KLUGE / PFc (POCS, same b), gas + dissolved → outputs/pf_test/021CH/ (F88: PF costs 20 % gas SNR, destroys aRBC) |
 | C40 | helpers/atlas/split_trust.py | aikill-atlas (B12) | DONE 2026-09-25 — trust grade; `--root/--tag` = production tree → split_trust_b44/ (A18/B23/C13/D5, F82) |
@@ -592,3 +594,42 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 | diaphragm_binning/ | C24 C25 | F37 F38 | VALID |
 | 016PG/ · 023LL/ · 025JC/ · 25JC/ · 025JC_sweep_lt/ · piston/ | ? (June backlog, pre-canon) | ? | untagged — verify before trust (reconciled 2026-09-13) |
 | resplit_2026-09-24/ | C36 C37 | F59 F61–F71 | VALID — fits/ (89 Steve refits), rows{,_xecs}/, resplit_summary{,_xecs}.csv (79 / 68 re-split), fit_xcheck.csv (Steve vs XeCS, 70), template_study{,_adaptive}.csv + template_params.json (C37), logs; fig/: cohort + per-session before/after (steve, _xecs), tyger_old_vs_new_6651591.png, template_study{,_adaptive}.png; big .mat on Ext `AIkill_Dynamic/<key>/d/recon_resplit{,_xecs}.mat` (79 / 68 × 128 MB) and Tyger validation runs Ext `Work/Codes/2026_ASAP_Recon/tyger_specfit_2026-09-24/{045VS,041WF}/d/` |
+
+### C54 · helpers/tune_gas.py
+- why: Hooman's go on the Tyger tuning (s14). Steve's knobs were set by eye; C53 resamples truth ON the grid, so it
+  cannot judge grid/kernel choices. This samples a known object at the real trajectory points instead.
+- origin: C (harness) on H's request · branch: tyger-tuning (B29) · facts: pending
+- in: `AIkill_Dynamic/<key>/d/input.mrd`, `AIkill_Dynamic_b44/<key>/d/recon.mat` (nav_volume → bins, calcb_b, gas_phase)
+- out: `outputs/tune_gas/<key>/{metrics.csv, report.md, tradeoff.png, real_montage.png, montage_bin0.npz, run.log}`
+- method: object T = real(F_all·b), all data, production kernel, no apod, zeroed outside 12-vox lung dilation;
+  forward = finufft type 2 at the unique trajectory; per-bin soft weights (bug-faithful ilvnum) and exclude mask
+  collapsed onto unique samples (exact: gridding linear, trajectory periodic); noise σ per sample calibrated so
+  production reproduces the real bin's far-bg σ (object aliasing removed in quadrature), common random numbers across
+  settings; metrics in lung vs T lung mean: blur (all data), alias (bin − all), noise, total (one draw), PSF FWHM/gain
+  from delta probes at 4 lung voxels; deapod rows divide by steve_rolloff
+- checks: production rebuild relerr < 1e-3 asserted (4e-7 on 025JC); finufft axis/sign vs analytic delta asserted
+- flags: `--obj-gplb N` (build the object with readout apod N; 0 favours sharp, 300 favours smooth → bracket),
+  `--cg-control` (instead of the sweep: real-constrained weighted-LS CG via finufft on the same samples, all/bin 0,
+  noise-free and matched noise → `cg_control.csv`), `--only`, `--bins`
+- result: F90 (MS200 + deapod best, knobs ≤ ~15 %), F91 (Steve's gridding = the floor; CG noise-free 2–4 %)
+- flags (2026-09-28): `--set main|stab|snr|reg`, `--bindist0sq`, `--nbins`, `--sigma` (fixed per-sample σ), `--noise-mult`;
+  registration proxies in every row (hp_pair_corr, hp_anat_corr, hp_incons, edge, anchor_snr); image stacks → Ext
+  `/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tune_gas/<run>/` (float32). Result: F96 (soft-bin stable), F97 (MS 200
+  SNR-conditional → keep 240; one LB), F98 (MS 160 not justified for registration). Scratch: `_tune_batch_2026-09-28.sh`,
+  `_tune_tests_2026-09-28.py`, `_cohort_gas_snr.py`, `_tune_snr_fig.py`, `_tune_gas_fig09.py`
+- caveat: static object (no motion); object is itself a Steve recon (blur = operator's deviation from identity on it);
+  b fixed to production for real-data rows (a real rerun would recompute calcb per setting)
+
+### C55 · pipeline/deapod_tree.py
+- why: Hooman's go (s14, 2026-09-28): "fork + offline tree + two-subject tyger check" after F97 left deapod as the only
+  change. Deapod is a fixed per-voxel division applied after the split, so the b44 tree can be converted offline.
+- origin: C on H's order · branch: deapod-prod (B30) · facts: F99 (pending the Tyger check)
+- in: `/Volumes/HoomHamExt/AIkill_Dynamic_b44/<key>/d/recon.mat`, MS/IS from `AIkill_Dynamic/<key>/d/input.mrd` header
+- out: `/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d/<key>/d/recon.mat` (+ `deapod`=1,
+  `deapod_source`), `PROVENANCE.json`, `build_2026-09-28.log` at the tree root
+- method: gas_phase, gas_phase_magnitude, dissolved_phase_real/imag/magnitude ÷ A(r) (results.rolloff, kdist0sq 0.2);
+  calcb_b, nav_*, rbc_tp_* copied unchanged (the fork computes them before the division); skip-if-exists, atomic write
+- companion: `pipeline/run_deapod_check_2026-09-28.sh` (waits for the GH image build, Tyger ee3c91f on 025JC + 011CN →
+  Ext `tyger_deapod_check_2026-09-28/<key>/d/`), `pipeline/recon_codespec_ee3c91f.yml`; mrd_to_mat.py now carries
+  the output meta `deapod` flag
+

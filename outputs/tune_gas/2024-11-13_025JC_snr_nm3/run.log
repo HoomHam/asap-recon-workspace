@@ -1,0 +1,21 @@
+05:12:53 GAS 2024-11-13_025JC: MS=240 IS=100 nbins=16 gplb=300 npts=510 nilv=6980 nuniq=424320 (832 ilv, 8.39 repeats) dtdyn=5.00 us TE=0.620 ms kmax=40.36 dk; kept 0.8330
+05:12:53 min |data| kept 0.00102: LB >= 93 keeps every sample (EPS rule); last kept sample index 509
+05:12:54 collapsed sums done; bin weight totals {'all': 5814.0, 0: 904.3, 4: 904.3, 8: 904.3, 12: 904.3}
+05:12:54 building production kernel ...
+05:12:59 CHECK production rebuild bin 0 vs Tyger gas_phase: relerr 4.00e-07
+05:12:59 object: lung 74150 vox, T lung mean 0.001327; corner 503329 vox
+05:13:00 CHECK finufft axis/sign mapping vs analytic delta: max err 7.7e-11
+05:13:00 probe points (z,y,x): [(40, 55, 30), (38, 55, 62), (65, 56, 28), (67, 55, 67)]
+05:13:00 per-sample noise sigma (each of re/im) = 0.9797 (given)
+05:13:02 object T (obj LB 0) carries noise sd 0.068 of its lung mean as fake detail
+05:13:02 noise x3: sweep sigma 2.939
+05:13:29 gplb100    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=100: FWHM all 4.67 bin0 4.74 vox | blur 0.217 alias 0.012 noise 0.055 total 0.230 | holes 0.562 | real SNR 39.1 (27 s)
+05:13:50 gplb150    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=150: FWHM all 3.64 bin0 3.70 vox | blur 0.172 alias 0.016 noise 0.091 total 0.203 | holes 0.562 | real SNR 30.0 (21 s)
+05:14:08 gplb200    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=200: FWHM all 3.14 bin0 3.18 vox | blur 0.147 alias 0.019 noise 0.124 total 0.201 | holes 0.562 | real SNR 25.2 (19 s)
+05:14:28 prod       MS=240 kd2=0.2 (sigma 0.132 dk) gplb=300: FWHM all 2.67 bin0 2.70 vox | blur 0.118 alias 0.021 noise 0.183 total 0.226 | holes 0.562 | real SNR 19.9 (19 s)
+05:14:46 gplb450    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=450: FWHM all 2.43 bin0 2.46 vox | blur 0.099 alias 0.023 noise 0.248 total 0.274 | holes 0.562 | real SNR 16.2 (19 s)
+05:15:06 gplb700    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=700: FWHM all 2.32 bin0 2.34 vox | blur 0.087 alias 0.025 noise 0.303 total 0.322 | holes 0.562 | real SNR 14.0 (19 s)
+05:15:16 MS160      MS=160 kd2=0.2 (sigma 0.198 dk) gplb=300: FWHM all 2.59 bin0 2.61 vox | blur 0.112 alias 0.016 noise 0.262 total 0.288 | holes 0.311 | real SNR 18.2 (10 s)
+05:15:32 MS200      MS=200 kd2=0.2 (sigma 0.158 dk) gplb=300: FWHM all 2.63 bin0 2.66 vox | blur 0.110 alias 0.017 noise 0.222 total 0.253 | holes 0.446 | real SNR 18.9 (16 s)
+05:15:35 image stacks -> /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tune_gas/2024-11-13_025JC_snr_nm3
+05:15:36 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/tune_gas/2024-11-13_025JC_snr_nm3

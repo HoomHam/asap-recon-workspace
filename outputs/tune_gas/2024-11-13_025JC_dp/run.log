@@ -1,0 +1,19 @@
+23:33:21 DISSOLVED 2024-11-13_025JC: MS=240 IS=100 nbins=16 gplb=300 npts=510 nilv=6980 nuniq=424320 (832 ilv, 8.39 repeats) dtdyn=5.00 us TE=0.620 ms kmax=40.36 dk; kept 0.3958
+23:33:21 min |data| kept 0.00065: LB >= 94 keeps every sample (EPS rule); last kept sample index 246
+23:33:22 collapsed sums done; bin weight totals {'all': 2762.4, 0: 429.7, 4: 429.6, 8: 429.6, 12: 429.7}
+23:33:22 building production kernel ...
+23:33:28 CHECK production rebuild bin 0 vs Tyger aRBC/aTP (LS 2x2 map): corr 1.000000 / 1.000000
+23:33:28 object: lung 97076 vox, T lung mean 7.446e-05; corner 505418 vox
+23:33:28 CHECK finufft axis/sign mapping vs analytic delta: max err 7.7e-11
+23:33:28 probe points (z,y,x): [(39, 54, 31), (40, 54, 62), (65, 53, 28), (67, 52, 65)]
+23:33:30   noise cal bin 0: real corner sd 3.6e-06, object-alias sd 3.833e-07, unit 4.544e-06 -> sigma 0.7879
+23:33:32   noise cal bin 4: real corner sd 3.508e-06, object-alias sd 3.765e-07, unit 4.336e-06 -> sigma 0.8043
+23:33:34   noise cal bin 8: real corner sd 3.511e-06, object-alias sd 4.011e-07, unit 4.395e-06 -> sigma 0.7936
+23:33:36   noise cal bin 12: real corner sd 3.561e-06, object-alias sd 3.896e-07, unit 4.453e-06 -> sigma 0.7948
+23:33:36 per-sample noise sigma (each of re/im) = 0.7942  (spread 0.7%)
+23:33:36 object T (obj LB 40) carries noise sd 0.028 of its lung mean as fake detail
+23:33:52 prod       MS=240 kd2=0.2 (sigma 0.132 dk) gplb=40: FWHM all 8.64 bin0 8.74 vox | blur 0.185 alias 0.004 noise 0.079 total 0.203 | holes 0.816 | real SNR 21.0 (16 s)
+23:34:02 MS200      MS=200 kd2=0.2 (sigma 0.158 dk) gplb=40: FWHM all 8.55 bin0 8.60 vox | blur 0.185 alias 0.006 noise 0.081 total 0.204 | holes 0.776 | real SNR 21.0 (10 s)
+23:34:11 MS160      MS=160 kd2=0.2 (sigma 0.198 dk) gplb=40: FWHM all 8.51 bin0 8.52 vox | blur 0.188 alias 0.007 noise 0.081 total 0.206 | holes 0.734 | real SNR 21.4 (8 s)
+23:34:31 k0.5       MS=240 kd2=0.5 (sigma 0.208 dk) gplb=40: FWHM all 8.50 bin0 8.51 vox | blur 0.187 alias 0.006 noise 0.078 total 0.204 | holes 0.726 | real SNR 23.8 (20 s)
+23:34:34 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/tune_gas/2024-11-13_025JC_dp

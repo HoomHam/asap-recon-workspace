@@ -1,0 +1,28 @@
+23:11:21 2024-11-13_025JC: MS=240 IS=100 nbins=16 gplb=300 npts=510 nilv=6980 nuniq=424320 (832 ilv, 8.39 repeats) dtdyn=5.00 us TE=0.620 ms kmax=40.36 dk; kept 0.8330
+23:11:22 min |data| kept 0.00102: gplb >= 93 keeps every sample (EPS rule)
+23:11:23 collapsed sums done; bin weight totals {'all': 5814.0, 0: 904.3, 4: 904.3, 8: 904.3, 12: 904.3}
+23:11:23 building production kernel ...
+23:11:26 CHECK production rebuild bin 0 vs Tyger gas_phase: relerr 4.00e-07
+23:11:29 object: lung 74150 vox, T lung mean 0.001311; corner 503329 vox
+23:11:29 CHECK finufft axis/sign mapping vs analytic delta: max err 7.7e-11
+23:11:29 probe points (z,y,x): [(40, 55, 30), (38, 55, 62), (65, 56, 28), (67, 55, 67)]
+23:11:33   noise cal bin 0: real corner sd 5.329e-05, object-alias sd 2.167e-05, unit 6.113e-05 -> sigma 0.7963
+23:11:37   noise cal bin 4: real corner sd 7.095e-05, object-alias sd 2.124e-05, unit 6.193e-05 -> sigma 1.093
+23:11:39   noise cal bin 8: real corner sd 7.317e-05, object-alias sd 2.182e-05, unit 6.057e-05 -> sigma 1.153
+23:11:41   noise cal bin 12: real corner sd 5.803e-05, object-alias sd 2.152e-05, unit 6.062e-05 -> sigma 0.889
+23:11:41 per-sample noise sigma (each of re/im) = 0.9911  (spread 14.7%)
+23:11:42 object T (obj gplb 300) carries noise sd 0.034 of its lung mean as fake detail
+23:12:01 prod       MS=240 kd2=0.2 (sigma 0.132 dk) gplb=300: FWHM all 2.67 bin0 2.70 vox | blur 0.083 alias 0.019 noise 0.062 total 0.116 | holes 0.562 | real SNR 19.9 (19 s)
+23:12:29 gplb0      MS=240 kd2=0.2 (sigma 0.132 dk) gplb=0: FWHM all 2.24 bin0 2.26 vox | blur 0.063 alias 0.022 noise 0.123 total 0.146 | holes 0.562 | real SNR 12.2 (28 s)
+23:13:12 gplb150    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=150: FWHM all 3.64 bin0 3.70 vox | blur 0.127 alias 0.015 noise 0.031 total 0.141 | holes 0.562 | real SNR 30.0 (43 s)
+23:14:12 gplb200    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=200: FWHM all 3.14 bin0 3.18 vox | blur 0.104 alias 0.017 noise 0.042 total 0.124 | holes 0.562 | real SNR 25.2 (60 s)
+23:15:06 gplb450    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=450: FWHM all 2.43 bin0 2.46 vox | blur 0.072 alias 0.020 noise 0.085 total 0.122 | holes 0.562 | real SNR 16.2 (54 s)
+23:15:36 gplb700    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=700: FWHM all 2.32 bin0 2.34 vox | blur 0.067 alias 0.021 noise 0.104 total 0.133 | holes 0.562 | real SNR 14.0 (29 s)
+23:16:30 k0.5       MS=240 kd2=0.5 (sigma 0.208 dk) gplb=300: FWHM all 2.58 bin0 2.60 vox | blur 0.090 alias 0.014 noise 0.090 total 0.132 | holes 0.283 | real SNR 19.4 (54 s)
+23:18:25 k1.0       MS=240 kd2=1.0 (sigma 0.295 dk) gplb=300: FWHM all 2.55 bin0 2.56 vox | blur 0.142 alias 0.018 noise 0.093 total 0.174 | holes 0.156 | real SNR 21.9 (115 s)
+23:19:03 k2.0       MS=240 kd2=2.0 (sigma 0.417 dk) gplb=300: FWHM all 2.54 bin0 2.55 vox | blur 0.253 alias 0.023 noise 0.085 total 0.272 | holes 0.113 | real SNR 28.6 (38 s)
+23:19:11 MS160      MS=160 kd2=0.2 (sigma 0.198 dk) gplb=300: FWHM all 2.59 bin0 2.61 vox | blur 0.086 alias 0.015 noise 0.089 total 0.129 | holes 0.311 | real SNR 18.2 (8 s)
+23:19:23 MS200      MS=200 kd2=0.2 (sigma 0.158 dk) gplb=300: FWHM all 2.63 bin0 2.66 vox | blur 0.078 alias 0.015 noise 0.076 total 0.116 | holes 0.446 | real SNR 18.9 (12 s)
+23:19:35 MS160k0.5  MS=160 kd2=0.5 (sigma 0.312 dk) gplb=300: FWHM all 2.55 bin0 2.56 vox | blur 0.155 alias 0.019 noise 0.093 total 0.186 | holes 0.143 | real SNR 22.4 (12 s)
+23:19:50 MS200k0.5  MS=200 kd2=0.5 (sigma 0.250 dk) gplb=300: FWHM all 2.56 bin0 2.57 vox | blur 0.112 alias 0.016 noise 0.094 total 0.150 | holes 0.204 | real SNR 20.2 (16 s)
+23:20:00 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/tune_gas/2024-11-13_025JC_obj300

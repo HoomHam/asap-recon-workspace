@@ -28,6 +28,7 @@ def convert(sess_dir):
                 m = it.value.meta
                 if m.get('gas_phase_image'):
                     out['gas_phase'] = np.asarray(it.value.data, dtype=np.float32)
+                    out['deapod'] = int(m['deapod'][0].value) if m.get('deapod') else 0   # fork ee3c91f+: rolloff divided
                 elif m.get('gas_phase_magnitude'):
                     out['gas_phase_magnitude'] = np.asarray(it.value.data, dtype=np.float32)
                 else:
@@ -48,7 +49,7 @@ def convert(sess_dir):
                     out['calcb_b'] = np.asarray(it.value.data, dtype=np.complex64)
                 elif m.get('gas_phase_complex'):
                     pass  # 128 MB, not needed offline
-    out['made_by'] = 'workspace/pipeline/mrd_to_mat.py 2026-09-25 (fork calcb_phase_sigma 4.4)'
+    out['made_by'] = 'workspace/pipeline/mrd_to_mat.py (fork calcb_phase_sigma 4.4; deapod flag from output meta)'
     sio.savemat(str(d / 'recon.mat'), out, do_compression=False)
     return {k: (v.shape if hasattr(v, 'shape') else v) for k, v in out.items() if k.startswith(('gas_phase', 'dissolved_phase_real', 'rbc_tp_separated', 'rbc_tp_dphi', 'calcb'))}
 

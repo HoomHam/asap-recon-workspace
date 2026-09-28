@@ -34,10 +34,12 @@ flowchart TD
   B22["✅ dixon-lit-review (09-24)<br/>reference/OnePointDixon_Review.md · 40 papers · Duke pipeline read<br/>F60 imaging RBC:M = spectro by construction · F59 TE term VALID"]
   B23["✅ rbctp-resplit (09-24/25)<br/>specfit k0 basis · fork 6651591 · 68 offline re-split (F61–F71)"]
   B24["✅ perbin-phaseref (09-25)<br/>per-bin gas ref = no effect (F77) · F74 RETRACTED<br/>FOUND: raw b phase inside mask = static RBC speckle (F79)"]
-  B25["★ prod-b44 (09-25)<br/>calcb phase low-pass σ 4.4 (F81) · fork 04f445b · 61 rerun → AIkill_Dynamic_b44<br/>speckle gone cohort-wide (F82) · atlas_b44 + trust_b44"]
+  B25["● prod-b44 (09-25)<br/>calcb phase low-pass σ 4.4 (F81) · fork 04f445b · 61 rerun → AIkill_Dynamic_b44<br/>speckle gone cohort-wide (F82) · atlas_b44 + trust_b44"]
   B26["✅ noise-consult for PCA (09-26)<br/>Tyger bg signed Gaussian · ACF · per-bin σ · PSF ≈ 2.2 vox (F83)<br/>Faraz bg self-referenced (F84) · legacy PF/P1 (F85 SUSPECT)"]
   B27["✅ pf-p1 (09-26)<br/>legacy dat/PF = oldway 0 Hermitian, P1 = oldway 1 (F86, C51, 37 studies)<br/>every Tyger image oldway 1, narrow kernel (F87) · F85 → VALID"]
   B28["✅ pf-merit (09-26/27)<br/>Tyger-exact rebuild 021CH: PF no SNR merit, kills dissolved (F88, C52)<br/>truth-resampling: PF \"structure\" = ghost of 18 % out-of-crop energy, code verified on ideal object (F89, C53) · 2steve/08"]
+  B29["★ tyger-tuning (09-27/28)<br/>C54 known-object sweep 025JC/011CN: knobs ≤15 % (F90) · sharpness = ×2 noise (F94)<br/>floor = gridding, no operator converts it (F91→F95) · dplb 40 = Dixon limit (F92/F93)<br/>soft-bin stable (F96) · MS 200 SNR-conditional → keep 240 (F97) · MS160-for-R ruled out (F98)<br/>open: soft-bin width × nbins needs a moving object · R optimum = PCA benchmark"]
+  B30["✅ deapod-prod (09-28)<br/>fork ee3c91f (after split, not in nav) · offline tree AIkill_Dynamic_b44d (61, C55)<br/>Tyger check 1e-7 / ≤1e-4 (F99) · XeCS + PCA told"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -55,6 +57,8 @@ flowchart TD
   B12 --> B24 --> B25
   B25 --> B26
   B26 --> B27 --> B28
+  B25 --> B29 --> B30
+  B28 -.two-target plan.-> B29
   B17 -.F47.-> B12
   B9 -.xecs_recon.pth.-> B10
 ```
@@ -71,10 +75,12 @@ flowchart TD
 | B10 batch | C8 batch_recon.py, C9 dyn_recon.py, C29 todo_batch.sh, C14–C17 helpers, SNR_Table_All.xlsx (F4–F16 F42–F45) |
 | B12 aikill-atlas ✅ | C26 dis_atlas.py (dp SUSPECT_F47.md), C38 te90_table.py → outputs/te90_2026-09-25/ (F72), C39 rbc_tm_atlas.py → outputs/aikill_atlas/rbc_tm_atlas.pdf (61, raw b, superseded by B25), C40 split_trust.py → outputs/split_trust_2026-09-25/ (grades; F73; F74 RETRACTED marker), C42 rbc_repro_tests.py (F75 F76) |
 | B24 perbin-phaseref ✅ | fork f5ac7c5 (gas_phase_complex) + c8366c3 (calcb_b export), C41 perbin_phaseref.py (F77), C43 bphase_fix.py, C44 bphase_confirm.py (F79 confirmed), C45 bphase_sigma.py, C46 bsmooth_compare.py (F80), C47 bsmooth_videos.py, outputs/bphase_fix_2026-09-25/, Ext tyger_{gascplx,bexport,bsmooth}_2026-09-25/ (bexport = raw b for all 61, 24 GB) (F78 F79 F80) |
-| B25 prod-b44 ★ | fork 19b7365 → 1fe07a0 → 04f445b (`results.calcb_phase_sigma` 2.5 → 5 → 4.4), C48 bphase_sigma_cohort.py → cohort_sigma.csv (F81), C49 run_prod_b44.sh + prod_b44_todo.txt, C50 mrd_to_mat.py, Ext `AIkill_Dynamic_b44/<key>/d/{output.mrd, recon.mat, tyger.log}` (61; 59 split), outputs/aikill_atlas_b44/ (PDF 679 pg + grades CSV; videos on Ext aikill_atlas_b44/), outputs/split_trust_b44/ (trust table, fine_static_b44.csv, trust_lookup_all.csv, registration21_trust_rank.csv) (F82) |
+| B25 prod-b44 ● | fork 19b7365 → 1fe07a0 → 04f445b (`results.calcb_phase_sigma` 2.5 → 5 → 4.4), C48 bphase_sigma_cohort.py → cohort_sigma.csv (F81), C49 run_prod_b44.sh + prod_b44_todo.txt, C50 mrd_to_mat.py, Ext `AIkill_Dynamic_b44/<key>/d/{output.mrd, recon.mat, tyger.log}` (61; 59 split), outputs/aikill_atlas_b44/ (PDF 679 pg + grades CSV; videos on Ext aikill_atlas_b44/), outputs/split_trust_b44/ (trust table, fine_static_b44.csv, trust_lookup_all.csv, registration21_trust_rank.csv) (F82) |
 | B26 noise-consult ✅ | helpers/_noise_char.py (scratch; bg Gaussianity, corner/near-lung σ, spatial ACF, per-bin σ, inter-bin corr on b44 d/recon.mat), 2 cross-session replies to 2026-pca-registration-e4 (F83 F84 F85) |
 | B27 pf-p1 ✅ | C51 pf_p1_check.py → outputs/pf_p1_check/ (F86); code archaeology: WorkVault `_staging_2tb/Downloads/{code,drive-download-20240829T203130Z-001}/recon.py`, mrisim 1a41ac0, GPT thread 2024-08-29 (F87) |
 | B28 pf-merit ✅ | C52 pf_test.py, C53 pf_inlung.py (--truth-bin/--b-raw/--b-self/--synth-real/--lung-only) → outputs/pf_test/2024-10-22_021CH/ (F88 F89); 2steve/08_Hermitian_PartialFourier_Branch.md + fig/08_*; notes/Two_Targets_Registration_vs_Truth.md (PROPOSAL) |
+| B29 tyger-tuning ★ | C54 helpers/tune_gas.py (--set/--dp/--obj-gplb/--cg-control/--bindist0sq/--nbins/--sigma/--noise-mult) → outputs/tune_gas/<key>[_dp/_obj300/_reg/_stab_*/_snr_*]/ (csv, md, png), combined_table*.md, tests_2026-09-28.md, cohort_gas_snr.csv, figures sharpness_vs_noise.png / snr_crossover.png / candidates_bin0.png; image stacks Ext `Work/Codes/2026_ASAP_Recon/tune_gas/`; scratch _tune_gas_{combine,candidates,fig09}.py, _tune_batch_2026-09-28.sh, _tune_tests_2026-09-28.py, _cohort_gas_snr.py, _tune_snr_fig.py; notes/Tyger_Tuning_Gas_Dissolved_2026-09-27.md; 2steve/09 + fig/09_* (F90–F98) |
+| B30 deapod-prod ✅ | fork ee3c91f (results.rolloff/deapod, tyger_recon meta), pipeline/recon_codespec_ee3c91f.yml, C55 pipeline/deapod_tree.py → Ext `Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d/` (61, PROVENANCE.json), pipeline/run_deapod_check_2026-09-28.sh → Ext `tyger_deapod_check_2026-09-28/`, mrd_to_mat.py deapod flag, _deapod_check_compare.py → outputs/tune_gas/deapod_check_2026-09-28.md; 2steve/03 update (F99) |
 | B13 tyger-access | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558), memory tyger_setup.md |
 | B14 leftover-recon | fork commits 472fbc9/40d23a4, C9 dyn_recon.py, C29 todo_batch.sh, outputs/roundtrip_audit_2026-09-13/, outputs/leftover_recon_2026-09-12/, Ext pipeline_runs/logs + quarantine/ (F42–F46 F51) |
 | B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
@@ -87,7 +93,7 @@ flowchart TD
 | B20 merged-dyn | C31 merge_dyn.py, C32 merged_batch.sh, C9 dyn_recon.py --merge/--ref, outputs/twix_audit_2026-09-16/, Ext AIkill_Dynamic/*_merged/ + pipeline_runs/logs/*_merged.log (F55 F56) |
 | B21 ct-overlay ● | C33 ct_to_nifti.py, C34 ct_mri_overlay.py, C35 ct_cohort_batch.py, outputs/ct_overlay/<key>/ (summary_3plane, montages, bins_video.mp4, register.json), cohort_fit_table.csv, cohort_summary.pdf (Ext, symlink), Ext `Codes/2026_ASAP_Recon/ct_overlay/` (NIfTI CT, mri_on_ct, rigid.tfm, per-slice PNG/GIF, manifest.json) (F58) |
 
-## Current position (★ B25, 2026-09-25 20:05)
+## Current position (★ B29, 2026-09-28 06:00; B25 history below)
 
 Session 11 built the RBC/TM atlas and trust grade (B12), then chased the non-moving structure Hooman saw in the
 RBC videos: not a smooth static field (F74 retracted), not noise (F75), not scanner-fixed (F76), but the raw
@@ -111,3 +117,14 @@ control: the added sharpness is a ghost of the 18 % non-real energy outside the 
 **Proposed next (Hooman's go pending): the two-target plan in `notes/Two_Targets_Registration_vs_Truth.md` —
 1 PF-as-anchor bin-consistency test, 2 derive MS/IS/kernel/LB from physics + harness check, 3 R/T dual export,
 4 bindist0sq × nbins by criterion, 5 2steve dead-knob note.**
+
+Session 14 (2026-09-27/28, Opus 5.5): plan step 2 done as B29, a known-object sweep over Steve's knobs on 025JC and
+011CN. Knobs buy ≤ 15 % (F90). Every sharpening knob pays about double noise (F94). The noise-free floor is the gridding
+but no tested operator converts it (F91 → F95, XeCS record). Hooman's pre-fork tests: soft-bin ranking stable (F96);
+MS 200's gain reverses below SNR ≈ 10–12 → MS stays 240 (F97); MS 160 for registration ruled out by proxies (F98).
+Production (B30): deapod only — fork ee3c91f, offline tree `AIkill_Dynamic_b44d` = Tyger rerun (F99); XeCS (on b44
+until 2026-10-12) and PCA told. Steve notes 09 (new) + 03 (update). ★ → B29.
+**Next: plan step 4 — soft-bin width × nbins judged with a MOVING object (the static harness cannot see temporal
+blur); PCA's b44-vs-b44d registration check and any R-image test are their lane. Still open from B25: "the rest"
+(43 sessions without a clean split), 2steve/06 addendum, B21.**
+

@@ -1,0 +1,19 @@
+case,iters,rms_err,bias
+"all, noise-free",2,0.87095,0.26659
+"all, noise-free",5,0.54484,0.6378
+"all, noise-free",10,0.34064,0.84608
+"all, noise-free",20,0.13174,0.97029
+"all, noise-free",40,0.045739,0.99409
+"all, noise-free",80,0.021775,0.99854
+"bin 0, noise-free",2,0.87038,0.26716
+"bin 0, noise-free",5,0.54905,0.63277
+"bin 0, noise-free",10,0.35187,0.83403
+"bin 0, noise-free",20,0.162,0.95492
+"bin 0, noise-free",40,0.075182,0.98732
+"bin 0, noise-free",80,0.038952,0.99626
+"bin 0, matched noise",2,0.87042,0.26711
+"bin 0, matched noise",5,0.54872,0.63314
+"bin 0, matched noise",10,0.34335,0.84262
+"bin 0, matched noise",20,0.15266,0.96968
+"bin 0, matched noise",40,0.15235,0.99301
+"bin 0, matched noise",80,0.22743,0.99804

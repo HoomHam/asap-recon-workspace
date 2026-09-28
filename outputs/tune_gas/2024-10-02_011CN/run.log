@@ -1,0 +1,57 @@
+23:05:55 2024-10-02_011CN: MS=240 IS=100 nbins=16 gplb=300 npts=510 nilv=6581 nuniq=424320 (832 ilv, 7.91 repeats) dtdyn=5.00 us TE=0.620 ms kmax=40.36 dk; kept 0.8835
+23:05:55 min |data| kept 0.000166: gplb >= 96 keeps every sample (EPS rule)
+23:05:57 collapsed sums done; bin weight totals {'all': 5814.0, 0: 904.3, 4: 904.3, 8: 904.3, 12: 904.3}
+23:05:57 building production kernel ...
+23:06:01 CHECK production rebuild bin 0 vs Tyger gas_phase: relerr 7.41e-06
+23:06:03 object: lung 37418 vox, T lung mean 0.001681; corner 509593 vox
+23:06:03 CHECK finufft axis/sign mapping vs analytic delta: max err 7.7e-11
+23:06:03 probe points (z,y,x): [(42, 63, 25), (43, 56, 38), (67, 54, 22), (68, 50, 37)]
+23:06:06   noise cal bin 0: real corner sd 6.435e-05, object-alias sd 2.914e-05, unit 5.952e-05 -> sigma 0.964
+23:06:08   noise cal bin 4: real corner sd 8.685e-05, object-alias sd 2.738e-05, unit 6.585e-05 -> sigma 1.252
+23:06:10   noise cal bin 8: real corner sd 0.0001039, object-alias sd 2.81e-05, unit 6.165e-05 -> sigma 1.622
+23:06:12   noise cal bin 12: real corner sd 7.615e-05, object-alias sd 2.805e-05, unit 6.304e-05 -> sigma 1.123
+23:06:12 per-sample noise sigma (each of re/im) = 1.187  (spread 20.5%)
+23:06:13 object T (obj gplb 0) carries noise sd 0.063 of its lung mean as fake detail
+23:06:30 prod       MS=240 kd2=0.2 (sigma 0.132 dk) gplb=300: FWHM all 2.67 bin0 2.70 vox | blur 0.155 alias 0.018 noise 0.058 total 0.178 | holes 0.545 | real SNR 19.5 (17 s)
+23:06:47 gplb0      MS=240 kd2=0.2 (sigma 0.132 dk) gplb=0: FWHM all 2.24 bin0 2.26 vox | blur 0.113 alias 0.021 noise 0.115 total 0.173 | holes 0.545 | real SNR 13.3 (17 s)
+23:07:05 gplb150    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=150: FWHM all 3.64 bin0 3.69 vox | blur 0.221 alias 0.013 noise 0.029 total 0.233 | holes 0.545 | real SNR 25.9 (18 s)
+23:07:24 gplb200    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=200: FWHM all 3.14 bin0 3.17 vox | blur 0.189 alias 0.015 noise 0.040 total 0.204 | holes 0.545 | real SNR 23.0 (19 s)
+23:07:41 gplb450    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=450: FWHM all 2.43 bin0 2.46 vox | blur 0.134 alias 0.019 noise 0.079 total 0.169 | holes 0.545 | real SNR 16.7 (18 s)
+23:08:00 gplb700    MS=240 kd2=0.2 (sigma 0.132 dk) gplb=700: FWHM all 2.32 bin0 2.34 vox | blur 0.122 alias 0.020 noise 0.097 total 0.169 | holes 0.545 | real SNR 14.9 (19 s)
+23:08:22 k0.5       MS=240 kd2=0.5 (sigma 0.208 dk) gplb=300: FWHM all 2.58 bin0 2.60 vox | blur 0.162 alias 0.010 noise 0.081 total 0.186 | holes 0.270 | real SNR 19.3 (22 s)
+23:08:59 k1.0       MS=240 kd2=1.0 (sigma 0.295 dk) gplb=300: FWHM all 2.56 bin0 2.56 vox | blur 0.227 alias 0.013 noise 0.082 total 0.247 | holes 0.151 | real SNR 20.9 (36 s)
+23:09:30 k2.0       MS=240 kd2=2.0 (sigma 0.417 dk) gplb=300: FWHM all 2.55 bin0 2.55 vox | blur 0.364 alias 0.017 noise 0.072 total 0.376 | holes 0.111 | real SNR 25.1 (31 s)
+23:09:37 MS160      MS=160 kd2=0.2 (sigma 0.198 dk) gplb=300: FWHM all 2.59 bin0 2.61 vox | blur 0.158 alias 0.011 noise 0.081 total 0.183 | holes 0.298 | real SNR 18.2 (7 s)
+23:09:45 MS200      MS=200 kd2=0.2 (sigma 0.158 dk) gplb=300: FWHM all 2.63 bin0 2.65 vox | blur 0.147 alias 0.013 noise 0.070 total 0.171 | holes 0.429 | real SNR 18.8 (8 s)
+23:09:56 MS160k0.5  MS=160 kd2=0.5 (sigma 0.312 dk) gplb=300: FWHM all 2.56 bin0 2.56 vox | blur 0.244 alias 0.014 noise 0.081 total 0.263 | holes 0.138 | real SNR 21.0 (11 s)
+23:10:10 MS200k0.5  MS=200 kd2=0.5 (sigma 0.250 dk) gplb=300: FWHM all 2.57 bin0 2.57 vox | blur 0.189 alias 0.012 noise 0.083 total 0.212 | holes 0.196 | real SNR 19.8 (14 s)
+23:10:19 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/tune_gas/2024-10-02_011CN
+23:15:44 2024-10-02_011CN: MS=240 IS=100 nbins=16 gplb=300 npts=510 nilv=6581 nuniq=424320 (832 ilv, 7.91 repeats) dtdyn=5.00 us TE=0.620 ms kmax=40.36 dk; kept 0.8835
+23:15:44 min |data| kept 0.000166: gplb >= 96 keeps every sample (EPS rule)
+23:15:45 collapsed sums done; bin weight totals {'all': 5814.0, 0: 904.3}
+23:15:45 building production kernel ...
+23:15:51 CHECK production rebuild bin 0 vs Tyger gas_phase: relerr 7.41e-06
+23:15:54 object: lung 37418 vox, T lung mean 0.001681; corner 509593 vox
+23:15:55 CHECK finufft axis/sign mapping vs analytic delta: max err 7.7e-11
+23:15:55 probe points (z,y,x): [(42, 63, 25), (43, 56, 38), (67, 54, 22), (68, 50, 37)]
+23:15:59   noise cal bin 0: real corner sd 6.435e-05, object-alias sd 2.914e-05, unit 5.952e-05 -> sigma 0.964
+23:15:59 per-sample noise sigma (each of re/im) = 0.964  (spread 0.0%)
+23:16:01 object T (obj gplb 0) carries noise sd 0.051 of its lung mean as fake detail
+23:16:02   CG all, noise-free          it   2: rms err 0.8709  lung mean ratio 0.2666  (1 s)
+23:16:04   CG all, noise-free          it   5: rms err 0.5448  lung mean ratio 0.6378  (3 s)
+23:16:08   CG all, noise-free          it  10: rms err 0.3406  lung mean ratio 0.8461  (6 s)
+23:16:14   CG all, noise-free          it  20: rms err 0.1317  lung mean ratio 0.9703  (12 s)
+23:16:27   CG all, noise-free          it  40: rms err 0.0457  lung mean ratio 0.9941  (26 s)
+23:16:53   CG all, noise-free          it  80: rms err 0.0218  lung mean ratio 0.9985  (52 s)
+23:16:55   CG bin 0, noise-free        it   2: rms err 0.8704  lung mean ratio 0.2672  (1 s)
+23:16:57   CG bin 0, noise-free        it   5: rms err 0.5490  lung mean ratio 0.6328  (3 s)
+23:17:00   CG bin 0, noise-free        it  10: rms err 0.3519  lung mean ratio 0.8340  (6 s)
+23:17:06   CG bin 0, noise-free        it  20: rms err 0.1620  lung mean ratio 0.9549  (12 s)
+23:17:19   CG bin 0, noise-free        it  40: rms err 0.0752  lung mean ratio 0.9873  (25 s)
+23:17:43   CG bin 0, noise-free        it  80: rms err 0.0390  lung mean ratio 0.9963  (49 s)
+23:17:45   CG bin 0, matched noise     it   2: rms err 0.8704  lung mean ratio 0.2671  (1 s)
+23:17:47   CG bin 0, matched noise     it   5: rms err 0.5487  lung mean ratio 0.6331  (3 s)
+23:17:50   CG bin 0, matched noise     it  10: rms err 0.3433  lung mean ratio 0.8426  (6 s)
+23:17:56   CG bin 0, matched noise     it  20: rms err 0.1527  lung mean ratio 0.9697  (12 s)
+23:18:07   CG bin 0, matched noise     it  40: rms err 0.1523  lung mean ratio 0.9930  (23 s)
+23:18:25   CG bin 0, matched noise     it  80: rms err 0.2274  lung mean ratio 0.9980  (41 s)
