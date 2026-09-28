@@ -1,0 +1,37 @@
+identified sampling pattern gas-dissolved
+TR (from metadata) = 17.200 ms, ilvperTR=2 (dual-phase)
+spectral fit (M3): gas -217.1 ppm from carrier, RBC 217.4 / mem 201.7+195.9 ppm from gas, df 336 Hz, RBC/TP lumped 0.507 (scalar 0.389, F_lump 1.30), RBC-TP phase at k0 60.5 deg (per-rep SD 4.7, drop-one-more change 2.0, noise gain 1.15), SNR 58
+filtering noise spikes...
+removed 0.0 points (noise spikes) of 3373140
+removed 0.0 points (noise spikes) of 3373140
+01:19:38 truth: gridding bin 4 alone (single phase, its own holes are part of the object) ...
+01:19:51 truth: lung 45049 vox, lung mean 1.663e+04, far-bg sd 633.3 (holes inside sphere 0.392 of touched cells)
+01:19:51 truth: residual phase of F.b inside the lung: 0.00 deg rms, |Im|/|F| 0.000
+01:19:51 truth: image energy outside the 100^3 crop = 0.1816 of total (240^3 grid)
+01:19:52 truth: synthetic real crop-supported object; round-trip error 2.4e-16
+01:19:52 bin 0: gridding for the sampling pattern ...
+01:20:22   pocs convergence (noise-free):
+01:20:24     pocs it 0: rel change 8.04e-02
+01:20:24     pocs it 1: rel change 2.99e-02
+01:20:25     pocs it 2: rel change 1.49e-02
+01:20:26     pocs it 3: rel change 8.74e-03
+01:20:27     pocs it 4: rel change 5.74e-03
+01:20:28     pocs it 5: rel change 4.08e-03
+01:20:28     pocs it 6: rel change 3.08e-03
+01:20:29     pocs it 7: rel change 2.42e-03
+01:20:30     pocs it 8: rel change 1.97e-03
+01:20:31     pocs it 9: rel change 1.63e-03
+01:20:31     pocs it 10: rel change 1.38e-03
+01:20:32     pocs it 11: rel change 1.19e-03
+01:20:33     pocs it 12: rel change 1.04e-03
+01:20:34     pocs it 13: rel change 9.17e-04
+01:20:35     pocs it 14: rel change 8.17e-04
+01:20:36     pocs it 15: rel change 7.34e-04
+01:20:36     pocs it 16: rel change 6.64e-04
+01:20:37     pocs it 17: rel change 6.04e-04
+01:20:38     pocs it 18: rel change 5.54e-04
+01:20:39     pocs it 19: rel change 5.10e-04
+01:20:39   noise-free rms err / lung mean: P1 0.0801, PFs 0.0122, PFs+k 0.0285, PFc 0.0074
+01:20:40   noise: real far-bg sd 800.2 -> per-cell sigma 0.6049
+01:21:19   with noise rms err / lung mean: P1 0.0941, PFs 0.0796, PFs+k 0.0840, PFc 0.1064
+01:21:19 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/pf_test/2024-10-22_021CH

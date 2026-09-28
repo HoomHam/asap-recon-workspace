@@ -1,0 +1,17 @@
+identified sampling pattern gas-dissolved
+TR (from metadata) = 17.200 ms, ilvperTR=2 (dual-phase)
+spectral fit (M3): gas -217.1 ppm from carrier, RBC 217.4 / mem 201.7+195.9 ppm from gas, df 336 Hz, RBC/TP lumped 0.507 (scalar 0.389, F_lump 1.30), RBC-TP phase at k0 60.5 deg (per-rep SD 4.7, drop-one-more change 2.0, noise gain 1.15), SNR 58
+filtering noise spikes...
+removed 0.0 points (noise spikes) of 3373140
+removed 0.0 points (noise spikes) of 3373140
+00:51:46 truth: gridding bin 4 alone (single phase, its own holes are part of the object) ...
+00:52:00 truth: lung 45049 vox, lung mean 1.653e+04, far-bg sd 933.1 (holes inside sphere 0.392 of touched cells)
+00:52:00 bin 0: gridding for the sampling pattern ...
+00:52:30   noise-free rms err / lung mean: P1 0.0100, PFs 0.0996, PFs+k 0.0970, PFc 0.1048
+00:52:31   noise: real far-bg sd 800.2 -> per-cell sigma 0.6057
+00:53:41   with noise rms err / lung mean: P1 0.0499, PFs 0.1266, PFs+k 0.1247, PFc 0.1503
+00:53:42 bin 8: gridding for the sampling pattern ...
+00:54:26   noise-free rms err / lung mean: P1 0.0077, PFs 0.0945, PFs+k 0.0927, PFc 0.1051
+00:54:27   noise: real far-bg sd 1432 -> per-cell sigma 1.079
+00:55:55   with noise rms err / lung mean: P1 0.0871, PFs 0.1704, PFs+k 0.1694, PFc 0.2185
+00:55:56 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/pf_test/2024-10-22_021CH

@@ -722,3 +722,59 @@ session-7 header, belong to THIS session — left in place, append-only.)
   bin blur must hit the truth signal, and v1 without the near-lung aliasing term is optimistic at the lung edge.
 - DECIDED: none (consult only; no code or data changes in the fork or the production tree).
 - BRANCH: noise-consult (B26), parent B25 — delivered ✅. ★ stays on B25 ("the rest" discussion).
+
+## 2026-09-26 · session 13 (Opus 5.5; ~16:30 →) — PF/P1 dig + PCA relay
+- Hooman: "dig in the P1 PF … some sort of partial Fourier Steve started … not even sure which Tyger version we ran."
+  Found: PF/P1 = the `oldway` flag in `recon.py::cudarenorm` (F86). Only on-disk copy with `oldway = 0` hardcoded =
+  Steve's 2024-04-24 Drive copy; Hooman added a "Use Oldway" checkbutton on 2024-08-29 (GPT thread) to the Aug-2024
+  Drive drop (`kdist0sq .5`, `bxsz 4`). Every Tyger image (3303276 → 04f445b) = `oldway 1`, `kdist0sq .2`, `bxsz 2` (F87).
+- C51 `helpers/pf_p1_check.py` over 37 unique legacy studies: DC-zero signature confirms PF = Hermitian branch
+  (24/37 strict pass, 011CN ratio 0.95); PF/P1 additionally differ in diaphragm bins and high-k noise (PF σ 1.24×,
+  narrower ACF — cause open). F85 SUSPECT → VALID→F86 (noise-corr clause did not hold).
+- Relayed to 2026-pca-registration-9c: Hooman's directive + F86 differences + F83 numbers (never reached them). PCA
+  confirmed on 015HK: b44 gas == old-tree gas (corner σ identical, lung corr 0.9999) → their bench v1 truths stand.
+  PCA note for XeCS: v2 Tyger-exact simulator must use fork 04f445b.
+- DECIDED (Hooman): registration uses the new Tyger recons for ALL tests (b44 first, `AIkill_Dynamic` fallback, tag
+  the tree); legacy `rspace/cspace_gas.mat` dropped — the legacy-exact registration pipeline already exists (PCA v11 repro).
+- BRANCH: pf-p1 (B27), parent B26 — delivered ✅. ★ stays on B25.
+- BRANCH: pf-merit (B28), parent B27 — opened 16:50: does oldway 0 (PF) have merit? C52 offline rebuild on 021CH, gas + dissolved.
+- (Fable 5.1 from ~16:45.) C52 `helpers/pf_test.py`: Tyger-exact offline rebuild of 021CH (P1 == production to relerr
+  1e-6; our RBC/TP split corr 1.0000), bins 0/4/8, four recons from one gridded k-space (P1, PFs = oldway 0 as written,
+  PFs+KLUGE, PFc = POCS with Steve's b) for gas AND dissolved → F88. Verdict: PF = no SNR merit (gas bg σ ×1.07–1.27,
+  correct POCS worse ×1.26–1.57; realness already harvested by real(F·b); the fill copies the mirror's noise
+  coherently), small resolution gain (fills 37 % of the 54 % per-bin holes, edge gradient +15 %), and it DESTROYS the
+  dissolved image (intrinsically complex, |Im D|/|D| 0.75; aRBC sign-flipped, corr −0.1…−0.3, |D| −35 %). Eye check on
+  the bin-4 montages agrees. F86's open cause (legacy PF σ 1.24×) closed by the same mechanism.
+- BRANCH: pf-merit (B28) — delivered ✅. ★ stays on B25.
+- Hooman's eye on the C52 montage: "non-KLUGE PFs is the best lung image, Tyger the worst, structure and smoothness;
+  amplitude not an issue" → my far-bg SNR metric was blind to the lung interior. C53 `helpers/pf_inlung.py`: all-data
+  truth resampled through each bin's real hole pattern → in-lung error P1 2 % vs PF 7 % noise-free (texture 1.6 % vs
+  6 %), P1 4–7 % vs PF 10–17 % with matched noise → F89: the added detail is conjugate-object leakage (the ~6° rms
+  voxel-scale phase real(F·b) drops cleanly), holes cost only 2 %. F88(b)'s "sharper PSF" clause RETRACTED. Eye rule
+  held in the sense that it forced the right test; the verdict went the other way this time.
+- Hooman: truth is motion-averaged → errors unclear; and on the sim montage his eye now picks PFc. Answered: sim rows
+  score each recon on returning its own input (motion-free by construction); reran with a single-phase truth (real
+  bin-4 image, `--truth-bin 4`, bins 0/8): P1 0.8–1.0 % vs PF 9.5–10.5 % noise-free — gap wider, PF error maps are
+  ghost blobs on the bright features (F89 amended). C53 gained `--truth-bin`.
+- 2026-09-27 00:50–01:25 (cont.). Hooman: "is the phase map not ideal / conjugates not phase-corrected?" → cause hunt
+  on bin 0, single-phase truth: full-res b no change (10.8 %); the object's own exact phase no fix (6.7 %) → NOT
+  phase. Ideal object (real, crop-supported, dense k-space): P1 8.0 % vs PFs 0.9–1.2 % / PFc 0.7 % → implementation
+  verified, PF recovers holes when its premise holds. Premise fails on real data: 18 % of the 240³ energy is
+  non-real noise/aliasing outside the crop, folded into the lung by the knorm-weighted Hermitian filter. F89
+  REWRITTEN (first-draft "residual lung phase" mechanism retracted), F88 hole clause amended. C53 gained
+  --truth-bin/--b-raw/--b-self/--synth-real/--lung-only. Verdict on PF unchanged: unusable here; reason corrected.
+- 2steve/08_Hermitian_PartialFourier_Branch.md written (A: what the branch does, B: real-data gas numbers, C: the truth-resampling chain incl. exact-phase and ideal-object controls, D: dissolved split destroyed; suggestion = leave oldway 1). Figures 08_* in 2steve/fig. README index row 08. Root-level folder, outside workspace by design (fork-only).
+- Hooman, closing: Steve's GUI parameters were never claimed optimal — can we optimise? Inventory: live = MS 240,
+  IS 100, nbins 16, GP LB 300, DP LB 40, exclude ranges, binning; DEAD = Kernel dx, Kernel dt, Freq filter (stored,
+  passed to Tyger, never read); hardcoded = kdist0sq 0.2, bxsz 2, bindist0sq 2, calcb 10σ / quadratic / σ 4.4.
+  Hooman's framing: two targets — a REGISTRATION image (sharpness, PSF, balanced undersampling artefact; fake
+  edges maybe acceptable as anchors like CLAHE/gradients) and a TRUTH image (SNR, unbiased, aliasing out of the
+  lung); motion fields from the first applied to the second. My take + plan: `notes/Two_Targets_Registration_vs_
+  Truth.md` (PROPOSAL) — split is right and half-exists (gas magnitude export); R may hold anchors that are locked
+  to anatomy AND consistent bin-to-bin; PF's ghost is predicted to fail the consistency test (noise- and hole-
+  pattern-driven) — measure before dropping; derive MS/IS/kernel/LB from physics, judge trade-off knobs by a stated
+  criterion (registration benchmark for R, in-lung aliasing + trust table for T), never by a metric vote (XeCS F143).
+- NEXT (proposed, Hooman's go pending): 1 PF-as-anchor consistency test on 021CH; 2 derive the derivable + harness
+  check; 3 R/T dual export in the fork; 4 bindist0sq × nbins by criterion; 5 2steve dead knobs + R/T.
+- DECIDED (Hooman): registration uses Tyger recons only (s13 start). PF closed. Model: Fable 5.1 set as default.
+- /leave 2026-09-27 ~02:00. Session 13 close. Untracked prior-session files left as found (see handoff).

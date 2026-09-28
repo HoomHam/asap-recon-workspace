@@ -1,0 +1,45 @@
+identified sampling pattern gas-dissolved
+TR (from metadata) = 17.200 ms, ilvperTR=2 (dual-phase)
+spectral fit (M3): gas -217.1 ppm from carrier, RBC 217.4 / mem 201.7+195.9 ppm from gas, df 336 Hz, RBC/TP lumped 0.507 (scalar 0.389, F_lump 1.30), RBC-TP phase at k0 60.5 deg (per-rep SD 4.7, drop-one-more change 2.0, noise gain 1.15), SNR 58
+filtering noise spikes...
+removed 0.0 points (noise spikes) of 3373140
+removed 0.0 points (noise spikes) of 3373140
+16:57:56 2024-10-22_021CH: MS=240 IS=100 nbins=16 gplb=300 dplb=40 npts=510 nilv=6614 gas samples=3373140 dp samples=3373140
+16:57:56 bin occupancy [361, 361, 361, 360, 361, 361, 361, 360, 361, 361, 361, 360, 361, 361, 361, 360]
+16:57:56 calcb ...
+16:58:19 our calcb (pre low-pass) vs production b: phase diff rms 1.40 deg (expect ~ the 5.9 deg the low-pass removed inside the mask, ~0 outside)
+16:58:19 bin 0: gridding gas ...
+16:58:42   P1 vs Tyger production gas: relerr 1.10e-06  (< 1e-3 = exact rebuild)
+16:58:42   Hermitian output imag/real: 1.1e-16 (should be ~0)
+16:58:42   pocs (20 it) ...
+16:59:14   gas coverage: holes inside k-sphere P1 0.540 -> after Hermitian 0.342 (filled 0.37 of holes)
+16:59:14   masks: lung 21410 shell 82433 corner 533608
+16:59:14   identity: corr(Fh, Re[F]) in lung 0.9825; PFs == Fh*Re(b): True
+16:59:14   cos(angle b) in lung: mean 0.997, 5th pct 0.989
+16:59:14 bin 0: gridding dissolved (dplb 40) ...
+16:59:32   dissolved k support radius ~29.7 cells (sample 80); holes inside it P1 0.1135
+16:59:32   our split vs production: corr aRBC 1.0000, aTP 1.0000; map angle 121.2 deg
+16:59:32   dissolved: mean |Im D|/|D| in lung 0.741 (0 = image already real)
+16:59:33 bin 4: gridding gas ...
+17:00:01   P1 vs Tyger production gas: relerr 1.14e-06  (< 1e-3 = exact rebuild)
+17:00:01   Hermitian output imag/real: 1.3e-16 (should be ~0)
+17:00:01   pocs (20 it) ...
+17:01:09   gas coverage: holes inside k-sphere P1 0.536 -> after Hermitian 0.339 (filled 0.37 of holes)
+17:01:09   identity: corr(Fh, Re[F]) in lung 0.9834; PFs == Fh*Re(b): True
+17:01:09   cos(angle b) in lung: mean 0.997, 5th pct 0.989
+17:01:09 bin 4: gridding dissolved (dplb 40) ...
+17:01:57   dissolved k support radius ~29.7 cells (sample 80); holes inside it P1 0.1103
+17:01:57   our split vs production: corr aRBC 1.0000, aTP 1.0000; map angle 120.4 deg
+17:01:57   dissolved: mean |Im D|/|D| in lung 0.760 (0 = image already real)
+17:01:58 bin 8: gridding gas ...
+17:02:46   P1 vs Tyger production gas: relerr 7.60e-07  (< 1e-3 = exact rebuild)
+17:02:46   Hermitian output imag/real: 9.5e-17 (should be ~0)
+17:02:46   pocs (20 it) ...
+17:03:27   gas coverage: holes inside k-sphere P1 0.535 -> after Hermitian 0.338 (filled 0.37 of holes)
+17:03:27   identity: corr(Fh, Re[F]) in lung 0.9863; PFs == Fh*Re(b): True
+17:03:27   cos(angle b) in lung: mean 0.997, 5th pct 0.989
+17:03:28 bin 8: gridding dissolved (dplb 40) ...
+17:03:50   dissolved k support radius ~29.7 cells (sample 80); holes inside it P1 0.1098
+17:03:50   our split vs production: corr aRBC 1.0000, aTP 1.0000; map angle 121.8 deg
+17:03:50   dissolved: mean |Im D|/|D| in lung 0.757 (0 = image already real)
+17:04:18 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/pf_test/2024-10-22_021CH

@@ -1,0 +1,15 @@
+identified sampling pattern gas-dissolved
+TR (from metadata) = 17.200 ms, ilvperTR=2 (dual-phase)
+spectral fit (M3): gas -217.1 ppm from carrier, RBC 217.4 / mem 201.7+195.9 ppm from gas, df 336 Hz, RBC/TP lumped 0.507 (scalar 0.389, F_lump 1.30), RBC-TP phase at k0 60.5 deg (per-rep SD 4.7, drop-one-more change 2.0, noise gain 1.15), SNR 58
+filtering noise spikes...
+removed 0.0 points (noise spikes) of 3373140
+removed 0.0 points (noise spikes) of 3373140
+01:14:27 b: full-resolution calcb (no phase low-pass) ...
+01:14:41 b: raw vs production phase diff rms 1.40 deg over the crop
+01:14:41 truth: gridding bin 4 alone (single phase, its own holes are part of the object) ...
+01:14:53 truth: lung 45049 vox, lung mean 1.657e+04, far-bg sd 933.1 (holes inside sphere 0.392 of touched cells)
+01:14:53 bin 0: gridding for the sampling pattern ...
+01:15:24   noise-free rms err / lung mean: P1 0.0100, PFs 0.0971, PFs+k 0.0947, PFc 0.1083
+01:15:24   noise: real far-bg sd 800.2 -> per-cell sigma 0.6057
+01:16:02   with noise rms err / lung mean: P1 0.0496, PFs 0.1240, PFs+k 0.1221, PFc 0.1571
+01:16:03 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/pf_test/2024-10-22_021CH

@@ -56,6 +56,9 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C48 | helpers/atlas/bphase_sigma_cohort.py | perbin-phaseref (B24) | DONE 2026-09-25 — 57 sessions (+4 stragglers): σ = 5 chosen (F81); fallback for container-gated sessions |
 | C49 | pipeline/run_prod_b44.sh + prod_b44_todo.txt | prod-b44 (B25) | DONE 2026-09-25 — 61/61, σ 4.4 (fork 04f445b) → Ext AIkill_Dynamic_b44/; 59 split, 2 container-gated (F82) |
 | C50 | pipeline/mrd_to_mat.py | prod-b44 (B25) | WORKS 2026-09-25 — output.mrd → recon.mat (gas, |gas|, aRBC/aTP, |dis|, calcb_b, rbc_tp_* meta, nav), no figures |
+| C51 | helpers/pf_p1_check.py | pf-p1 (B27) | WORKS 2026-09-26 — legacy dat/PF vs dat/P1: DC-zero test (PF = oldway 0), geometry, bg σ/corr, Bin_* agreement → outputs/pf_p1_check/ |
+| C53 | helpers/pf_inlung.py | pf-merit (B28) | DONE 2026-09-27 — in-lung error vs a truth resampled through each bin's real hole pattern; flags --truth-bin/--b-raw/--b-self/--synth-real/--lung-only; real data P1 1–2 % vs PF 7–10 %, ideal object P1 8 % vs PF 0.7–1.2 % (F89: ghost of out-of-crop energy; code verified) |
+| C52 | helpers/pf_test.py | pf-merit (B28) | DONE 2026-09-26 — Tyger-exact rebuild (relerr 1e-6) of 021CH; P1 / PFs (oldway 0) / PFs+KLUGE / PFc (POCS, same b), gas + dissolved → outputs/pf_test/021CH/ (F88: PF costs 20 % gas SNR, destroys aRBC) |
 | C40 | helpers/atlas/split_trust.py | aikill-atlas (B12) | DONE 2026-09-25 — trust grade; `--root/--tag` = production tree → split_trust_b44/ (A18/B23/C13/D5, F82) |
 
 ## Cards
@@ -502,6 +505,44 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   dissolved_phase_real/imag = aRBC/aTP when rbc_tp_separated = 1, dissolved_phase_magnitude, calcb_b, rbc_tp_* strings, nav_*)
 - note: the OLD recon.mat convention (post_process) has the same names; readers must check `rbc_tp_separated`
 
+### C51 · helpers/pf_p1_check.py
+- why: settle what legacy `dat/PF` vs `dat/P1` are (F85 SUSPECT) — PCA's legacy `rspace_gas.mat` = (PF+P1)/2
+- origin: C · branch: pf-p1 (B27) · facts: F85, F86, F87
+- in: WorkVault `Work/Analysis/<study>/dat/{PF,P1}/gpdyn.mat` (+ `Bin_*.mat`); args = studies (default all with both)
+- out: `outputs/pf_p1_check/{summary.csv, <study>.txt}` — DC-zero regression (measured PF−P1 far-bg shift vs
+  −S_bin/240³; slope ≈ 1 = DC cell zeroed = oldway 0), xcorr shift, lung corr, bg σ ratio + noise corr, gpdyn mtimes,
+  Bin_* agreement (circular bin-phase diff)
+- note: MS = 240 hardcoded in the prediction; a different MS shows up as slope (240/MS)³
+
+### C52 · helpers/pf_test.py
+- why: Hooman 2026-09-26 — "test if Steve's PF is right, has merit, esp. for the dissolved signal; if unusable, why"
+- origin: C · branch: pf-merit (B28) · facts: F88, F86 (cause closed)
+- in: Ext `AIkill_Dynamic/<key>/d/input.mrd` (raw), Ext `AIkill_Dynamic_b44/<key>/d/recon.mat` (nav_volume → DIAPHRAGM
+  bins via raw.bin, calcb_b = production phase reference, gas/aRBC/aTP for the exactness checks); XeCS numpy kernel
+  (`selftest_steve_tyger.py`, `steve_kernel_numpy.py`) with the cudarecon accumulation copied (k_acc, knorm exposed)
+- out: `outputs/pf_test/<key>/{report.md, metrics.csv, gas_bin*.png, dis_bin*.png, gas_coverage.png, arrays.npz}`
+- variants from ONE k_acc/knorm per bin: P1 (oldway 1 = Tyger, relerr check), PFs (oldway 0 Aug-2024, flat-index
+  mirror as his, DC zeroed, no KLUGE), PFs+k, PFc (POCS: real after b inside crop, zero outside, measured cells kept)
+- metrics: lung mean, far-bg σ, shell σ (aliasing), edge gradient, hole fraction vs |k| before/after Hermitian, identity
+  Fh == Re[F], PFs == Fh·Re(b); dissolved: |Im D|/|D| in lung, LS-mapped RBC/TP split vs production for P1 and PF
+
+### C53 · helpers/pf_inlung.py
+- why: Hooman's eye on the C52 montage — "non-KLUGE PFs is the best lung image, Tyger the worst, structure and
+  smoothness" — while C52 scored noise in the FAR background only. Inside the lung the error is thermal + per-bin
+  aliasing of the lung's own signal; this separates them.
+- origin: H (observation) / C (test) · branch: pf-merit (B28) · facts: F88 (amend), F89 (pending)
+- in: same as C52 (input.mrd, b44 recon.mat for b, bins, real far-bg σ) + C52's `arrays.npz` for the real-data rows
+- out: `outputs/pf_test/<key>/inlung_{report.md, metrics.csv, bin*.png}`, `truth_T.npy`
+- method: truth T = real(F_all·b) (6614 ilv, no binning); per bin, truth k-space × the bin's real knorm/S pattern →
+  the four recons; error inside the lung vs T: rms, texture (2-vox high-pass) rms, corr, bias — noise-free (pure
+  aliasing) and with complex noise on sampled cells scaled so P1's far-bg σ matches the real bin (3 draws)
+- flags: `--truth-bin N` (single-phase object = bin N's P1 k-space), `--b-raw` (calcb b before the 4.4-vox low-pass), `--b-self`
+  (b = conj phase of the object: F·b real by construction), `--synth-real` (object = exact k-space of the real crop-
+  supported T: ideal PF world), `--lung-only` (zero T outside a 12-vox lung dilation). Prints residual phase of F·b in
+  the lung, out-of-crop energy fraction, POCS convergence
+- caveat: static truth (no motion); in-lung anatomy identical across bins by construction; hole cost is object-
+  dependent (pre-holed all-data truth ~1 %, dense single-bin-like spectrum ~8 %)
+
 ### C40 · helpers/atlas/split_trust.py
 - why: Hooman on the RBC/TM atlas: "I still see the fake lung structures you thought came from the static b maps — check
   that; and give me some marker of how much to trust the separation"
@@ -546,6 +587,8 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 | leftover_recon_2026-09-12/ | copies of AIkill_Dynamic montages | F47 | VALID gas; dp montages magnitude-of-split caveat |
 | aikill_atlas/ | C26 C39 | F47 F72 | dissolved_atlas.pdf + videos/: gp VALID, ⚠ dp pages SUSPECT (SUSPECT_F47.md) — superseded by rbc_tm_atlas.pdf + videos_rbctm/ + rbc_tm_atlas_sessions.csv (C39, 61 ON_RBC sessions, 2026-09-25) |
 | rt_prepost/ | C27 | — | VALID |
+| pf_p1_check/ | C51 | F86 | VALID — summary.csv (37 legacy studies: DC-zero slope/corr, shift, lung corr, bg σ ratio, Bin_* agreement) + <study>.txt |
+| pf_test/2024-10-22_021CH/ | C52 C53 | F88 F89 | VALID — report.md/metrics.csv (real-data variants), gas_bin*/dis_bin*/gas_coverage.png, inlung*_report.md/metrics.csv/bin*.png (truth-resampling: _truthbin4, _braw, _bself, _synth, _lungonly); arrays.npz + *.npy (347 MB) NOT in git, regenerable |
 | diaphragm_binning/ | C24 C25 | F37 F38 | VALID |
 | 016PG/ · 023LL/ · 025JC/ · 25JC/ · 025JC_sweep_lt/ · piston/ | ? (June backlog, pre-canon) | ? | untagged — verify before trust (reconciled 2026-09-13) |
 | resplit_2026-09-24/ | C36 C37 | F59 F61–F71 | VALID — fits/ (89 Steve refits), rows{,_xecs}/, resplit_summary{,_xecs}.csv (79 / 68 re-split), fit_xcheck.csv (Steve vs XeCS, 70), template_study{,_adaptive}.csv + template_params.json (C37), logs; fig/: cohort + per-session before/after (steve, _xecs), tyger_old_vs_new_6651591.png, template_study{,_adaptive}.png; big .mat on Ext `AIkill_Dynamic/<key>/d/recon_resplit{,_xecs}.mat` (79 / 68 × 128 MB) and Tyger validation runs Ext `Work/Codes/2026_ASAP_Recon/tyger_specfit_2026-09-24/{045VS,041WF}/d/` |

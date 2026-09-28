@@ -36,6 +36,8 @@ flowchart TD
   B24["✅ perbin-phaseref (09-25)<br/>per-bin gas ref = no effect (F77) · F74 RETRACTED<br/>FOUND: raw b phase inside mask = static RBC speckle (F79)"]
   B25["★ prod-b44 (09-25)<br/>calcb phase low-pass σ 4.4 (F81) · fork 04f445b · 61 rerun → AIkill_Dynamic_b44<br/>speckle gone cohort-wide (F82) · atlas_b44 + trust_b44"]
   B26["✅ noise-consult for PCA (09-26)<br/>Tyger bg signed Gaussian · ACF · per-bin σ · PSF ≈ 2.2 vox (F83)<br/>Faraz bg self-referenced (F84) · legacy PF/P1 (F85 SUSPECT)"]
+  B27["✅ pf-p1 (09-26)<br/>legacy dat/PF = oldway 0 Hermitian, P1 = oldway 1 (F86, C51, 37 studies)<br/>every Tyger image oldway 1, narrow kernel (F87) · F85 → VALID"]
+  B28["✅ pf-merit (09-26/27)<br/>Tyger-exact rebuild 021CH: PF no SNR merit, kills dissolved (F88, C52)<br/>truth-resampling: PF \"structure\" = ghost of 18 % out-of-crop energy, code verified on ideal object (F89, C53) · 2steve/08"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -52,6 +54,7 @@ flowchart TD
   B17 --> B22 --> B23 --> B12
   B12 --> B24 --> B25
   B25 --> B26
+  B26 --> B27 --> B28
   B17 -.F47.-> B12
   B9 -.xecs_recon.pth.-> B10
 ```
@@ -70,6 +73,8 @@ flowchart TD
 | B24 perbin-phaseref ✅ | fork f5ac7c5 (gas_phase_complex) + c8366c3 (calcb_b export), C41 perbin_phaseref.py (F77), C43 bphase_fix.py, C44 bphase_confirm.py (F79 confirmed), C45 bphase_sigma.py, C46 bsmooth_compare.py (F80), C47 bsmooth_videos.py, outputs/bphase_fix_2026-09-25/, Ext tyger_{gascplx,bexport,bsmooth}_2026-09-25/ (bexport = raw b for all 61, 24 GB) (F78 F79 F80) |
 | B25 prod-b44 ★ | fork 19b7365 → 1fe07a0 → 04f445b (`results.calcb_phase_sigma` 2.5 → 5 → 4.4), C48 bphase_sigma_cohort.py → cohort_sigma.csv (F81), C49 run_prod_b44.sh + prod_b44_todo.txt, C50 mrd_to_mat.py, Ext `AIkill_Dynamic_b44/<key>/d/{output.mrd, recon.mat, tyger.log}` (61; 59 split), outputs/aikill_atlas_b44/ (PDF 679 pg + grades CSV; videos on Ext aikill_atlas_b44/), outputs/split_trust_b44/ (trust table, fine_static_b44.csv, trust_lookup_all.csv, registration21_trust_rank.csv) (F82) |
 | B26 noise-consult ✅ | helpers/_noise_char.py (scratch; bg Gaussianity, corner/near-lung σ, spatial ACF, per-bin σ, inter-bin corr on b44 d/recon.mat), 2 cross-session replies to 2026-pca-registration-e4 (F83 F84 F85) |
+| B27 pf-p1 ✅ | C51 pf_p1_check.py → outputs/pf_p1_check/ (F86); code archaeology: WorkVault `_staging_2tb/Downloads/{code,drive-download-20240829T203130Z-001}/recon.py`, mrisim 1a41ac0, GPT thread 2024-08-29 (F87) |
+| B28 pf-merit ✅ | C52 pf_test.py, C53 pf_inlung.py (--truth-bin/--b-raw/--b-self/--synth-real/--lung-only) → outputs/pf_test/2024-10-22_021CH/ (F88 F89); 2steve/08_Hermitian_PartialFourier_Branch.md + fig/08_*; notes/Two_Targets_Registration_vs_Truth.md (PROPOSAL) |
 | B13 tyger-access | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558), memory tyger_setup.md |
 | B14 leftover-recon | fork commits 472fbc9/40d23a4, C9 dyn_recon.py, C29 todo_batch.sh, outputs/roundtrip_audit_2026-09-13/, outputs/leftover_recon_2026-09-12/, Ext pipeline_runs/logs + quarantine/ (F42–F46 F51) |
 | B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
@@ -97,3 +102,12 @@ physics-anchored global phase (non-circular ratio check), bmask-edge blend, 8-ch
 
 Session 12 (2026-09-26) was a side consult (B26) for the PCA registration benchmark: noise, PSF and legacy-input facts
 F83–F85, no code or data changed. ★ unchanged.
+
+Session 13 (2026-09-26/27, Opus 5.5 → Fable 5.1): Hooman's PF question. B27 identified the legacy dat/PF vs P1 as
+Steve's `oldway` flag (F86, F87); B28 tested the branch on a Tyger-exact rebuild of 021CH — no SNR merit, dissolved
+destroyed (F88) — and, after Hooman's eye preferred the PF lung, a truth-resampling chain ending in an ideal-object
+control: the added sharpness is a ghost of the 18 % non-real energy outside the crop, the code itself is right
+(F89). Note 08 to Steve. Registration told to use Tyger only (Hooman's decision). ★ unchanged (B25 "the rest").
+**Proposed next (Hooman's go pending): the two-target plan in `notes/Two_Targets_Registration_vs_Truth.md` —
+1 PF-as-anchor bin-consistency test, 2 derive MS/IS/kernel/LB from physics + harness check, 3 R/T dual export,
+4 bindist0sq × nbins by criterion, 5 2steve dead-knob note.**

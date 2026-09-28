@@ -1,0 +1,21 @@
+identified sampling pattern gas-dissolved
+TR (from metadata) = 17.200 ms, ilvperTR=2 (dual-phase)
+spectral fit (M3): gas -217.1 ppm from carrier, RBC 217.4 / mem 201.7+195.9 ppm from gas, df 336 Hz, RBC/TP lumped 0.507 (scalar 0.389, F_lump 1.30), RBC-TP phase at k0 60.5 deg (per-rep SD 4.7, drop-one-more change 2.0, noise gain 1.15), SNR 58
+filtering noise spikes...
+removed 0.0 points (noise spikes) of 3373140
+removed 0.0 points (noise spikes) of 3373140
+23:40:33 truth: gridding all interleaves ...
+23:41:37 truth: lung 42791 vox, lung mean 2.181e+04, far-bg sd 712.7 (holes inside sphere 0.326 of touched cells)
+23:41:37 bin 0: gridding for the sampling pattern ...
+23:42:23   noise-free rms err / lung mean: P1 0.0225, PFs 0.0745, PFs+k 0.0670, PFc 0.0773
+23:42:24   noise: real far-bg sd 800.8 -> per-cell sigma 0.6061
+23:43:47   with noise rms err / lung mean: P1 0.0434, PFs 0.0953, PFs+k 0.0896, PFc 0.1126
+23:43:48 bin 4: gridding for the sampling pattern ...
+23:44:30   noise-free rms err / lung mean: P1 0.0205, PFs 0.0730, PFs+k 0.0662, PFc 0.0770
+23:44:31   noise: real far-bg sd 933.3 -> per-cell sigma 0.7035
+23:46:00   with noise rms err / lung mean: P1 0.0474, PFs 0.1010, PFs+k 0.0962, PFc 0.1220
+23:46:01 bin 8: gridding for the sampling pattern ...
+23:46:50   noise-free rms err / lung mean: P1 0.0195, PFs 0.0771, PFs+k 0.0707, PFc 0.0779
+23:46:51   noise: real far-bg sd 1434 -> per-cell sigma 1.079
+23:48:17   with noise rms err / lung mean: P1 0.0689, PFs 0.1321, PFs+k 0.1284, PFc 0.1652
+23:48:19 done -> /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/outputs/pf_test/2024-10-22_021CH
