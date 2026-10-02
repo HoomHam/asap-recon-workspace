@@ -15,7 +15,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C6 | convert_siemens_to_mrd.py (root) | tyger | WORKS (F16 caveat) |
 | C7 | tyger_recon.py (root) | diaphragm | WORKS (fork image 40d23a4, cloud GPU) · z-flip = deviation from Steve (F49) · nav 26-guard local |
 | C8 | pipeline/batch_recon.py | batch | SUPERSEDED by C29 todo_batch.sh (F1 retracted) |
-| C9 | pipeline/dyn_recon.py | batch | WORKS all nch on 40d23a4 (F42); robust submit (F43 F44), MPLBACKEND=Agg (F45) |
+| C9 | pipeline/dyn_recon.py | batch · proton-1h | WORKS all nch on 40d23a4 (F42); robust submit (F43 F44), MPLBACKEND=Agg (F45); +--gp-traj/--pneumo for 1H (F101 F102) |
 | C10 | pipeline/asap_run.py | auto-steve | WORKS |
 | C11 | pipeline/post_process.py | auto-steve | WORKS · writes rbc_tp_separated to recon.mat |
 | C12 | pipeline/param_gui.py | auto-steve | WORKS |
@@ -120,6 +120,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 - in: `/Volumes/HoomHamExt/_5t_images_roundtrip/Images/<date>/<id>/` (+ `--data-root`), `--codespec`
 - out: `/Volumes/HoomHamExt/AIkill_Dynamic/<date>_<id>/{s,p,d}/` (output.mrd, input.mrd, tyger.log with run/buffer ids, codespec.yml, pngs, recon.mat, fig/); scratch run dirs on Ext `.../2026_ASAP_Recon/pipeline_runs/`
 - status: WORKS for nch=1 and nch=8 on image 40d23a4. submit = buffer create (NO --ttl) → buffer write → run create → poll → run logs → buffer read -o -p 4, retried; plot/post under MPLBACKEND=Agg
+- 2026-10-01: `--gp-traj <npy>` (explicit gas trajectory, disables dp; used with the 1H water traj, F101) and `--pneumo <file>` (explicit pneumotach-format file; used for the synthetic k0 surrogate, F102). 1H run: `--data-dir …/006KL/Dynamic Proton --date 2024-03-12 --id 006KL --out-dir Ext AIkill_Dynamic_1H/… --methods p --codespec recon_codespec_ee3c91f.yml`
 
 ### C10 · workspace/pipeline/asap_run.py
 - why: single-dataset orchestrator, 6 stages resolve→param GUI→convert→submit→publish→post_process ("analyze 25JC with Steve")
@@ -195,6 +196,8 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 - status: WORKS but coupled — rerunning XeCS sweep silently changes later montages
 
 ## Scratch / reference (uncarded)
+
+- 2026-10-01 proton-1h (B31) scratch: helpers/_proton_{gamma_check,hires,local,delay_sweep,delay_dc,traj_cv,resp_pneumo,selfnav,dome_pneumo,usimg_video,apod,apod_eval}.py, _mrd_apodize.py (input.mrd × exp readout window), _cine_compare.py (2-row × 10-slice bin cine), _asap_traj.c (Steve's designer with γ/FOV args; does NOT reproduce measured trajs)
 `read_mapvbvd.py` (root, standalone loader, UNKNOWN) · `workspace/codes/kasap.c` (Kento reference, F20) · `asap/asap.c` (Steve reference, F20) · `helpers/_delete/` (byte-verified CS originals, moved to XeCS 2026-06-24) · `helpers/calib/` (duplicate .npy pair) · `pipeline/runs/`, `batch_recon.log`, `__pycache__/` · 2026-09 scratch tier: `helpers/_roundtrip_audit.py` (roundtrip image-tree audit → outputs/roundtrip_audit_2026-09-13/), `helpers/_zorder_check.py` (F49 check → outputs/zorder_check_2026-09-12/), `helpers/_rbctp_fig.py` (F47 evidence figure → outputs/snr_2026-09-13/04_rbctp_split_evidence.png), `helpers/_f59_check.py` (reruns Steve's spectral fit on d/input.mrd, compares split basis Δφ vs measured → outputs/f59_te_term_2026-09-24/, F59), `helpers/_calcb_8ch_weight.py` (calcb Σ|b| map via XeCS numpy replica at MS=104 → outputs/calcb_imprint_2026-09-24/) · `Codes/2026_Steve_Recon/` (plain snapshot of Steve main 3303276, diff reference only).
 
 Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/recon — STALE, they moved to 2026_XeCS_Recon in the 2026-06-24 decouple.
@@ -569,6 +572,7 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 
 | Output dir (workspace/outputs/) | From | Facts | Status |
 |---|---|---|---|
+| proton_dyn_2026-10-01/ | C9 + scratch _proton_*.py, _mrd_apodize.py, _cine_compare.py | F100–F105 | VALID — 1H 006KL: traj tests (gamma_check, scale_sweep, hires, water15_*), k0 breathing figs, bins_s_d_p, selfnav/ (SI navigator, k0-vs-dome correspondence, bins_k0_vs_dome), improve/ (delay/scale/CV json, apod_tradeoff/eval, cine_orig_vs_exp1ms.mp4), videos_* (p / Xe-d / 26- and 52-ilv). *.npy/*.mp4/*.gif NOT in git (gitignored; copies/regenerable, recon trees on Ext AIkill_Dynamic_1H/) |
 | te90_2026-09-25/ | C38 | F72 | VALID (te90_table.csv 88 rows, te90_strip.png) |
 | aikill_atlas_b44/ | C39 (--root) | F82 | VALID — PRODUCTION atlas (σ 4.4): rbc_tm_atlas.pdf, rbc_tm_atlas_sessions.csv (+ grades), videos_rbctm → Ext Work/Codes/2026_ASAP_Recon/aikill_atlas_b44/ |
 | split_trust_b44/ | C40 (--root) | F82 | VALID — PRODUCTION trust table (split_trust.csv, fine_static_b44.csv, cohort_trust.png, fig/) |

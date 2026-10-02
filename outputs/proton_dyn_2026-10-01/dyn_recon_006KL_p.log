@@ -1,0 +1,41 @@
+[dyn_recon 18:31:26] data dir   : /Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-03-12/006KL/Dynamic Proton
+[dyn_recon 18:31:26] date / id  : 2024-03-12 / 006KL
+[dyn_recon 18:31:26] dynamic    : meas_MID00174_FID08670_fa_spiral_dyn_fancy_v3_20240130.dat (110505984 bytes)
+[dyn_recon 18:31:26] seqname    : fa_spiral_dyn_fancy_v3_20240130
+[dyn_recon 18:31:26] gp / dp    : fa_spiral_dyn_fancy_v3_20240130_water_fov350_gp.npy / (none)
+[dyn_recon 18:31:26] pneumotach : k0resp_pneumotach
+[dyn_recon 18:31:26] output base: /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL  (methods -> s/p/d subfolders)
+[dyn_recon 18:31:26] codespec   : /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/pipeline/recon_codespec_ee3c91f.yml
+[dyn_recon 18:31:26] running methods: PNEUMOTACH
+[dyn_recon 18:31:26] ==================== PNEUMOTACH -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p ====================
+[dyn_recon 18:31:26] run dir    : /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_p_20261001-183126
+[dyn_recon 18:31:26] converting (PNEUMOTACH) -> /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_p_20261001-183126/input.mrd
+dynamic:   /Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-03-12/006KL/Dynamic Proton/meas_MID00174_FID08670_fa_spiral_dyn_fancy_v3_20240130.dat (110505984 bytes)
+pymapVBVD version 0.6.1
+Software version: VD
+Scan 1/1, read all mdhs:   0%|          | 0.00/105M [00:00<?, ?B/s]Scan 1/1, read all mdhs:  24%|██▍       | 25.8M/105M [00:00<00:00, 270MB/s]Scan 1/1, read all mdhs:  49%|████▉     | 51.5M/105M [00:00<00:00, 109MB/s]Scan 1/1, read all mdhs:  73%|███████▎  | 76.7M/105M [00:00<00:00, 149MB/s]Scan 1/1, read all mdhs:  94%|█████████▍| 99.5M/105M [00:00<00:00, 173MB/s]                                                                           read data:   0%|          | 0/13000 [00:00<?, ?it/s]read data:   3%|▎         | 399/13000 [00:00<00:03, 3987.92it/s]read data:   6%|▌         | 798/13000 [00:00<00:04, 3038.20it/s]read data:  15%|█▍        | 1933/13000 [00:00<00:01, 6194.00it/s]read data:  20%|██        | 2606/13000 [00:00<00:01, 6114.99it/s]read data:  27%|██▋       | 3502/13000 [00:00<00:01, 7043.62it/s]read data:  33%|███▎      | 4237/13000 [00:00<00:01, 6409.03it/s]read data:  39%|███▉      | 5072/13000 [00:00<00:01, 6944.61it/s]read data:  47%|████▋     | 6089/13000 [00:00<00:00, 7813.11it/s]read data:  54%|█████▎    | 6969/13000 [00:01<00:00, 8101.10it/s]read data:  60%|█████▉    | 7797/13000 [00:01<00:00, 7647.28it/s]read data:  66%|██████▌   | 8578/13000 [00:01<00:00, 7523.23it/s]read data:  73%|███████▎  | 9457/13000 [00:01<00:00, 7622.20it/s]read data:  82%|████████▏ | 10718/13000 [00:01<00:00, 8782.60it/s]read data:  89%|████████▉ | 11603/13000 [00:01<00:00, 8192.80it/s]read data:  96%|█████████▌| 12432/13000 [00:01<00:00, 7678.18it/s]                                                                  found 44918 pressure measurements in /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/k0resp_pneumotach
+[dyn_recon 18:31:31] uploading input.mrd (117 MB) ...
+[dyn_recon 18:31:46] uploaded in 15 s -> input buffer appccq6lurbetjkdmyv54ztxha
+[dyn_recon 18:31:47] run 808 created (output buffer iwtgivshcrkerhjf6al6a6ilm4); polling every 30 s
+[dyn_recon 18:32:18] run 808: Succeeded (31 s)
+[dyn_recon 18:32:18] downloading output buffer iwtgivshcrkerhjf6al6a6ilm4 ...
+[dyn_recon 18:32:28] recon done -> output.mrd (80 MB, 10 s download)
+[dyn_recon 18:32:28] rendering montages (plot_recon.py)...
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/tyger_deploy/plot_recon.py:67: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+gas phase: shape=(16, 100, 100, 100) dtype=float32
+saved /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_p_20261001-183126/output_gp.png
+[dyn_recon 18:32:30] post-processing (mat + GIFs)...
+[post_process] reading /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/output.mrd ...
+[post_process] gas shape (16, 100, 100, 100) dtype float32
+[post_process] extracting signal/pneumo from /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/input.mrd ...
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/signal_pneumo.npz
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/recon.mat
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/fig/axial.gif  (100 slices, 10x10, 16 bins, EE=8 EI=13, vmin=-3.5e+04 vmax=2.18e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/fig/coronal.gif  (96 slices, 10x10, 16 bins, EE=8 EI=13, vmin=-3.5e+04 vmax=2.18e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/fig/sagittal.gif  (100 slices, 10x10, 16 bins, EE=8 EI=13, vmin=-3.5e+04 vmax=2.18e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/fig/diaphragm.gif
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/fig/resp_traces.png
+[post_process] DONE -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/fig
+[dyn_recon 18:33:28] DONE. Results -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p
+[dyn_recon 18:33:28] ALL DONE -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL  (p)

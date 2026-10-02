@@ -884,3 +884,26 @@ session-7 header, belong to THIS session — left in place, append-only.)
 - BRANCH: deapod-prod (B30), parent B29 — delivered ✅.
 - Big-output slip fixed in-session: tune_gas stacks → Ext `Work/Codes/2026_ASAP_Recon/tune_gas/` (458 MB); laptop
   outputs/tune_gas small (csv/md/png). Ext 97 % full (70 GB free).
+
+## 2026-10-01/02 · session 15 (Opus 5.5)
+- Side requests: scored K99 Aim-1/Aim-2 opening sentences for k99-8c (3 rounds); found the Xe-consortium 197 ppm
+  naming answer (Niedbalski 2021 MRM: "tissue/plasma" used, no consensus, "membrane" floated via Wang 2021); added
+  `archive/*.jsonl` to workspace/.gitignore on System's request.
+- PROTON DYNAMIC found (F100): only 006KL 2024-03-12 MID00174 (`Dynamic Proton/`) is a usable 1H free-breathing cine.
+  010AJ (FOV 500) is blocked: no 1H trajectory at FOV 500, and Hooman remembers only one good scan → dropped.
+- 1H plays its own spiral: the Xe trajectory gives a k-centre blob, and Faraz's measured 'water' entry 15 works (F101).
+  Gradient delay τ = 0 by LS data consistency and interleave-split CV.
+- Binning: 1H k0 breathing (~1 %) sits under a fixed per-interleave pattern, so SIGNAL/DIAPHRAGM bins are flat. The k0
+  surrogate (pattern removed) goes in as a synthetic pneumotach → `p` (F102). The image-based low-k navigator agrees
+  (r 0.64, F103); its dome-binned recon is similar but noisier. Breathing rates: pneumotach 17.4 / Xe k0 17.9 /
+  1H k0 21.0 per min (F104).
+- Packet → XeCS `outputs/incoming_asap_proton_006KL_2026-10-01/` (p GIFs, k0 figs, SI self-nav fig, README); dome
+  excursion corrected to 5.5 mm (XeCS definition; my whole-profile xcorr 3.5 mm underestimated).
+- Improve: readout exp filter (F105): lung SNR ×1.31 (1.5 ms) / ×1.52 (1 ms) at FWHM 8.0 / 8.6 vs 7.2 mm. 4D Tyger
+  runs for both done (Ext `AIkill_Dynamic_1H/2024-03-12_006KL_filt/`); cine orig vs 1 ms rendered, 1.5 ms not yet.
+- DECIDED (Hooman): `p` (k0 surrogate) is the deliverable for the prelim, not `d`.
+- DECIDED (Hooman): pneumotach and imaging are triggered together; the scanner and delivery-PC clocks differ, so the
+  Xe pneumotach t=0 alignment is fine (confirmed by the Xe k0 vs pneumotach rate match, F104).
+- DECIDED (Hooman): nothing more goes to XeCS until "all we can do" is done. Next session = challenge/collaboration
+  with XeCS on the best 006KL proton recon.
+- BRANCH: proton-1h (B31), parent B10 — ● open. ★ → B31.

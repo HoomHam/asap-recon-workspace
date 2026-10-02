@@ -1,0 +1,73 @@
+[dyn_recon 18:20:11] data dir   : /Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-03-12/006KL/Dynamic Proton
+[dyn_recon 18:20:11] date / id  : 2024-03-12 / 006KL
+[dyn_recon 18:20:11] dynamic    : meas_MID00174_FID08670_fa_spiral_dyn_fancy_v3_20240130.dat (110505984 bytes)
+[dyn_recon 18:20:11] seqname    : fa_spiral_dyn_fancy_v3_20240130
+[dyn_recon 18:20:11] gp / dp    : fa_spiral_dyn_fancy_v3_20240130_water_fov350_gp.npy / (none)
+[dyn_recon 18:20:11] pneumotach : (none)
+[dyn_recon 18:20:11] output base: /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL  (methods -> s/p/d subfolders)
+[dyn_recon 18:20:11] codespec   : /Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/pipeline/recon_codespec_ee3c91f.yml
+[dyn_recon 18:20:11] running methods: SIGNAL, DIAPHRAGM
+[dyn_recon 18:20:11] ==================== SIGNAL -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s ====================
+[dyn_recon 18:20:11] run dir    : /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_s_20261001-182011
+[dyn_recon 18:20:11] converting (SIGNAL) -> /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_s_20261001-182011/input.mrd
+dynamic:   /Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-03-12/006KL/Dynamic Proton/meas_MID00174_FID08670_fa_spiral_dyn_fancy_v3_20240130.dat (110505984 bytes)
+pymapVBVD version 0.6.1
+Software version: VD
+Scan 1/1, read all mdhs:   0%|          | 0.00/105M [00:00<?, ?B/s]Scan 1/1, read all mdhs:  21%|██        | 22.2M/105M [00:00<00:00, 233MB/s]Scan 1/1, read all mdhs:  46%|████▋     | 49.0M/105M [00:00<00:00, 261MB/s]Scan 1/1, read all mdhs:  70%|███████   | 73.9M/105M [00:00<00:00, 237MB/s]Scan 1/1, read all mdhs:  92%|█████████▏| 96.7M/105M [00:00<00:00, 231MB/s]                                                                           read data:   0%|          | 0/13000 [00:00<?, ?it/s]read data:   2%|▏         | 254/13000 [00:00<00:05, 2267.19it/s]read data:   4%|▎         | 481/13000 [00:00<00:06, 2055.78it/s]read data:   8%|▊         | 1054/13000 [00:00<00:05, 2131.38it/s]read data:  10%|▉         | 1277/13000 [00:00<00:05, 2118.45it/s]read data:  14%|█▎        | 1774/13000 [00:00<00:04, 2688.82it/s]read data:  18%|█▊        | 2366/13000 [00:00<00:03, 3504.93it/s]read data:  23%|██▎       | 3022/13000 [00:00<00:02, 4277.81it/s]read data:  27%|██▋       | 3480/13000 [00:01<00:02, 3854.07it/s]read data:  31%|███       | 4037/13000 [00:01<00:02, 4298.36it/s]read data:  37%|███▋      | 4764/13000 [00:01<00:01, 4785.63it/s]read data:  42%|████▏     | 5483/13000 [00:01<00:01, 4787.51it/s]read data:  46%|████▌     | 5974/13000 [00:01<00:01, 4210.55it/s]read data:  52%|█████▏    | 6754/13000 [00:01<00:01, 5033.40it/s]read data:  58%|█████▊    | 7478/13000 [00:01<00:01, 5321.77it/s]read data:  62%|██████▏   | 8033/13000 [00:01<00:01, 4899.57it/s]read data:  66%|██████▌   | 8610/13000 [00:02<00:00, 5106.31it/s]read data:  74%|███████▍  | 9679/13000 [00:02<00:00, 6230.40it/s]read data:  79%|███████▉  | 10314/13000 [00:02<00:00, 5822.67it/s]read data:  86%|████████▌ | 11198/13000 [00:02<00:00, 6413.39it/s]read data:  91%|█████████ | 11851/13000 [00:02<00:00, 5901.23it/s]read data:  97%|█████████▋| 12621/13000 [00:02<00:00, 6362.64it/s]                                                                  [dyn_recon 18:20:17] uploading input.mrd (117 MB) ...
+[dyn_recon 18:20:59] uploaded in 43 s -> input buffer ltcyon5nwbzuxnhai3gxf6uije
+[dyn_recon 18:21:00] run 806 created (output buffer j4jn6nx5azze5hcqvaytr2qoxa); polling every 30 s
+[dyn_recon 18:21:32] run 806: Succeeded (32 s)
+[dyn_recon 18:21:33] downloading output buffer j4jn6nx5azze5hcqvaytr2qoxa ...
+[dyn_recon 18:21:55] recon done -> output.mrd (80 MB, 22 s download)
+[dyn_recon 18:21:55] rendering montages (plot_recon.py)...
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/tyger_deploy/plot_recon.py:67: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+gas phase: shape=(16, 100, 100, 100) dtype=float32
+saved /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_s_20261001-182011/output_gp.png
+[dyn_recon 18:21:57] post-processing (mat + GIFs)...
+[post_process] reading /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/output.mrd ...
+[post_process] gas shape (16, 100, 100, 100) dtype float32
+[post_process] extracting signal/pneumo from /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/input.mrd ...
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/signal_pneumo.npz
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/recon.mat
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/fig/axial.gif  (100 slices, 10x10, 16 bins, EE=15 EI=7, vmin=-4.03e+04 vmax=2.12e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/fig/coronal.gif  (95 slices, 10x10, 16 bins, EE=15 EI=7, vmin=-4.03e+04 vmax=2.12e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/fig/sagittal.gif  (100 slices, 10x10, 16 bins, EE=15 EI=7, vmin=-4.03e+04 vmax=2.12e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/fig/diaphragm.gif
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/fig/resp_traces.png
+[post_process] DONE -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s/fig
+[dyn_recon 18:22:56] DONE. Results -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/s
+[dyn_recon 18:22:56] ==================== DIAPHRAGM -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d ====================
+[dyn_recon 18:22:56] run dir    : /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_d_20261001-182256
+[dyn_recon 18:22:56] converting (DIAPHRAGM) -> /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_d_20261001-182256/input.mrd
+dynamic:   /Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-03-12/006KL/Dynamic Proton/meas_MID00174_FID08670_fa_spiral_dyn_fancy_v3_20240130.dat (110505984 bytes)
+pymapVBVD version 0.6.1
+Software version: VD
+Scan 1/1, read all mdhs:   0%|          | 0.00/105M [00:00<?, ?B/s]Scan 1/1, read all mdhs:  20%|█▉        | 20.6M/105M [00:00<00:00, 216MB/s]Scan 1/1, read all mdhs:  41%|████      | 43.3M/105M [00:00<00:00, 229MB/s]Scan 1/1, read all mdhs:  63%|██████▎   | 66.1M/105M [00:00<00:00, 234MB/s]Scan 1/1, read all mdhs:  84%|████████▍ | 88.6M/105M [00:00<00:00, 234MB/s]                                                                           read data:   0%|          | 0/13000 [00:00<?, ?it/s]read data:   6%|▌         | 766/13000 [00:00<00:01, 6785.91it/s]read data:  13%|█▎        | 1642/13000 [00:00<00:02, 5475.10it/s]read data:  17%|█▋        | 2273/13000 [00:00<00:01, 5554.99it/s]read data:  24%|██▎       | 3070/13000 [00:00<00:01, 6344.89it/s]read data:  34%|███▍      | 4441/13000 [00:00<00:00, 8697.75it/s]read data:  41%|████      | 5356/13000 [00:00<00:00, 8163.03it/s]read data:  50%|█████     | 6517/13000 [00:00<00:00, 7930.70it/s]read data:  57%|█████▋    | 7470/13000 [00:00<00:00, 8316.53it/s]read data:  68%|██████▊   | 8872/13000 [00:01<00:00, 9878.56it/s]read data:  76%|███████▌  | 9905/13000 [00:01<00:00, 9470.78it/s]read data:  87%|████████▋ | 11258/13000 [00:01<00:00, 10438.23it/s]read data: 100%|█████████▉| 12943/13000 [00:01<00:00, 12230.03it/s]                                                                   [dyn_recon 18:23:01] uploading input.mrd (117 MB) ...
+[dyn_recon 18:23:27] uploaded in 27 s -> input buffer xbrwx6jpaoae7llug2zt6nhz34
+[dyn_recon 18:23:28] run 807 created (output buffer w2ttmmg6hkbutghtwa2ybyhow4); polling every 30 s
+[dyn_recon 18:23:59] run 807: Running (31 s)
+[dyn_recon 18:25:06] run 807: Succeeded (98 s)
+[dyn_recon 18:25:06] downloading output buffer w2ttmmg6hkbutghtwa2ybyhow4 ...
+[dyn_recon 18:25:20] recon done -> output.mrd (100 MB, 13 s download)
+[dyn_recon 18:25:20] rendering montages (plot_recon.py)...
+/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/tyger_deploy/plot_recon.py:67: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+gas phase: shape=(16, 100, 100, 100) dtype=float32
+saved /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/2024-03-12_006KL_d_20261001-182256/output_gp.png
+[dyn_recon 18:25:22] post-processing (mat + GIFs)...
+[post_process] reading /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/output.mrd ...
+[post_process] gas shape (16, 100, 100, 100) dtype float32
+[post_process] navigator arrays: nav_coronal(500, 100, 100), nav_diaphragm_z(500,), nav_time(500,), nav_volume(13000,), nav_ilvtime(13000,), nav_volmeastime(500,)
+[post_process] extracting signal/pneumo from /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/input.mrd ...
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/signal_pneumo.npz
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/recon.mat
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig/axial.gif  (100 slices, 10x10, 16 bins, EE=1 EI=8, vmin=-4.51e+04 vmax=2.03e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig/coronal.gif  (90 slices, 9x10, 16 bins, EE=1 EI=8, vmin=-4.51e+04 vmax=2.03e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig/sagittal.gif  (100 slices, 10x10, 16 bins, EE=1 EI=8, vmin=-4.51e+04 vmax=2.03e+05)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig/diaphragm.gif
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig/navigator.gif  (500 nav frames)
+[post_process] saved /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig/resp_traces.png
+[post_process] DONE -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d/fig
+[dyn_recon 18:27:43] DONE. Results -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/d
+[dyn_recon 18:27:43] ALL DONE -> /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL  (s, d)

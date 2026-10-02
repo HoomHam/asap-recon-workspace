@@ -1,0 +1,14 @@
+[dyn_recon 23:57:54] uploading input.mrd (117 MB) ...
+[dyn_recon 23:59:48] uploaded in 114 s -> input buffer rhuubpgp2enuni72vxijhmi7gm
+[dyn_recon 23:59:49] run 810 created (output buffer 42q2vzr57b5uneiyps4uzajc4m); polling every 30 s
+[dyn_recon 00:00:20] run 810: Succeeded (30 s)
+[dyn_recon 00:00:20] downloading output buffer 42q2vzr57b5uneiyps4uzajc4m ...
+[dyn_recon 00:04:18] recon done -> output.mrd (80 MB, 238 s download)
+DONE exp1ms /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL_filt/exp1ms/d/output.mrd
+[dyn_recon 00:04:19] uploading input.mrd (117 MB) ...
+[dyn_recon 00:04:45] uploaded in 27 s -> input buffer kkojyxwgxpoedn7dxbuuravgzy
+[dyn_recon 00:04:46] run 811 created (output buffer yzgleljecotejfrvzkp5265vpu); polling every 30 s
+[dyn_recon 00:05:26] run 811: Succeeded (40 s)
+[dyn_recon 00:05:26] downloading output buffer yzgleljecotejfrvzkp5265vpu ...
+[dyn_recon 00:05:37] recon done -> output.mrd (80 MB, 11 s download)
+DONE exp1p5ms /Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL_filt/exp1p5ms/d/output.mrd

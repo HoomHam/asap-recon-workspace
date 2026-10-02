@@ -141,10 +141,16 @@ def resolve(args):
     seqname = args.seqname or next(s for s in seqnames if s in dyn)
 
     # -- trajectory --
-    gp = TRAJ_DIR / f'{seqname}_gp.npy'
-    dp = TRAJ_DIR / f'{seqname}_dp.npy'
-    gp = str(gp) if gp.is_file() else None
-    dp = str(dp) if dp.is_file() else None
+    if args.gp_traj:
+        # explicit trajectory (e.g. a measured 1H 'water' calibration); gas-only, no dp
+        gp, dp = str(Path(args.gp_traj).resolve()), None
+        if not Path(gp).is_file():
+            _die(f'--gp-traj not found: {gp}')
+    else:
+        gp = TRAJ_DIR / f'{seqname}_gp.npy'
+        dp = TRAJ_DIR / f'{seqname}_dp.npy'
+        gp = str(gp) if gp.is_file() else None
+        dp = str(dp) if dp.is_file() else None
     if gp is None:
         _die(f'gas-phase trajectory missing: {TRAJ_DIR}/{seqname}_gp.npy')
 
@@ -156,6 +162,11 @@ def resolve(args):
                    if 'pneumotach' in f.lower()
                    and not f.startswith('._') and not f.endswith('.dat')), None)
     pneumo = str(datadir / pneumo) if pneumo else None
+    if args.pneumo:
+        # explicit respiratory file in pneumotach format (e.g. a synthetic k0 surrogate for 1H)
+        pneumo = str(Path(args.pneumo).resolve())
+        if not Path(pneumo).is_file():
+            _die(f'--pneumo not found: {pneumo}')
 
     _log(f'data dir   : {datadir}')
     _log(f'date / id  : {date} / {subj_id}')
@@ -377,6 +388,9 @@ def main():
                     help="binning methods to run, as letters s(ignal)/p(neumotach)/"
                          "d(iaphragm), comma-separated (default 's,p,d' = all three)")
     ap.add_argument('--seqname', help='override auto-detected trajectory seqname')
+    ap.add_argument('--pneumo', help='explicit pneumotach-format file (overrides the one found in the data dir)')
+    ap.add_argument('--gp-traj', help='explicit gas-phase trajectory .npy (cycles/mm); disables dp '
+                                      '(used for 1H dynamics with a measured water calibration)')
     ap.add_argument('--merge', help='comma-separated MIDs of free-breathing dynamics to merge into '
                                     'one input (acquisition order; first keeps its cal block). '
                                     'Output folder gets a _merged suffix; p binning is skipped.')

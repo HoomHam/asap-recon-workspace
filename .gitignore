@@ -9,3 +9,9 @@ helpers/lustig_oneshot/.venv_lustig/
 helpers/_delete/**/__pycache__/
 outputs/archive/
 pipeline/runs/
+# session transcripts (full conversation exports; System nightly sweep adds more) — never commit
+archive/*.jsonl
+# proton 1H session outputs: heavy media/arrays are copies or regenerable (recon trees on Ext AIkill_Dynamic_1H/)
+outputs/proton_dyn_2026-10-01/**/*.npy
+outputs/proton_dyn_2026-10-01/**/*.mp4
+outputs/proton_dyn_2026-10-01/**/*.gif

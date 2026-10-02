@@ -1,0 +1,65 @@
+{
+ "full_(2.56_ms)": {
+  "lung_SNR": 4.011431694030762,
+  "tissue_SNR": 15.400680541992188,
+  "sigma_bg": 2.9760130887492076e-19,
+  "sigma_passdiff": 5.067990022373212e-19,
+  "lung_over_floor": 2.2411818504333496
+ },
+ "trunc_1.5_ms": {
+  "lung_SNR": 4.094666481018066,
+  "tissue_SNR": 17.02989959716797,
+  "sigma_bg": 2.669385765975867e-19,
+  "sigma_passdiff": 4.460130686115466e-19,
+  "lung_over_floor": 2.2785024642944336
+ },
+ "trunc_1.0_ms": {
+  "lung_SNR": 4.274627208709717,
+  "tissue_SNR": 18.644302368164062,
+  "sigma_bg": 2.414986110091242e-19,
+  "sigma_passdiff": 4.0189324301899803e-19,
+  "lung_over_floor": 2.3596842288970947
+ },
+ "matched_exp(-t/2ms)": {
+  "lung_SNR": 4.87614107131958,
+  "tissue_SNR": 20.230236053466797,
+  "sigma_bg": 2.1053478498882087e-19,
+  "sigma_passdiff": 3.973438067209367e-19,
+  "lung_over_floor": 2.6351828575134277
+ },
+ "tukey_from_1.0_ms": {
+  "lung_SNR": 4.036921501159668,
+  "tissue_SNR": 16.927520751953125,
+  "sigma_bg": 2.6874015012233308e-19,
+  "sigma_passdiff": 4.469221175170533e-19,
+  "lung_over_floor": 2.2525949478149414
+ },
+ "matched_exp(-t/0.75ms)": {
+  "lung_SNR": 7.019128799438477,
+  "tissue_SNR": 26.6466064453125,
+  "sigma_bg": 1.4616047486795011e-19,
+  "sigma_passdiff": 3.822453792405973e-19,
+  "lung_over_floor": 3.649252414703369
+ },
+ "matched_exp(-t/1ms)": {
+  "lung_SNR": 6.0959625244140625,
+  "tissue_SNR": 24.24822425842285,
+  "sigma_bg": 1.6603264897922698e-19,
+  "sigma_passdiff": 3.7864135872776246e-19,
+  "lung_over_floor": 3.2078325748443604
+ },
+ "matched_exp(-t/1.5ms)": {
+  "lung_SNR": 5.255698204040527,
+  "tissue_SNR": 21.644149780273438,
+  "sigma_bg": 1.9289514550143049e-19,
+  "sigma_passdiff": 3.8582212732419125e-19,
+  "lung_over_floor": 2.811688184738159
+ },
+ "matched_exp(-t/3ms)": {
+  "lung_SNR": 4.533705711364746,
+  "tissue_SNR": 18.721763610839844,
+  "sigma_bg": 2.324815410010778e-19,
+  "sigma_passdiff": 4.179140008247188e-19,
+  "lung_over_floor": 2.4776241779327393
+ }
+}
