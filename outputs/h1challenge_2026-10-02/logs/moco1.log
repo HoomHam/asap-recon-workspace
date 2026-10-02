@@ -1,0 +1,4 @@
+warp matrices 5 s
+moco_lt0.5_it15        noise/tis 0.0243  lung/tis 0.175  tisSNR   41.2  bg/tis 0.028  dome exc 10.99 mm width 16.16 mm | held-out lines low/mid/high    128906   211.7  40.04 | held-out ilv    129898   361.0 101.62 | train    127685   146.2  21.46  (520 s)
+moco_lt2_it15          noise/tis 0.0155  lung/tis 0.175  tisSNR   64.8  bg/tis 0.028  dome exc 10.92 mm width 16.03 mm | held-out lines low/mid/high    137911   214.4  40.16 | held-out ilv    138977   371.9 101.36 | train    136560   166.9  26.01  (738 s)
+moco_lt8_it15          noise/tis 0.0118  lung/tis 0.174  tisSNR   85.9  bg/tis 0.027  dome exc 11.06 mm width 16.33 mm | held-out lines low/mid/high    171474   279.6  47.92 | held-out ilv    174032   525.4 114.07 | train    169883   230.4  35.53  (411 s)

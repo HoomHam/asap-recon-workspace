@@ -907,3 +907,31 @@ session-7 header, belong to THIS session — left in place, append-only.)
 - DECIDED (Hooman): nothing more goes to XeCS until "all we can do" is done. Next session = challenge/collaboration
   with XeCS on the best 006KL proton recon.
 - BRANCH: proton-1h (B31), parent B10 — ● open. ★ → B31.
+
+## 2026-10-02 · session 16 (Fable 5.1)
+- ASAP × XeCS CHALLENGE on the 006KL proton cine (MID174), run between the two sessions on Hooman's order (ASAP = no
+  sparsity prior, XeCS = with). Rules, judging kit v2 (shared masks, odd/even-pass halves, held-out lines, held-out
+  interleaves, ground-truth phantom built by ASAP and reviewed by XeCS) agreed before reconstructing; each side's files
+  scored by the other's code (agree to the last digit). Frozen 09:05; joint summary signed by both:
+  `2026_XeCS_Recon/workspace/outputs/h1challenge/JOINT_SUMMARY.md`. Hooman's ruling is pending.
+- Run 811 (exp 1.5 ms) salvaged from the Tyger buffer; both filter cines re-rendered. Breathing-rate conflict with XeCS
+  resolved (F106).
+- FORWARD MODEL (shared, the real product): body is far outside the 350 mm field (XeCS, F109) → full field + body
+  support; the RECEIVER BAND-LIMIT (F107, mine) → filter in the model; thermal noise re-measured, 12× lower (F108);
+  second channel worth ~4 % (F110).
+- My arms (F111): 4D least squares, 16 nodes, coupling along a demons breathing field, one prior-weighted Tikhonov.
+  Real scan vs gridding: lung variation 0.148 → 0.014, lung/tissue 0.358 → 0.166, excursion 10.0 mm. Level with XeCS
+  (ASAP ahead on lung variation + excursion, XeCS SNR ahead on high-k never-sampled error; phantom: XeCS keeps more
+  vessel contrast). Both sessions' eye: sharp = ASAP sharp; SNR close.
+- Negatives (F112): self-navigation, MP-PCA, smoothing outside the box, symmetric warp, trajectory delay/gain/rotation
+  errors, far off-resonance, phase constraint (XeCS). Phantom must not be used to choose regularisation strength (F113).
+- DECIDED (Hooman): the two sessions settle comparison + quantification themselves; he rules at the end.
+- DECIDED (ASAP+XeCS, XeCS ruling): the one-pass prior-weighted Tikhonov is inside "no sparsity prior" if labelled and
+  delivered with a twin without it; at one-voxel smoothing it is labelled "a single step of reweighted least squares".
+- RETRACTION: F104's "1H k0 21.0/min (72 breaths)" clause → F106 (70 cycles, 19.25/min by count; 21.4 is the strongest
+  spectral line). My first noise covariance sent to XeCS (pass-to-pass tail differences) was breathing, not thermal →
+  F108 (corrected in-session, never a facts row).
+- Not done: ASAP phantom SNR arm, T2* phantom (v1b), XeCS's hard-assignment test of the node interpolation.
+- Open: fixed pattern in the first 50 readout samples (~0.4 % of signal power) unexplained (question to Hooman: does
+  the sequence spoil?); run 808 shows 5.5 mm excursion vs 9.0 mm from a plain re-gridding of the same lines (unchecked).
+- BRANCH: h1-challenge (B32), parent B31 — delivered, awaiting Hooman's ruling. ★ → B32. B31 ✅ (superseded by B32).

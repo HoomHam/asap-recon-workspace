@@ -1,0 +1,13 @@
+{
+ "ref_tissue_level": 0.046476974561701884,
+ "caudal_sign": -1,
+ "posterior_sign": -1,
+ "lung_litres": 2.48847571875,
+ "vessel_fraction_of_lung": 0.0990088774600385,
+ "fine_grid": [
+  352,
+  240,
+  320
+ ],
+ "dx_mm": 1.75
+}

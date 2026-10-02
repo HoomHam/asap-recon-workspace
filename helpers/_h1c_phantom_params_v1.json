@@ -1,0 +1,21 @@
+{
+ "seed": 20261002,
+ "parenchyma_level": 0.12,
+ "gravity_gradient": 0.30,
+ "vessels_per_lung": 110,
+ "vessel_radius_mm": [1.75, 7.0],
+ "vessel_end_radius_mm": 0.9,
+ "vessel_contrast": [0.30, 0.90],
+ "displacement_mm": 16.0,
+ "abdomen_plateau_mm": 90.0,
+ "abdomen_taper_mm": 110.0,
+ "wall_mm": 12.0,
+ "wall_transition_mm": 18.0,
+ "arm_radius_mm": 62.0,
+ "surrogate_mismatch_sd": 0.06,
+ "surrogate_mismatch_corr_s": 1.5,
+ "sensitivity_perturbation": 0.10,
+ "noise": "measured covariance (1.40e-10, 1.70e-11, |corr| 0.30), unit variance after whitening",
+ "amplitude_states": 64,
+ "_units": "levels are fractions of the bright-tissue reference; displacement_mm is the SI shift at the lung base for surrogate amplitude 1 (deepest breath of the scan); vessel radii are tube radii (diameter 3.5 to 14 mm = 1 to 4 voxels of 3.5 mm), tapering to vessel_end_radius_mm"
+}

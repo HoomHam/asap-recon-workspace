@@ -1,0 +1,13 @@
+{
+ "scale": 1.0354217290878296,
+ "err_box": 0.0685916468501091,
+ "err_lung": 0.24215573072433472,
+ "lung_bias": 0.04581218957901001,
+ "vessel_contrast": 0.9006665349006653,
+ "dome_excursion_mm": 8.239347457885742,
+ "truth_excursion_mm": 9.45346736907959,
+ "dome_width_mm": 17.566125869750977,
+ "truth_width_mm": 17.04123306274414,
+ "dome_pos_rms_err_mm": 0.43579351902008057,
+ "vessel_voxels": 3202
+}

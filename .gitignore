@@ -15,3 +15,5 @@ archive/*.jsonl
 outputs/proton_dyn_2026-10-01/**/*.npy
 outputs/proton_dyn_2026-10-01/**/*.mp4
 outputs/proton_dyn_2026-10-01/**/*.gif
+# h1 challenge outputs: cines are regenerable (arrays + delivery on Ext Work/Codes/2026_ASAP_Recon/h1challenge/)
+outputs/h1challenge_2026-10-02/**/*.mp4

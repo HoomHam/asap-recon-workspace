@@ -1,0 +1,8 @@
+  self-navigation round 1: rms coordinate change 0.0302 cycles
+  self-navigation round 2: rms coordinate change 0.0105 cycles
+displacement at end inspiration (voxels): 99th pct |d| 1.87, max along axes (LR, AP, SI) [0.47 0.54 2.12]
+node amplitudes a_b: [-0.04  0.02  0.14  0.22  0.33  0.52  0.76  0.96  1.14  0.95  0.66  0.42
+  0.26  0.17  0.1   0.02]
+v1_m05_prior_nav2      noise/tis 0.0052  lung/tis 0.134  tisSNR  149.9  bg/tis 0.011  dome exc  7.97 mm width 17.71 mm | held-out lines low/mid/high       392    13.7   5.53 | held-out ilv       404    36.8  18.05 | train       388     9.4   3.32  (1005 s)
+v1_m05_prior_nav2          err box 0.058  err lung 0.188  lung bias -0.038  vessel contrast 0.885  dome exc  8.01 (truth 9.45) mm  width 17.67 (truth 17.04) mm  dome pos err 0.64 mm
+total 1019 s

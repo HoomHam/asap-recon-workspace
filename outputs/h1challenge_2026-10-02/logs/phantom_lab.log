@@ -1,0 +1,5 @@
+A reference: lt .5, prior 9 mm, lam .01        err box 0.053 err lung 0.176 bias -0.035 vessel 0.893 exc 8.21 | held-out ilv   338  28.0 16.39 (203 s)
+B prior 3.5 mm smoothing, lam .01              err box 0.052 err lung 0.177 bias -0.047 vessel 0.932 exc 8.21 | held-out ilv   326  25.6 15.80 (192 s)
+C prior 3.5 mm, lam .003                       err box 0.056 err lung 0.191 bias -0.004 vessel 0.926 exc 8.19 | held-out ilv   285  30.8 17.83 (192 s)
+D uniform Tikhonov .003                        err box 0.063 err lung 0.212 bias +0.039 vessel 0.910 exc 8.15 | held-out ilv   503  41.9 20.39 (177 s)
+E uniform Tikhonov .0005, 40 iterations        err box 0.042 err lung 0.148 bias +0.009 vessel 0.940 exc 8.19 | held-out ilv   228   9.4 11.61 (375 s)

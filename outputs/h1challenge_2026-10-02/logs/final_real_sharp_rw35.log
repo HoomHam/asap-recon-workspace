@@ -1,0 +1,5 @@
+displacement at end inspiration (voxels): 99th pct |d| 2.37, max along axes (LR, AP, SI) [1.16 2.08 3.44]
+node amplitudes a_b: [-0.02  0.01  0.07  0.15  0.31  0.54  0.77  1.03  1.16  0.87  0.58  0.35
+  0.22  0.13  0.06  0.01]
+real_sharp_rw35        noise/tis 0.0137  lung/tis 0.166  tisSNR   64.1  bg/tis 0.025  dome exc 10.04 mm width 16.09 mm | held-out lines low/mid/high     89509   202.1  37.07 | held-out ilv     88815   328.3  90.14 | train     88672   159.3  24.65  (876 s)
+total 1067 s

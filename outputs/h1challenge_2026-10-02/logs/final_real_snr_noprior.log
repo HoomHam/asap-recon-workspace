@@ -1,0 +1,2 @@
+real_snr_noprior       noise/tis 0.0084  lung/tis 0.181  tisSNR  116.9  bg/tis 0.025  dome exc  9.98 mm width 17.27 mm | held-out lines low/mid/high     88577   219.0  40.28 | held-out ilv     87399   384.0 103.13 | train     87465   177.3  27.96  (525 s)
+total 731 s

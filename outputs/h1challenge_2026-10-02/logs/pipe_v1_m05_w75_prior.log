@@ -1,0 +1,6 @@
+displacement at end inspiration (voxels): 99th pct |d| 1.96, max along axes (LR, AP, SI) [0.49 0.49 2.29]
+node amplitudes a_b: [-0.05  0.03  0.12  0.21  0.34  0.52  0.73  0.97  1.11  0.76  0.49  0.34
+  0.25  0.19  0.12  0.02]
+v1_m05_w75_prior       noise/tis 0.0054  lung/tis 0.135  tisSNR  147.9  bg/tis 0.011  dome exc  8.23 mm width 17.64 mm | held-out lines low/mid/high       315    10.6   5.01 | held-out ilv       339    28.2  16.44 | train       317     7.3   3.06  (694 s)
+v1_m05_w75_prior           err box 0.053  err lung 0.177  lung bias -0.029  vessel contrast 0.894  dome exc  8.25 (truth 9.45) mm  width 17.60 (truth 17.04) mm  dome pos err 0.36 mm
+total 709 s
