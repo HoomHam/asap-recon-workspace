@@ -58,6 +58,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C50 | pipeline/mrd_to_mat.py | prod-b44 (B25) | WORKS 2026-09-25 — output.mrd → recon.mat (gas, |gas|, aRBC/aTP, |dis|, calcb_b, rbc_tp_* meta, nav), no figures |
 | C51 | helpers/pf_p1_check.py | pf-p1 (B27) | WORKS 2026-09-26 — legacy dat/PF vs dat/P1: DC-zero test (PF = oldway 0), geometry, bg σ/corr, Bin_* agreement → outputs/pf_p1_check/ |
 | C55 | pipeline/deapod_tree.py | deapod-prod (B30) | WORKS 2026-09-28 — offline deapodised copy of the b44 tree (images / A(r)); == Tyger fork ee3c91f; → Ext Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d/ |
+| C56 | pipeline/convert_mixed_adc.py | prev2-calib (B33) | WORKS 2026-10-04 (11 acq7 sessions + HH pair through Tyger; F115) — root converter with an MDH reader for mixed-ADC twix (2022 0812 acqOrder 7: 512-sample imaging + 1024-sample spectra); used via ASAP_CONVERTER=… dyn_recon.py |
 | C54 | helpers/tune_gas.py | tyger-tuning (B29) | WORKS 2026-09-27 — gas knob sweep (MS, kdist0sq/box, gplb, deapod) against a known lung object sampled at the real trajectory points; blur/alias/noise/total + PSF per bin; --obj-gplb bracket, --cg-control (LS CG on same samples), --dp, --set stab/snr/reg (soft-bin, noise ×, registration proxies) → outputs/tune_gas/<key>[_dp/_obj300/_reg/_stab_*/_snr_*]/ (F90–F98) |
 | C53 | helpers/pf_inlung.py | pf-merit (B28) | DONE 2026-09-27 — in-lung error vs a truth resampled through each bin's real hole pattern; flags --truth-bin/--b-raw/--b-self/--synth-real/--lung-only; real data P1 1–2 % vs PF 7–10 %, ideal object P1 8 % vs PF 0.7–1.2 % (F89: ghost of out-of-crop energy; code verified) |
 | C52 | helpers/pf_test.py | pf-merit (B28) | DONE 2026-09-26 — Tyger-exact rebuild (relerr 1e-6) of 021CH; P1 / PFs (oldway 0) / PFs+KLUGE / PFc (POCS, same b), gas + dissolved → outputs/pf_test/021CH/ (F88: PF costs 20 % gas SNR, destroys aRBC) |
@@ -575,6 +576,8 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 |---|---|---|---|
 | proton_dyn_2026-10-01/ | C9 + scratch _proton_*.py, _mrd_apodize.py, _cine_compare.py | F100–F105 | VALID (⚠ F104 1H rate clause → F106; F105 "SNR" = pass difference, not thermal, F108) — 1H 006KL: traj tests (gamma_check, scale_sweep, hires, water15_*), k0 breathing figs, bins_s_d_p, selfnav/ (SI navigator, k0-vs-dome correspondence, bins_k0_vs_dome), improve/ (delay/scale/CV json, apod_tradeoff/eval, cine_orig_vs_exp1ms.mp4), videos_* (p / Xe-d / 26- and 52-ilv). *.npy/*.mp4/*.gif NOT in git (gitignored; copies/regenerable, recon trees on Ext AIkill_Dynamic_1H/) |
 | h1challenge_2026-10-02/ | scratch helpers/_h1c*.py (engine _h1c.py + _h1c_dyn.py, pipeline _h1c_pipeline.py, scorers, phantom, diagnostics) | F106–F113 | VALID — ASAP × XeCS proton-cine challenge, ASAP side: joint_real.png/.mp4 (run 808, ASAP sharp/SNR, XeCS sharp/SNR, 4 views × 2 phases; cine of 16 phases), joint_v1.png/.mp4 (phantom truth vs both sides), METHOD_asap.md, scores/*.json (kit v2 per arm), diag_bw/receiver_filter/diag_fixed/diag_rot/static700_log (receiver band-limit hunt), support_g/sens700 (body support, coil ratio), motion_v0 (demons field), phantom_object_v1, view_* (before/after montages), logs/. *.mp4 NOT in git. Arrays + delivery on Ext `Work/Codes/2026_ASAP_Recon/h1challenge/` (16 GB, regenerable): deliver/, arms/, phantom/, shared/ (receiver_filter_v1, noise_thermal_v2, cyc_coord_per_line) |
+| prev2_calib_2026-10-03/ | C56 + scratch _prev2_*.py, _twix_quickinfo.py, _pick_best_2022.py | F114–F120 | VALID — headers.csv (2022 twix vs calib headers), static_*.png/.npy (quick local recons — SOFT by method, F116), _arm_c_vs_3c / _017AK_* / _delay_scan / _families_* (mapping/delay/dwell tests), binned_HH1026_*.png, HH1026_{slow,fast}_tyger_vs_faraz.png, tyger_2022_contact.png + tyger_2022_all_contact.png, tyger_2022_sessions.csv, human_sessions_all_2026-10-03.csv (inventory). Tyger trees on Ext `Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_2022/` |
+| hh_fastslow_2026-10-03/ | scratch _hh_k0_scan.py, _hh_coronal_video{,_tyger}.py | F121 | VALID — HH_2022-10-26_coronal_slow_vs_fast{,_TYGER}.{mp4,gif} (10 coronal slices A→P, rows matched), _still_EI / _TYGER_still_EI.png, k0_hh.csv + 2022/2023 HH k0 traces, orientation checks. Raw + Faraz mats on Ext Work/Images/MRI/Human/2022-10-2{6,7}_000HH; timing npz on Ext hh_fastslow_2026-10-03/timing/ |
 | te90_2026-09-25/ | C38 | F72 | VALID (te90_table.csv 88 rows, te90_strip.png) |
 | aikill_atlas_b44/ | C39 (--root) | F82 | VALID — PRODUCTION atlas (σ 4.4): rbc_tm_atlas.pdf, rbc_tm_atlas_sessions.csv (+ grades), videos_rbctm → Ext Work/Codes/2026_ASAP_Recon/aikill_atlas_b44/ |
 | split_trust_b44/ | C40 (--root) | F82 | VALID — PRODUCTION trust table (split_trust.csv, fine_static_b44.csv, cohort_trust.png, fig/) |
@@ -589,7 +592,7 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 | twix_audit_2026-09-16/ | inline script (ledger s7) | F55 | VALID (twix_audit.csv, 104 rows) |
 | merged_dyn_2026-09-16/ | C31 C32 + snr_calc | F56 | VALID (snr_merged_vs_orig.csv, panel_orig_vs_merged_gas_d.png; 025VP merge hurts) |
 | archive/ | ? (pre-canon) | ? | untagged — verify before trust (reconciled 2026-09-17) |
-| roundtrip_audit_2026-09-13/ | _roundtrip_audit.py | F51 | VALID (roundtrip_audit.csv, 136 folders) |
+| roundtrip_audit_2026-09-13/ | _roundtrip_audit.py | F51 | ⚠ F51 RETRACTED→F114 (the 20 NO_TRAJ 2022 sessions DO have a calibration: entry 4/10 = v2 npy); csv itself still valid (roundtrip_audit.csv, 136 folders) |
 | steve_vs_fork_diff/ | git diff main/dev/diaphragm-recon | F49 | VALID (4 .diff files) |
 | zorder_check_2026-09-12/ | _zorder_check.py | F49 | VALID (030DN edge-finder figure) |
 | leftover_recon_2026-09-12/ | copies of AIkill_Dynamic montages | F47 | VALID gas; dp montages magnitude-of-split caveat |
@@ -639,3 +642,20 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   Ext `tyger_deapod_check_2026-09-28/<key>/d/`), `pipeline/recon_codespec_ee3c91f.yml`; mrd_to_mat.py now carries
   the output meta `deapod` flag
 
+### C56 · pipeline/convert_mixed_adc.py
+- why: Hooman 2026-10-03 "find the right calibration for the one we started for (2022-10-26_000HH fast/slow) and the
+  rest of the 2022 ones". 2022 fancy_20220812 acqOrder-7 ('GP-DP-DP-Spectra') files interleave one 1024-sample
+  spectrum per 31 scans with 512-sample imaging scans; mapVBVD (Python AND MATLAB) sizes all scans to NCol=1024 →
+  the imaging scans come out as garbage, so the root converter cannot feed Tyger.
+- origin: C on H's order · branch: prev2-calib (B33)
+- in: twix dir (same CLI as root convert_siemens_to_mrd.py); reader = `helpers/_prev2_static_recon.read_scans`
+  (direct MDH walk, keeps ushSamplesInScan==512 in acquisition order, spectra dropped); header meta via mapVBVD
+- out: input.mrd identical in layout to the root converter's; dyn_recon.py picks it up when
+  `ASAP_CONVERTER=…/convert_mixed_adc.py` (one-line env override added to dyn_recon.py, default unchanged)
+- evidence: gas arm = gas-scan counter mod 640 (spectra do NOT advance it): within-arm coherence 0.81 vs 0.64 random;
+  Faraz's own reader (Gmail 2022-11-18, twix_map_obj_fa.m: per-scan length, Lin=mod(scanIdx,20) over all scans)
+  fails that test; labelings 3c / MDH Lin+20·Rep give garbage. Calibration = Faraz entry 4 (=v2 gp) / entry 10 (=v2 dp).
+- companions (scratch, uncarded): helpers/_prev2_headers.py, _prev2_static_recon.py, _prev2_shift_scan.py,
+  _prev2_freq_scan.py, _prev2_binned_compare.py → outputs/prev2_calib_2026-10-03/; traj seqnames.txt + symlinks
+  fa_spiral_dyn_fancy_2022{0812,1103}_{gp,dp}.npy → v2 (backup seqnames.txt.bak-2026-10-03)
+- 2026-10-04 additions: env `ASAP_DROP_CH=1[,..]|auto[:frac]` drops receive channels (auto = k0 SNR < frac×best, 0.35) — NOT a reliable gain (F118), default unset; companion spec pipeline/recon_codespec_6b01071.yml (fork 6b01071 = ee3c91f + calcb flat-phase fallback for < 20 mask voxels, pushed to hooman/diaphragm-recon, image built); dyn_recon.py (C9) gained the one-line ASAP_CONVERTER env override.

@@ -41,7 +41,8 @@ flowchart TD
   B29["● tyger-tuning (09-27/28)<br/>C54 known-object sweep 025JC/011CN: knobs ≤15 % (F90) · sharpness = ×2 noise (F94)<br/>floor = gridding, no operator converts it (F91→F95) · dplb 40 = Dixon limit (F92/F93)<br/>soft-bin stable (F96) · MS 200 SNR-conditional → keep 240 (F97) · MS160-for-R ruled out (F98)<br/>open: soft-bin width × nbins needs a moving object · R optimum = PCA benchmark"]
   B30["✅ deapod-prod (09-28)<br/>fork ee3c91f (after split, not in nav) · offline tree AIkill_Dynamic_b44d (61, C55)<br/>Tyger check 1e-7 / ≤1e-4 (F99) · XeCS + PCA told"]
   B31["✅ proton-1h (10-01/02)<br/>006KL MID174 = the one 1H cine (F100) · water traj entry 15, τ=0 (F101)<br/>k0 surrogate → p binning, 5.5 mm dome (F102) · low-k SI navigator r 0.64 (F103)<br/>exp readout filter ×1.3–1.5 lung SNR (F105) · packet → XeCS<br/>→ challenge with XeCS = B32"]
-  B32["★ h1-challenge (10-02)<br/>ASAP × XeCS, 006KL proton cine · kit v2 + phantom agreed, cross-scored<br/>forward model: full field (F109) + receiver band-limit (F107) · thermal noise 12× lower (F108)<br/>4D LS + motion coupling + one-pass prior (F111): lung variation 0.148 → 0.014, excursion 10.0 mm · level with XeCS<br/>negatives F112 · phantom limits F113 · delivered, joint summary signed<br/>next: Hooman rules"]
+  B33["★ prev2-calib (10-03/04)<br/>HH fast/slow = 2022-10-26_000HH (BigMac HD4) · video Faraz + Tyger<br/>2022 calib = Faraz entry 4/10 = v2 npy (F114) · acq7 mixed ADC → C56 reader (F115)<br/>17 sessions through Tyger · fork 6b01071 calcb guard · weak coil 1 (F118)<br/>inventory 164 sessions / 83 subjects (F120) · all-coil reruns 4/8 left"]
+  B32["● h1-challenge (10-02)<br/>ASAP × XeCS, 006KL proton cine · kit v2 + phantom agreed, cross-scored<br/>forward model: full field (F109) + receiver band-limit (F107) · thermal noise 12× lower (F108)<br/>4D LS + motion coupling + one-pass prior (F111): lung variation 0.148 → 0.014, excursion 10.0 mm · level with XeCS<br/>negatives F112 · phantom limits F113 · delivered, joint summary signed<br/>next: Hooman rules"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -60,7 +61,7 @@ flowchart TD
   B25 --> B26
   B26 --> B27 --> B28
   B25 --> B29 --> B30
-  B10 --> B31 --> B32
+  B10 --> B31 --> B32 --> B33
   B30 -.prod image ee3c91f.-> B31
   B28 -.two-target plan.-> B29
   B17 -.F47.-> B12
@@ -86,7 +87,8 @@ flowchart TD
 | B29 tyger-tuning ★ | C54 helpers/tune_gas.py (--set/--dp/--obj-gplb/--cg-control/--bindist0sq/--nbins/--sigma/--noise-mult) → outputs/tune_gas/<key>[_dp/_obj300/_reg/_stab_*/_snr_*]/ (csv, md, png), combined_table*.md, tests_2026-09-28.md, cohort_gas_snr.csv, figures sharpness_vs_noise.png / snr_crossover.png / candidates_bin0.png; image stacks Ext `Work/Codes/2026_ASAP_Recon/tune_gas/`; scratch _tune_gas_{combine,candidates,fig09}.py, _tune_batch_2026-09-28.sh, _tune_tests_2026-09-28.py, _cohort_gas_snr.py, _tune_snr_fig.py; notes/Tyger_Tuning_Gas_Dissolved_2026-09-27.md; 2steve/09 + fig/09_* (F90–F98) |
 | B30 deapod-prod ✅ | fork ee3c91f (results.rolloff/deapod, tyger_recon meta), pipeline/recon_codespec_ee3c91f.yml, C55 pipeline/deapod_tree.py → Ext `Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d/` (61, PROVENANCE.json), pipeline/run_deapod_check_2026-09-28.sh → Ext `tyger_deapod_check_2026-09-28/`, mrd_to_mat.py deapod flag, _deapod_check_compare.py → outputs/tune_gas/deapod_check_2026-09-28.md; 2steve/03 update (F99) |
 | B31 proton-1h ✅ | C9 dyn_recon.py --gp-traj/--pneumo, `data/h1/traj/fa_spiral_dyn_fancy_v3_20240130_water_fov350_gp.npy` (Faraz water entry 15), scratch helpers/_proton_*.py + _mrd_apodize.py + _cine_compare.py + _asap_traj.c, outputs/proton_dyn_2026-10-01/ (+ selfnav/, improve/, videos_*), Ext `AIkill_Dynamic_1H/2024-03-12_006KL/{s,d,p,selfnav,usimg26,usimg52}` (only p is breathing-resolved) + `_dome/p` + `_filt/{orig,exp1ms,exp1p5ms}/d`, XeCS packet `2026_XeCS_Recon/workspace/outputs/incoming_asap_proton_006KL_2026-10-01/` (F100–F105) |
-| B32 h1-challenge ★ | scratch helpers/_h1c*.py (see cards "Scratch"), outputs/h1challenge_2026-10-02/ (joint_real/joint_v1 figures + cines, METHOD_asap.md, scores/), Ext `Work/Codes/2026_ASAP_Recon/h1challenge/{deliver,arms,phantom,shared}/`, XeCS `workspace/outputs/h1challenge/JOINT_SUMMARY.md` + Ext `Work/Codes/2026_XeCS_Recon/h1challenge/{shared (judging kit v2),deliver}/` (F106–F113) |
+| B32 h1-challenge ● | scratch helpers/_h1c*.py (see cards "Scratch"), outputs/h1challenge_2026-10-02/ (joint_real/joint_v1 figures + cines, METHOD_asap.md, scores/), Ext `Work/Codes/2026_ASAP_Recon/h1challenge/{deliver,arms,phantom,shared}/`, XeCS `workspace/outputs/h1challenge/JOINT_SUMMARY.md` + Ext `Work/Codes/2026_XeCS_Recon/h1challenge/{shared (judging kit v2),deliver}/` (F106–F113) |
+| B33 prev2-calib ★ | C56 pipeline/convert_mixed_adc.py, pipeline/recon_codespec_6b01071.yml (fork 6b01071), traj seqnames.txt + fa_spiral_dyn_fancy_2022{0812,1103}_{gp,dp}.npy → v2 symlinks, scratch helpers/_prev2_*.py · _hh_*.py · _twix_quickinfo.py · _pick_best_2022.py, outputs/prev2_calib_2026-10-03/ + outputs/hh_fastslow_2026-10-03/, Ext `Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_2022/<key>/d/` (+ _logs/), Ext `Work/Images/MRI/Human/2022-10-2{6,7}_000HH/` (raw + Faraz mats), Ext `Work/Codes/2026_ASAP_Recon/{hh_fastslow_2026-10-03/timing,calib_libraries}/` (F114–F121) |
 | B13 tyger-access | Ext tyger_check_2026-09-03/2024-05-13_005JJ_s/ (run 558), memory tyger_setup.md |
 | B14 leftover-recon | fork commits 472fbc9/40d23a4, C9 dyn_recon.py, C29 todo_batch.sh, outputs/roundtrip_audit_2026-09-13/, outputs/leftover_recon_2026-09-12/, Ext pipeline_runs/logs + quarantine/ (F42–F46 F51) |
 | B15 steve-provenance | `Codes/2026_Steve_Recon` (plain = 3303276), outputs/steve_vs_fork_diff/, outputs/zorder_check_2026-09-12/ (F49) |
@@ -99,7 +101,7 @@ flowchart TD
 | B20 merged-dyn | C31 merge_dyn.py, C32 merged_batch.sh, C9 dyn_recon.py --merge/--ref, outputs/twix_audit_2026-09-16/, Ext AIkill_Dynamic/*_merged/ + pipeline_runs/logs/*_merged.log (F55 F56) |
 | B21 ct-overlay ● | C33 ct_to_nifti.py, C34 ct_mri_overlay.py, C35 ct_cohort_batch.py, outputs/ct_overlay/<key>/ (summary_3plane, montages, bins_video.mp4, register.json), cohort_fit_table.csv, cohort_summary.pdf (Ext, symlink), Ext `Codes/2026_ASAP_Recon/ct_overlay/` (NIfTI CT, mri_on_ct, rigid.tfm, per-slice PNG/GIF, manifest.json) (F58) |
 
-## Current position (★ B32, 2026-10-02; B31/B29/B25 history below)
+## Current position (★ B33, 2026-10-04; B32/B31/B29/B25 history below)
 
 Session 11 built the RBC/TM atlas and trust grade (B12), then chased the non-moving structure Hooman saw in the
 RBC videos: not a smooth static field (F74 retracted), not noise (F75), not scanner-fixed (F76), but the raw
@@ -154,3 +156,9 @@ cannot choose regularisation strength (F113). B31 ✅. ★ → B32.
 recon is to be kept: promote the `_h1c` engine out of scratch, run the T2* phantom (v1b) + ASAP phantom SNR arm, check
 why run 808 shows 5.5 mm excursion against 9.0 mm from plain re-gridding, and check the receiver band-limit on xenon.**
 B29 open items unchanged.
+
+Session 17 (2026-10-03/04, Opus 5.5): B33 prev2-calib. Hunted Hooman's own fast/slow-breathing pair (000HH 2022-10-26,
+BigMac-only, fetched by System) → two-row coronal videos (Faraz, then our Tyger). The 2022 "no trajectory" sessions
+(F51) use Faraz calib entry 4/10 = the v2 npy (F114 retracts F51); acqOrder-7 twix need a mixed-ADC reader (C56, F115);
+the "softness" was the quick local recon, not the data (F116). 17 2022 sessions through Tyger, fork 6b01071 calcb guard,
+weak coil 1 (F118). Inventory 164/83 (F120) → K99 F-273. ★ → B33: 4 all-coil reruns + pick-best left.

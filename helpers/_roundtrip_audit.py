@@ -1,3 +1,4 @@
+# ⚠ RETRACTED-DEPENDENCY [F51]: NO_TRAJ for 2022 seqs is wrong (calib = Faraz entry 4/10 = v2 npy) — see workspace/canon/facts.md F114
 #!/usr/bin/env python3
 """
 Scratch audit (2026-09-13): every session folder under the Ext roundtrip image

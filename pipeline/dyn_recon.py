@@ -43,6 +43,9 @@ WORKSPACE    = PIPELINE_DIR.parent                        # workspace
 REPO_ROOT    = WORKSPACE.parent                           # repo root (read-only)
 
 CONVERT      = REPO_ROOT / 'convert_siemens_to_mrd.py'
+# ASAP_CONVERTER=<path> swaps in a workspace converter (e.g. pipeline/convert_mixed_adc.py for the 2022
+# acqOrder-7 twix with interleaved 1024-sample spectra, which mapVBVD cannot read)
+CONVERT      = Path(os.environ.get('ASAP_CONVERTER', CONVERT))
 PLOT_SCRIPT  = REPO_ROOT / 'tyger_deploy' / 'plot_recon.py'
 POST_SCRIPT  = PIPELINE_DIR / 'post_process.py'
 TYGER_SPEC   = PIPELINE_DIR / 'recon_codespec.yml'        # fork image w/ DIAPHRAGM

@@ -935,3 +935,50 @@ session-7 header, belong to THIS session — left in place, append-only.)
 - Open: fixed pattern in the first 50 readout samples (~0.4 % of signal power) unexplained (question to Hooman: does
   the sequence spoil?); run 808 shows 5.5 mm excursion vs 9.0 mm from a plain re-gridding of the same lines (unchecked).
 - BRANCH: h1-challenge (B32), parent B31 — delivered, awaiting Hooman's ruling. ★ → B32. B31 ✅ (superseded by B32).
+
+## 2026-10-03 · HH fast/slow hunt + pre-v2 (2022) calibration — in progress (full entry at /leave)
+- Found (via System session, BigMac HD4): Hooman's fast/slow pair = 2022-10-26_000HH MID00017 (fast ~36 bpm) /
+  MID00018 (slow deep ~6.5 bpm), raw now on Ext Work/Images/MRI/Human/2022-10-2{6,7}_000HH (sha verified).
+  Two-row coronal video delivered from Faraz's img_dyn_16ph_{low,high}bpm (outputs/hh_fastslow_2026-10-03/).
+- 2022 calibration = Faraz entry 4 (gas) / 10 (dissolved) = v2 npy (bit-identical); no other FOV-350 2022 calib exists
+  (146/446 MB libraries checked). Gas arm = gas-scan counter mod 640 for every 2022 family (ADC: per b-set; Saturation:
+  all lines). Tyger works on 2022 acq6 sessions (seqnames + v2 symlinks) → Ext Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_2022/.
+- acqOrder-7 files (1024-sample spectra interleaved) need pipeline/convert_mixed_adc.py (C56).
+- RETRACTION (own, in session): "acq7 images softer → trajectory/handling problem" — the softness was my quick local
+  recon (coherent per-arm time average + plain NUFFT); same data through Tyger with entry 4 is sharp (026ED control).
+- BRANCH: prev2-calib (B33), parent B32 — Tyger of the HH pair via C56 running. ★ → B33.
+- RESULT (22:25): HH pair through Tyger via C56 + entry 4 + ee3c91f — slow (run 827) matches Faraz lowbpm bin-for-bin
+  (orient corr 0.97, bronchi at EI), fast (run 829) matches highbpm (0.90). Fast first failed (run 828) in results.calcb:
+  coil 1 weak (k0/noise 7.7 vs 18–34) → < 10 mask voxels → curve_fit TypeError; rerun with ASAP_DROP_CH=1 (C56 env,
+  7 coils). Proper fix = fork guard in calcb (Hooman's call). 6 acq6 2022 sessions also done (026ED 025VP 018BI 030DN
+  032WS 019WR), sharp. Figures: outputs/prev2_calib_2026-10-03/{HH1026_slow,HH1026_fast}_tyger_vs_faraz.png, tyger_2022_contact.png.
+- RETRACTION (own, 2026-10-04, via XeCS): breathing rates for the HH pair were taken from Faraz's k0 trace on the
+  index·TR clock (7 % short) with over-counted peaks: fast MID17 "1.69 s / ~36 bpm" → 2.21 s ≈ 27 bpm; slow "9.2 s /
+  ~6.5 bpm" → 9.7 s ≈ 6.2 bpm (MDH clock). Video labels re-rendered. Also retracted: "2022-07-22_000HH analysis-only" —
+  HD4 holds raw hybridXTC/OPT_FLASH/Multislice (my search scope missed non-dyn HD4 files).
+- RESULT (01:10): all 17 2022 sessions (16 + HH 10-27) through Tyger, entry 4/10, contact sheet
+  outputs/prev2_calib_2026-10-03/tyger_2022_all_contact.png, table tyger_2022_sessions.csv (median gas SNR 9–31).
+- RETRACTION (own): the auto weak-coil drop (C56 ASAP_DROP_CH=auto, 0.35 × best) is not a reliable gain — 027GB
+  8-coil 31.3 vs dropped 26.7 (−15 %); HH fast +8 %, others ±2 %. Default = all coils (fork 6b01071 guard); 8 acq7
+  sessions in AIkill_Dynamic_2022 currently carry the auto-drop version (pending Hooman: rerun all-coil + keep better).
+
+## 2026-10-03/04 · session 17 (Opus 5.5) — HH fast/slow + 2022 calibration (CLOSE)
+- Found Hooman's own fast/slow-breathing pair: 2022-10-26_000HH MID00017 (fast, 2.21 s) + MID00018 (slow deep, 9.7 s),
+  BigMac HD4 only, fetched by System to Ext Work/Images/MRI/Human/ (+ 2022-10-27 MID00028 fast). Two-row coronal videos
+  (Faraz recon, then our Tyger recon) → outputs/hh_fastslow_2026-10-03/. Rates corrected by XeCS (F121).
+- 2022 calibration solved: Faraz entry 4/10 = the v2 npy (F114, retracts F51). acqOrder-7 twix need the MDH reader
+  (C56, F115). Quick local recon soft by method (F116). 17 2022 sessions through Tyger → Ext AIkill_Dynamic_2022/
+  (contact sheet + tyger_2022_sessions.csv). Diffusion/saturation patterns decoded (F117), Tyger set-up parked.
+- Fork 6b01071 pushed (calcb flat-phase fallback, image built, spec recon_codespec_6b01071.yml). Weak coil 1 (F118).
+- Inventory 164 sessions / 83 subjects (F120) sent to K99 (their F-273; Hooman's wording "more than 160 archived
+  dynamic imaging sessions from more than 80 participants"). XeCS (ratepair1) got 000HH inventory, timing npz,
+  hybridXTC gap logic (no calibration exists for hybridXTC), entry-4 scale 1.0167 (F119, SUSPECT).
+- DECIDED (Hooman): BigMac 2022/v2 raws (33 human sessions, 28.9 GB) copied when he is at Penn; diffusion/saturation
+  Tyger set-up parked; weak coils → rerun all-coil and keep the better per session.
+- DECIDED (Hooman): fork guard in calcb (6b01071) + all-coil default.
+- RETRACTION: F51 (2022 sessions have no trajectory) → F114. Session-internal (never fact rows): "acq7 softer than
+  acq6" (it was the quick recon, F116); "auto coil drop helps" (F118); rates 1.69 s / 9.2 s → 2.21 / 9.7 s; "2022-07-22
+  analysis-only" (HD4 holds hybridXTC raws).
+- STOPPED for a system restart (02:15): all-coil reruns done 021JM, 017AK, 029CK, 019WR(10-06); left 001SW, 011BA,
+  023DB, 2022-10-27_000HH (001SW run dir moved to pipeline_runs/_aborted_*). _pick_best_2022.py NOT applied yet.
+- BRANCH: prev2-calib (B33), parent B32 — ● open. ★ → B33.
