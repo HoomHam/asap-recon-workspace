@@ -1051,3 +1051,7 @@ session-7 header, belong to THIS session — left in place, append-only.)
   BRANCH: snr-all (B36), parent: B16 — ✅. B33 prev2-calib → ✅.
 - Reconciled: session-17 run scripts (run_hh_k0win, run_s2022, run_s2022cut, run_allcoil4) + outputs hh_2021_scans,
   hh_k0bin_2026-10-04, s2022_check had no cards → C58 (untagged).
+- A s/p input.mrd (10-22, after the reboot-safe rerun): 214/217 byte-identical except the binning string → Ext Trash
+  (AIkill_Dynamic s 23.4 + p 14.9, _2022 s 14.3, _1H s 0.1 = 52.7 GB; input.mrd_REMOVED.txt in each). 3 FAIL = p/ files
+  52–719 KB larger than d/ (pneumotach trace) → kept. Prune totals in Trash: A 76.1 GB + B 88.4 GB = 164.5 GB; freed only
+  when Hooman empties Ext Trash. Log outputs/ext_prune_2026-10-21/A_verify.out.
