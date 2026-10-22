@@ -31,7 +31,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 import snr_calc as S  # noqa: E402
 
-SRC = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+SRC = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 WS = HERE.parents[1]
 OUT = WS / 'outputs' / 'split_trust_2026-09-25'
 TABLE = WS / 'outputs' / 'te90_2026-09-25' / 'te90_table.csv'

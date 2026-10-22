@@ -43,8 +43,8 @@ from raw import traj, raw as steve_raw_cls  # noqa: E402
 from steve_kernel_numpy import EPS, KDIST0SQ, BXSZ, KNORM_FLOOR  # noqa: E402
 from selftest_steve_tyger import read_input_mrd, exclude_mask, calcb_numpy, bin_sample_weight  # noqa: E402
 
-RAW_TREE = '/Volumes/HoomHamExt/AIkill_Dynamic/'       # has input.mrd
-PROD_TREE = '/Volumes/HoomHamExt/AIkill_Dynamic_b44/'  # production recon.mat (fork 04f445b)
+RAW_TREE = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic/'       # has input.mrd
+PROD_TREE = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44/'  # production recon.mat (fork 04f445b)
 OUT = os.path.join(ASAP, 'workspace/outputs/pf_test')
 SIGMA_B = 4.4                                          # calcb_phase_sigma at 04f445b
 C_SERIES = ['#2563EB', '#EA580C', '#6B7280']           # blue, orange, gray (fixed order)

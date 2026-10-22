@@ -27,7 +27,7 @@ import scipy.io as sio
 SUBJ = '2024-03-06_030DN'
 DAT = Path('/Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-03-06/030DN/'
            'meas_MID00543_FID08467_fa_spiral_dyn_fancy_v3_20240130.dat')
-OUT = Path('/Volumes/HoomHamExt/AIkill_Dynamic') / SUBJ / 'd'
+OUT = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic') / SUBJ / 'd'
 FIG_DIR = Path(__file__).resolve().parents[1] / 'outputs' / 'zorder_check_2026-09-12'
 KILLPTS = 2
 

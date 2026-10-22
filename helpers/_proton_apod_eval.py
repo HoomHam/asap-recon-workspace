@@ -4,7 +4,7 @@ Noise floor from background: E[x^2]=2*Nc*sigma^2 (2-coil SOS); S_lung = sqrt(<x^
 import sys, os, json, numpy as np
 from scipy import ndimage as ndi
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-Z = np.load('/Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/apod_images.npz'); names = list(Z.keys())
+Z = np.load('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_1H/2024-03-12_006KL/apod_images.npz'); names = list(Z.keys())
 NC = 2
 x0 = Z[names[0]].mean(0); xs = ndi.gaussian_filter(x0, 2.0); p99 = np.percentile(xs, 99); N = x0.shape[0]
 hull = np.zeros_like(xs, bool)

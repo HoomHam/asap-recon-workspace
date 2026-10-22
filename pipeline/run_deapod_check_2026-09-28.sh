@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Two-subject Tyger check of fork ee3c91f (deapod) from stored d/input.mrd; compared against the offline deapod tree.
 SPEC=/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/pipeline/recon_codespec_ee3c91f.yml
-SRC=/Volumes/HoomHamExt/AIkill_Dynamic
+SRC=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic
 DST=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tyger_deapod_check_2026-09-28
 # wait for the GitHub image build of ee3c91f
 while true; do

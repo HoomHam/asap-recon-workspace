@@ -25,7 +25,7 @@ from pathlib import Path
 import openpyxl
 
 IMAGES = Path('/Volumes/HoomHamExt/_5t_images_roundtrip/Images')
-DYN_OUT = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+DYN_OUT = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 LOGS = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/logs')
 WS = Path(__file__).resolve().parents[1]
 TRAJ_DIR = WS / 'data' / 'xe' / 'human' / 'traj'
@@ -105,7 +105,8 @@ def output_status(key):
     d = DYN_OUT / key
     if not d.is_dir():
         return '', ''
-    methods = ''.join(m if (d / m / 'output.mrd').is_file() else '-' for m in 'spd')
+    methods = ''.join(m if (d / m / 'output.mrd').is_file() or (d / m / 'recon.mat').is_file() else '-'
+                      for m in 'spd')
     kinds = set()
     for m in 'spd':
         log = d / m / 'tyger.log'

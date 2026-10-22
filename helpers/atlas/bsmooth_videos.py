@@ -21,7 +21,7 @@ sys.path.insert(0, str(HERE)); sys.path.insert(0, str(HERE.parent))
 import rbc_tm_atlas as A  # noqa: E402
 from bphase_confirm import read_mrd  # noqa: E402
 
-SRC = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+SRC = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 NEW = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tyger_bsmooth_2026-09-25')
 OUTV = A.WS / 'outputs' / 'bphase_fix_2026-09-25' / 'videos'
 

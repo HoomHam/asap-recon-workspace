@@ -34,7 +34,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C25 | helpers/recon/diaphragm_bintime_demo.py | diaphragm-binning | WORKS (synthetic demo) |
 | C26 | helpers/atlas/dis_atlas.py | aikill-atlas | gp pages fine; ⚠ dp pages SUSPECT (F47) — SUPERSEDED by C39 rbc_tm_atlas.py 2026-09-25 (still imported for layout helpers) |
 | C27 | helpers/rt_prepost_fig.py | main | WORKS (RT pre/post figs 2026-08-31) |
-| C28 | helpers/snr_calc.py | snr-table | WORKS (gas + whitened DP SNR, 104 sessions, F48) |
+| C28 | helpers/snr_calc.py | snr-table | WORKS (gas + whitened DP SNR, 104 sessions, F48) · ⚠ deapod trees read ≈0.84× (F129) |
 | C29 | pipeline/todo_batch.sh | leftover-recon | WORKS (25-session worklist, FORCE=1) |
 | C30 | helpers/structure_rank.py | structure-rank | WORKS (107 sessions incl. 3 merged; carina-slice panels as mp4/gif over 16 bins, F57) |
 | C31 | pipeline/merge_dyn.py | merged-dyn | WORKS (030DN validated through raw loader, F56) |
@@ -63,6 +63,8 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C53 | helpers/pf_inlung.py | pf-merit (B28) | DONE 2026-09-27 — in-lung error vs a truth resampled through each bin's real hole pattern; flags --truth-bin/--b-raw/--b-self/--synth-real/--lung-only; real data P1 1–2 % vs PF 7–10 %, ideal object P1 8 % vs PF 0.7–1.2 % (F89: ghost of out-of-crop energy; code verified) |
 | C52 | helpers/pf_test.py | pf-merit (B28) | DONE 2026-09-26 — Tyger-exact rebuild (relerr 1e-6) of 021CH; P1 / PFs (oldway 0) / PFs+KLUGE / PFc (POCS, same b), gas + dissolved → outputs/pf_test/021CH/ (F88: PF costs 20 % gas SNR, destroys aRBC) |
 | C40 | helpers/atlas/split_trust.py | aikill-atlas (B12) | DONE 2026-09-25 — trust grade; `--root/--tag` = production tree → split_trust_b44/ (A18/B23/C13/D5, F82) |
+| C57 | pipeline/run_*_2026-10-21.sh + run_adc_p_2026-10-22.sh | leftover-recon-2 (B34) | WORKS 2026-10-22 — 36/43 leftover sessions + p for HH diffusion → Ext AIkill_Dynamic_2022 (F122–F128) |
+| C58 | session-17 run scripts + 3 outputs (reconciled) | prev2-calib (B33) | untagged — verify before trust |
 
 ## Cards
 
@@ -114,6 +116,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 - in: SNR_Table_All.xlsx, source/archive drives
 - out: /Volumes/HoomHamExt/Dynamic/<date>_<id>/{s,p,d}/ (now AIkill_Dynamic), updated Excel
 - status: SUPERSEDED for the leftover set by C29 todo_batch.sh; default drive paths stale (HoomHam dead)
+- 2026-10-21: done_already() accepts recon.mat as well as output.mrd (output.mrd pruned from finished Ext trees, F130).
 
 ### C9 · workspace/pipeline/dyn_recon.py
 - why: per-subject driver — resolve, _clean_datadir (symlinks around ._*), convert, submit to Tyger, publish, post-process
@@ -122,6 +125,7 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 - out: `/Volumes/HoomHamExt/AIkill_Dynamic/<date>_<id>/{s,p,d}/` (output.mrd, input.mrd, tyger.log with run/buffer ids, codespec.yml, pngs, recon.mat, fig/); scratch run dirs on Ext `.../2026_ASAP_Recon/pipeline_runs/`
 - status: WORKS for nch=1 and nch=8 on image 40d23a4. submit = buffer create (NO --ttl) → buffer write → run create → poll → run logs → buffer read -o -p 4, retried; plot/post under MPLBACKEND=Agg
 - 2026-10-01: `--gp-traj <npy>` (explicit gas trajectory, disables dp; used with the 1H water traj, F101) and `--pneumo <file>` (explicit pneumotach-format file; used for the synthetic k0 surrogate, F102). 1H run: `--data-dir …/006KL/Dynamic Proton --date 2024-03-12 --id 006KL --out-dir Ext AIkill_Dynamic_1H/… --methods p --codespec recon_codespec_ee3c91f.yml`
+- 2026-10-21/22: skip check accepts recon.mat (output.mrd pruned, F130); DEFAULT_OUT_ROOT/paths → Ext mirror path (Ext-root trees moved under Work/Codes/2026_ASAP_Recon/).
 
 ### C10 · workspace/pipeline/asap_run.py
 - why: single-dataset orchestrator, 6 stages resolve→param GUI→convert→submit→publish→post_process ("analyze 25JC with Steve")
@@ -265,6 +269,7 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   blobs ≥500 vox; DP = √max(vᵀC⁻¹v − 2, 0) mean over mask (C = background covariance of
   real/imag; E[q]=2 verified)
 - status: WORKS (104 sessions, 0 errors, ~1 s/session)
+- 2026-10-22: ⚠ corner-σ reads ≈0.84× true lung SNR on deapod trees (b44d, 2022 tree) — F129; values from the Sept pre-b44 AIkill_Dynamic build are not biased. All-tree driver = scratch helpers/_snr_all_2026_10_22.py → outputs/snr_2026-10-22/ (fix not applied, Hooman "fine for now").
 
 ### C29 · pipeline/todo_batch.sh
 - why: detached worklist driver for the 25 leftover v2/v3 sessions (inventory 2026-09-12)
@@ -272,6 +277,7 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - in: `<codespec.yml> [filter-regex]`, env `FORCE=1`; roundtrip Images + Ext `staged_src/` symlink dirs
 - out: per-session logs + `SUMMARY.txt` in `/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/logs/`; outputs via C9
 - status: WORKS (run with nohup; bigmac 2023-11-02 000LL commented out — duplicate)
+- 2026-10-21: done marker = output.mrd OR recon.mat (F130).
 
 ### C30 · helpers/structure_rank.py
 - why: Hooman wanted the recons with the most intra-lung patchiness (COPD-like bright/dark patches with
@@ -301,6 +307,7 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
 - method: A keeps cal block, trimmed to whole arm cycles (nuniquesmp/npts gas ilv); B's cal block stripped;
   concat along lines; header equality asserted (TR/TE/dwell/numspec)
 - status: WORKS on 030DN (27460 lines = 229 s imaging). p binning unsupported.
+- 2026-10-21: FIX — every non-last chunk is trimmed to whole arm cycles (before: only the head file; 3+ file merges of early-2022 100-rep chunks were wrong). merge_report: 2880 of 3200 kept per middle chunk (F125).
 
 ### C32 · pipeline/merged_batch.sh
 - why: run the 4 merged sessions unattended (harness kills long foreground jobs)
@@ -659,3 +666,25 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   _prev2_freq_scan.py, _prev2_binned_compare.py → outputs/prev2_calib_2026-10-03/; traj seqnames.txt + symlinks
   fa_spiral_dyn_fancy_2022{0812,1103}_{gp,dp}.npy → v2 (backup seqnames.txt.bak-2026-10-03)
 - 2026-10-04 additions: env `ASAP_DROP_CH=1[,..]|auto[:frac]` drops receive channels (auto = k0 SNR < frac×best, 0.35) — NOT a reliable gain (F118), default unset; companion spec pipeline/recon_codespec_6b01071.yml (fork 6b01071 = ee3c91f + calcb flat-phase fallback for < 20 mask voxels, pushed to hooman/diaphragm-recon, image built); dyn_recon.py (C9) gained the one-line ASAP_CONVERTER env override.
+- 2026-10-21 additions: env `ASAP_BSET=b0|b` (2022 diffusion b-set split, rule auto 12-block / plain alternation by k0, TR ×2, F122) and `ASAP_GASPHASE=N` (keep the brightest of N line phases, TR unchanged); both wrap the reader, exit if spectra present. Used by C57 run_adc4/run_bigmac/run_adc_p.
+
+### C57 · pipeline/run_{failed4,sat2,adc4,bigmac,early2022,early2022_merge}_2026-10-21.sh + run_adc_p_2026-10-22.sh
+- why: Hooman 2026-10-21 "finish all that we can do" (43 undone sessions of the 10-03 inventory) + 10-22 "p for HH"
+- origin: C on H's order · branch: leftover-recon-2 (B34)
+- in: raws on Ext `_5t_images_roundtrip/Images/<date>/<id>` and WorkVault BigMac set (read in place, never written);
+  traj `data/xe/human/traj/` (v2 npy, Faraz entries 1/2 npy, local 02-24 fit; seqnames.txt + symlinks); spec
+  recon_codespec_6b01071.yml; env ASAP_CONVERTER/ASAP_ROOT_READER/ASAP_BSET/ASAP_GASPHASE (C56); --merge (C31)
+- out: Ext `Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_2022/<key>/{s,d[,p]}/` (recon.mat + PNGs/GIFs per bin; diffusion
+  as `<key>_b0`/`<key>_b`, chunk merges as `*_merged`); 2 v2 sessions → AIkill_Dynamic_b44d; logs `_logs/_<batch>.log`
+- result: 36 of 43 reconstructed (F122–F128), all 160 Xe sessions have s+d, p for every session with a pneumotach
+- QC: helpers/_contact_2026_10_21.py → outputs/leftover_recon_2026-10-21/contact_d.png (time-averaged axial+coronal
+  per key) + qc_d.csv; outcome table outputs/leftover_recon_2026-10-21/undone43_outcome.csv
+- companions (scratch): helpers/_mrd_gas_only_resubmit.py (--mode gasonly | refasdyn: rewrite input.mrd + submit/publish)
+- caveat: dyn_recon exits 0 when the Tyger run fails → judge by outputs, not exit codes
+- status: WORKS
+
+### C58 · reconciled (session 17, 10-04/05, carded 10-22 by /leave)
+- pipeline/run_hh_k0win_2026-10-04.sh, run_s2022_2026-10-04.sh, run_s2022cut_2026-10-05.sh, run_allcoil4_2026-10-04.sh;
+  outputs/hh_2021_scans/, outputs/hh_k0bin_2026-10-04/, outputs/s2022_check/
+- origin: C (session 17) · branch: prev2-calib (B33) · facts: ?
+- status: untagged — verify before trust (reconciled; no card was written at the time)

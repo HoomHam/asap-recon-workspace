@@ -34,7 +34,7 @@ import numpy as np
 import scipy.io as sio
 from scipy import ndimage
 
-DYN = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+DYN = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 OUT = Path(__file__).resolve().parents[1] / 'outputs' / 'snr_2026-09-13'
 CORNER = 10
 THR = 5.0

@@ -2,8 +2,8 @@
 # PRODUCTION rerun with calcb phase low-pass 4.4 vox (fork 04f445b) from stored d/input.mrd.
 # Output tree: Ext AIkill_Dynamic_b44/<key>/d/{output.mrd, tyger.log, codespec.yml}; recon.mat via mrd_to_mat.py.
 SPEC=/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/pipeline/recon_codespec_04f445b.yml
-SRC=/Volumes/HoomHamExt/AIkill_Dynamic
-DST=/Volumes/HoomHamExt/AIkill_Dynamic_b44
+SRC=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic
+DST=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44
 for key in "$@"; do
   mount | grep -q " /Volumes/HoomHamExt " || { echo "[$(date +%H:%M:%S)] $key: EXT NOT MOUNTED, abort"; exit 3; }
   out=$DST/$key/d; mkdir -p $out

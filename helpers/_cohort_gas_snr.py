@@ -6,7 +6,7 @@ from scipy.io import loadmat
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pf_test import lung_masks
 rows = []
-for p in sorted(glob.glob('/Volumes/HoomHamExt/AIkill_Dynamic_b44/*/d/recon.mat')):
+for p in sorted(glob.glob('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44/*/d/recon.mat')):
     key = p.split('/')[-3]
     try:
         g = np.asarray(loadmat(p, variable_names=['gas_phase'])['gas_phase'], dtype=np.float64)

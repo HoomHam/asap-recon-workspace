@@ -20,7 +20,7 @@ from scipy import ndimage
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE.parent / 'outputs' / 'snr_2026-09-13'
-DYN = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+DYN = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 spec = importlib.util.spec_from_file_location('snr', HERE / 'snr_calc.py')
 S = importlib.util.module_from_spec(spec); spec.loader.exec_module(S)
 

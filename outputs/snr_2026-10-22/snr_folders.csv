@@ -1,0 +1,233 @@
+tree,key,spec,insp_bin,exp_bin,gas_snr_insp,gas_snr_exp,dp_snr_insp,dp_snr_exp,gas_snr_max,gas_snr_min,dp_snr_max,dp_snr_min,dp_method,lung_vox_insp,lung_vox_exp,bins,error,reused
+AIkill_Dynamic,2023-01-31_000LL,472fbc9,7,15,29.73,11.09,21.12,8.67,32.28,11.09,24.29,8.67,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",94153,54333,16,,2026-09-13
+AIkill_Dynamic,2023-03-08_017AK,40d23a4,8,0,37.47,19.83,17.17,11.69,37.47,18.80,17.17,10.74,"unsplit: whitened |z|, Rician-corrected",105671,62398,16,,2026-09-13
+AIkill_Dynamic,2023-03-09_023DB,40d23a4,8,0,40.25,22.38,22.16,10.45,40.25,22.38,22.16,10.45,"unsplit: whitened |z|, Rician-corrected",113793,72641,16,,2026-09-13
+AIkill_Dynamic,2023-03-10_004LR,40d23a4,6,15,46.71,17.14,20.94,9.48,46.71,17.14,20.94,9.48,"unsplit: whitened |z|, Rician-corrected",120588,64281,16,,2026-09-13
+AIkill_Dynamic,2023-03-24_029CK,40d23a4,7,0,38.35,13.83,18.08,10.23,38.35,13.83,18.08,9.98,"unsplit: whitened |z|, Rician-corrected",93751,45056,16,,2026-09-13
+AIkill_Dynamic,2023-03-27_02BB,40d23a4,8,0,17.21,10.98,4.13,3.14,17.21,10.94,4.13,2.81,"unsplit: whitened |z|, Rician-corrected",65619,39140,16,,2026-09-13
+AIkill_Dynamic,2023-03-31_032WS,40d23a4,7,1,17.46,8.62,6.16,4.82,17.49,8.62,6.97,4.27,"unsplit: whitened |z|, Rician-corrected",91335,33424,16,,2026-09-13
+AIkill_Dynamic,2023-04-07_030DN,pre-b44 (Sept),7,0,32.80,15.37,10.97,9.79,34.65,15.37,15.08,8.41,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",127825,55628,16,,2026-09-13
+AIkill_Dynamic,2023-04-11_000KR,40d23a4,8,0,31.57,22.03,nan,nan,31.91,21.77,,,none (gas-only acquisition),133100,90004,16,,2026-09-13
+AIkill_Dynamic,2023-04-14_000KR,40d23a4,8,0,31.58,20.05,nan,nan,31.58,19.75,,,none (gas-only acquisition),110311,73835,16,,2026-09-13
+AIkill_Dynamic,2023-04-18_021JM,pre-b44 (Sept),8,1,22.04,8.94,8.34,7.99,22.53,8.94,9.53,6.56,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",122793,41405,16,,2026-09-13
+AIkill_Dynamic,2023-04-26_023DB,pre-b44 (Sept),8,0,29.31,16.15,17.76,11.21,29.31,16.15,18.28,10.53,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",116236,78979,16,,2026-09-13
+AIkill_Dynamic,2023-05-02_011BA,pre-b44 (Sept),8,0,33.35,14.05,17.95,10.08,33.35,13.86,18.29,9.64,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",95641,48607,16,,2026-09-13
+AIkill_Dynamic,2023-05-02_012SR,pre-b44 (Sept),7,0,27.19,14.10,15.74,13.98,28.48,13.05,18.69,11.86,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",84079,41343,16,,2026-09-13
+AIkill_Dynamic,2023-05-04_034LR,pre-b44 (Sept),7,0,42.86,26.55,27.75,19.05,43.32,26.55,29.37,16.67,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",91012,64001,16,,2026-09-13
+AIkill_Dynamic,2023-05-15_000SK,40d23a4,7,0,14.93,8.08,6.09,5.18,14.93,8.08,7.09,4.82,"split: whitened |z|, Rician-corrected",113256,41572,16,,2026-09-13
+AIkill_Dynamic,2023-05-15_035EK,pre-b44 (Sept),5,0,29.83,16.54,17.35,9.60,35.72,15.14,19.15,9.60,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",137758,80740,16,,2026-09-13
+AIkill_Dynamic,2023-05-18_000SV,40d23a4,7,0,28.26,13.88,16.74,11.30,28.26,13.78,18.27,10.72,"split: whitened |z|, Rician-corrected",139788,76261,16,,2026-09-13
+AIkill_Dynamic,2023-08-24_030DN,pre-b44 (Sept),9,0,37.65,22.49,17.87,17.12,39.18,21.28,32.58,16.90,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",124423,67101,16,,2026-09-13
+AIkill_Dynamic,2023-09-25_032WS,pre-b44 (Sept),8,15,31.12,19.54,22.99,16.32,32.40,18.38,36.17,16.30,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",110509,77170,16,,2026-09-13
+AIkill_Dynamic,2023-10-10_002BB,pre-b44 (Sept),6,15,28.18,16.48,12.35,5.60,28.35,16.31,12.35,5.17,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",123783,78880,16,,2026-09-13
+AIkill_Dynamic,2023-10-20_001JM,pre-b44 (Sept),10,15,25.92,17.35,6.52,3.61,26.65,17.35,7.98,3.46,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",86710,62487,16,,2026-09-13
+AIkill_Dynamic,2023-10-25_002JM,pre-b44 (Sept),6,0,9.05,7.52,1.45,1.37,9.05,7.25,2.16,1.33,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",41530,10377,16,,2026-09-13
+AIkill_Dynamic,2023-10-27_000LL,40d23a4,7,15,31.38,24.17,22.99,23.68,32.37,22.70,30.69,17.10,"split: whitened |z|, Rician-corrected",110983,77714,16,,2026-09-13
+AIkill_Dynamic,2023-10-31_003KH,pre-b44 (Sept),10,3,19.67,16.48,6.39,5.28,20.52,14.73,8.25,4.49,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",123062,95196,16,,2026-09-13
+AIkill_Dynamic,2023-11-02_025VP,40d23a4,8,0,19.13,14.71,10.94,9.78,19.30,14.71,12.86,9.70,"unsplit: whitened |z|, Rician-corrected",36598,26946,16,,2026-09-13
+AIkill_Dynamic,2023-11-02_036RL,pre-b44 (Sept),7,0,24.04,13.19,12.32,7.44,24.04,13.19,12.95,7.44,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",111213,78402,16,,2026-09-13
+AIkill_Dynamic,2023-11-03_000LL,40d23a4,8,0,39.65,32.57,nan,nan,39.65,31.14,,,none (gas-only acquisition),85060,69321,16,,2026-09-13
+AIkill_Dynamic,2023-11-06_002ZS,pre-b44 (Sept),8,1,24.04,14.43,15.01,9.75,24.04,14.38,15.01,9.06,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",80606,55822,16,,2026-09-13
+AIkill_Dynamic,2023-11-13_037GD,pre-b44 (Sept),8,14,16.37,12.08,8.85,5.85,16.37,12.07,8.85,5.83,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",94225,77110,16,,2026-09-13
+AIkill_Dynamic,2023-11-16_038RL,pre-b44 (Sept),7,0,23.79,15.58,25.70,22.39,24.83,15.12,26.71,16.14,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",156678,108715,16,,2026-09-13
+AIkill_Dynamic,2023-11-17_005DS,pre-b44 (Sept),7,0,23.05,18.39,7.41,4.37,24.21,17.13,8.61,4.16,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",81001,56316,16,,2026-09-13
+AIkill_Dynamic,2023-11-21_039CP,pre-b44 (Sept),7,0,38.11,24.67,32.42,20.62,38.11,24.01,37.24,18.72,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",96643,68240,16,,2026-09-13
+AIkill_Dynamic,2023-12-06_003PM,pre-b44 (Sept),6,15,30.28,20.32,21.51,12.02,30.28,19.90,21.51,9.76,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",88989,62945,16,,2026-09-13
+AIkill_Dynamic,2023-12-11_040RP,pre-b44 (Sept),7,15,31.48,15.11,20.44,15.68,31.48,15.11,21.97,13.02,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",95449,53947,16,,2026-09-13
+AIkill_Dynamic,2023-12-15_003KH,pre-b44 (Sept),8,0,19.40,10.88,5.52,2.13,19.40,10.86,5.52,1.97,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",87990,61793,16,,2026-09-13
+AIkill_Dynamic,2023-12-19_041WF,pre-b44 (Sept),8,0,25.23,15.08,13.70,11.63,25.46,14.65,16.03,10.82,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",105381,64293,16,,2026-09-13
+AIkill_Dynamic,2024-01-16_004DS,pre-b44 (Sept),6,1,18.49,14.87,6.11,5.40,18.62,14.78,6.68,4.57,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",81951,59508,16,,2026-09-13
+AIkill_Dynamic,2024-01-17_042DR,472fbc9,8,1,20.90,11.91,nan,nan,20.90,11.51,,,none (gas-only acquisition),80017,55644,16,,2026-09-13
+AIkill_Dynamic,2024-01-18_001JM,pre-b44 (Sept),11,0,33.99,32.45,nan,nan,36.13,25.87,,,none (gas-only acquisition),79059,60520,16,,2026-09-13
+AIkill_Dynamic,2024-01-22_007RA,pre-b44 (Sept),7,15,26.58,16.46,nan,nan,31.11,14.02,,,none (gas-only acquisition),108909,50771,16,,2026-09-13
+AIkill_Dynamic,2024-01-31_008CR_merged,40d23a4,1,6,31.9,17.5,nan,nan,32.5,17.5,,,none (gas-only acquisition),70878,53160,16,,
+AIkill_Dynamic,2024-02-02_000LL,40d23a4,7,0,13.54,7.97,9.69,6.74,13.85,7.97,11.01,6.41,"unsplit: whitened |z|, Rician-corrected",73284,35707,16,,2026-09-13
+AIkill_Dynamic,2024-02-02_005DS,40d23a4,8,0,32.87,24.40,19.06,10.44,32.99,23.87,19.31,9.98,"unsplit: whitened |z|, Rician-corrected",88262,63772,16,,2026-09-13
+AIkill_Dynamic,2024-02-19_037GD,pre-b44 (Sept),6,0,13.88,6.51,11.55,4.35,13.95,6.44,13.05,4.17,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",102958,29381,16,,2026-09-13
+AIkill_Dynamic,2024-02-21_043AS,pre-b44 (Sept),7,0,38.18,14.65,31.24,15.36,39.15,14.65,46.05,15.36,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",107381,59884,16,,2026-09-13
+AIkill_Dynamic,2024-02-26_029CK,pre-b44 (Sept),7,0,34.49,22.24,24.22,22.94,34.49,21.00,27.39,18.74,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",94976,54139,16,,2026-09-13
+AIkill_Dynamic,2024-02-27_009JT,pre-b44 (Sept),6,13,19.99,15.59,9.91,5.30,19.99,15.17,10.53,5.30,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",126768,109794,16,,2026-09-13
+AIkill_Dynamic,2024-03-06_030DN_merged,40d23a4,8,1,27.7,9.5,18.2,13.1,29.7,9.5,22.3,9.7,"split: whitened |z|, Rician-corrected",101734,33837,16,,
+AIkill_Dynamic,2024-03-11_039CP,pre-b44 (Sept),6,0,30.17,17.42,24.66,19.62,30.83,17.42,33.92,17.03,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",81363,63109,16,,2026-09-13
+AIkill_Dynamic,2024-03-12_006KL,pre-b44 (Sept),9,1,27.82,24.42,14.45,11.61,27.85,23.47,15.70,11.61,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",65908,53729,16,,2026-09-13
+AIkill_Dynamic,2024-03-12_044DY,pre-b44 (Sept),7,12,25.51,19.47,24.66,19.94,25.51,15.20,26.31,14.23,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",94708,80411,16,,2026-09-13
+AIkill_Dynamic,2024-03-14_038RL,pre-b44 (Sept),7,0,28.01,18.08,43.00,21.26,28.16,18.05,43.00,21.26,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",89406,59825,16,,2026-09-13
+AIkill_Dynamic,2024-03-21_032WS,pre-b44 (Sept),7,15,35.85,19.55,27.89,17.39,36.91,18.99,27.93,13.82,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",114328,72139,16,,2026-09-13
+AIkill_Dynamic,2024-03-21_036RL,pre-b44 (Sept),6,0,31.13,19.26,34.47,17.97,31.80,19.26,42.00,16.63,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",107095,71802,16,,2026-09-13
+AIkill_Dynamic,2024-03-28_010AJ,pre-b44 (Sept),9,2,28.04,19.01,12.71,7.90,28.04,18.97,14.01,7.90,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",64761,51390,16,,2026-09-13
+AIkill_Dynamic,2024-04-01_008CR,pre-b44 (Sept),8,4,27.58,21.30,17.16,8.47,27.86,21.08,17.16,7.07,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",92496,80916,16,,2026-09-13
+AIkill_Dynamic,2024-04-03_040RP,pre-b44 (Sept),9,1,15.70,13.88,13.44,11.86,15.97,13.73,15.35,9.39,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",90546,75812,16,,2026-09-13
+AIkill_Dynamic,2024-04-09_019WR,pre-b44 (Sept),8,1,25.94,18.14,21.10,16.79,25.94,18.14,21.10,14.75,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",102771,73812,16,,2026-09-13
+AIkill_Dynamic,2024-04-22_025VP,pre-b44 (Sept),7,14,25.65,20.55,25.70,19.99,25.82,20.55,27.02,15.58,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",59346,51004,16,,2026-09-13
+AIkill_Dynamic,2024-04-25_042DR,pre-b44 (Sept),6,15,21.77,12.43,28.18,20.78,21.77,12.43,31.78,17.61,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",65239,42988,16,,2026-09-13
+AIkill_Dynamic,2024-04-29_011CN,40d23a4,10,1,15.63,12.95,22.56,11.36,16.30,12.86,25.59,11.36,"unsplit: whitened |z|, Rician-corrected",120455,72487,16,,2026-09-13
+AIkill_Dynamic,2024-05-02_023DB,pre-b44 (Sept),7,0,30.90,20.97,24.29,19.06,30.90,20.97,26.18,16.86,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",112014,78390,16,,2026-09-13
+AIkill_Dynamic,2024-05-06_043AS,pre-b44 (Sept),6,0,37.36,16.33,28.53,17.05,39.35,16.33,38.57,17.05,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",100072,58000,16,,2026-09-13
+AIkill_Dynamic,2024-05-08_012EB,pre-b44 (Sept),8,1,18.73,11.43,16.09,13.93,19.59,11.43,16.09,11.77,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",49595,26050,16,,2026-09-13
+AIkill_Dynamic,2024-05-13_002ZS,pre-b44 (Sept),8,0,14.92,9.28,11.98,10.34,14.92,9.27,11.98,8.40,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",50091,32276,16,,2026-09-13
+AIkill_Dynamic,2024-05-13_005JJ,pre-b44 (Sept),8,0,11.28,8.42,7.46,7.65,11.28,8.42,7.88,5.47,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",62282,39773,16,,2026-09-13
+AIkill_Dynamic,2024-06-18_003PM,pre-b44 (Sept),8,0,27.21,21.90,20.11,18.97,27.34,20.57,24.37,13.63,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",59627,44874,16,,2026-09-13
+AIkill_Dynamic,2024-07-03_044DY,pre-b44 (Sept),7,0,33.09,18.44,35.85,19.46,33.09,18.44,37.13,19.46,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",86801,61650,16,,2026-09-13
+AIkill_Dynamic,2024-07-29_004DS,pre-b44 (Sept),5,14,20.86,16.89,11.55,10.69,20.86,16.63,13.61,8.91,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",58469,49972,16,,2026-09-13
+AIkill_Dynamic,2024-08-12_013VM_merged,40d23a4,7,0,30.1,19.5,14.8,7.5,30.9,19.5,14.8,7.5,"split: whitened |z|, Rician-corrected",107288,71847,16,,
+AIkill_Dynamic,2024-08-15_006MM,pre-b44 (Sept),9,0,26.96,17.40,19.88,10.54,26.96,16.81,20.07,10.11,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",154433,125486,16,,2026-09-13
+AIkill_Dynamic,2024-08-19_015HK,pre-b44 (Sept),8,0,38.00,22.60,26.68,20.55,38.00,22.60,28.85,18.85,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",104845,60934,16,,2026-09-13
+AIkill_Dynamic,2024-08-21_044DY,pre-b44 (Sept),7,0,28.91,20.28,28.55,24.72,28.91,19.79,33.47,18.32,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",89678,69083,16,,2026-09-13
+AIkill_Dynamic,2024-08-23_016PG,pre-b44 (Sept),6,15,21.51,9.18,16.46,7.71,23.71,9.18,20.80,7.71,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",154485,78299,16,,2026-09-13
+AIkill_Dynamic,2024-08-28_007IT,40d23a4,8,1,25.86,14.38,14.68,7.29,25.91,14.33,14.68,6.44,"unsplit: whitened |z|, Rician-corrected",84192,53499,16,,2026-09-13
+AIkill_Dynamic,2024-08-30_014KS,pre-b44 (Sept),8,0,38.16,20.70,46.82,30.10,38.50,19.53,55.09,25.99,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",94257,62069,16,,2026-09-13
+AIkill_Dynamic,2024-09-03_041WF,pre-b44 (Sept),7,0,27.37,17.13,23.77,17.50,28.60,17.13,25.80,17.31,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",123141,75415,16,,2026-09-13
+AIkill_Dynamic,2024-09-09_043AS,pre-b44 (Sept),7,0,35.36,18.86,27.76,20.95,35.36,18.86,35.50,16.84,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",84919,51824,16,,2026-09-13
+AIkill_Dynamic,2024-09-10_008TP,pre-b44 (Sept),7,0,30.84,24.29,29.20,20.49,30.89,23.54,32.44,18.88,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",93331,73323,16,,2026-09-13
+AIkill_Dynamic,2024-09-10_045VS,pre-b44 (Sept),6,15,46.11,23.53,57.71,33.08,46.11,23.34,60.49,31.40,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",60375,39374,16,,2026-09-13
+AIkill_Dynamic,2024-09-24_039CP,pre-b44 (Sept),7,0,38.46,21.04,36.42,17.21,38.47,20.28,39.41,16.05,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",98567,67494,16,,2026-09-13
+AIkill_Dynamic,2024-09-24_046AA,pre-b44 (Sept),7,0,26.12,12.03,26.47,15.27,26.12,12.03,26.47,13.93,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",108440,60811,16,,2026-09-13
+AIkill_Dynamic,2024-09-25_017ED,pre-b44 (Sept),7,1,13.15,8.80,2.44,1.79,13.15,8.54,2.61,1.72,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",68103,31766,16,,2026-09-13
+AIkill_Dynamic,2024-09-26_009ML,pre-b44 (Sept),7,0,32.80,19.54,30.12,20.06,32.80,19.54,36.84,19.08,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",96787,69493,16,,2026-09-13
+AIkill_Dynamic,2024-09-27_036RL,pre-b44 (Sept),6,15,26.97,15.98,20.95,13.17,27.52,15.98,22.32,13.17,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",93608,63487,16,,2026-09-13
+AIkill_Dynamic,2024-10-02_011CN,pre-b44 (Sept),8,1,25.13,18.83,14.66,7.67,25.13,18.50,14.66,7.09,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",90308,76453,16,,2026-09-13
+AIkill_Dynamic,2024-10-02_018CS,pre-b44 (Sept),7,1,18.43,14.45,9.22,5.36,18.43,14.45,9.39,5.30,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",102826,75673,16,,2026-09-13
+AIkill_Dynamic,2024-10-08_009JT,pre-b44 (Sept),8,3,19.79,16.10,8.85,5.07,20.08,16.10,8.85,5.07,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",100966,86379,16,,2026-09-13
+AIkill_Dynamic,2024-10-10_019LR,pre-b44 (Sept),10,1,29.82,19.52,13.05,9.78,29.82,19.12,18.22,8.23,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",104517,73564,16,,2026-09-13
+AIkill_Dynamic,2024-10-16_020JS,pre-b44 (Sept),6,0,21.18,13.18,5.50,2.90,21.18,13.07,5.78,2.90,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",123156,79898,16,,2026-09-13
+AIkill_Dynamic,2024-10-16_047SS,pre-b44 (Sept),9,1,21.61,15.38,12.33,7.11,21.61,15.38,12.77,6.34,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",91750,71115,16,,2026-09-13
+AIkill_Dynamic,2024-10-17_048JJ,pre-b44 (Sept),8,0,25.96,17.00,20.59,11.70,25.96,17.00,20.59,11.70,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",107375,77522,16,,2026-09-13
+AIkill_Dynamic,2024-10-22_021CH,pre-b44 (Sept),9,1,25.07,19.51,12.09,8.12,25.07,18.71,13.18,7.34,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",85442,68994,16,,2026-09-13
+AIkill_Dynamic,2024-10-23_047SS,pre-b44 (Sept),8,1,23.27,17.47,14.11,9.37,23.70,17.47,14.17,8.48,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",93122,77840,16,,2026-09-13
+AIkill_Dynamic,2024-10-28_022VT,pre-b44 (Sept),10,2,19.81,13.08,6.12,3.56,19.81,13.02,6.60,2.73,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",81060,58111,16,,2026-09-13
+AIkill_Dynamic,2024-10-29_049WG,pre-b44 (Sept),8,1,21.05,11.05,11.82,6.72,21.26,11.05,13.20,6.46,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",95192,51119,16,,2026-09-13
+AIkill_Dynamic,2024-11-05_023LL,pre-b44 (Sept),9,0,34.18,29.45,15.40,15.86,35.84,27.16,18.59,9.80,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",59344,45631,16,,2026-09-13
+AIkill_Dynamic,2024-11-13_025JC,pre-b44 (Sept),7,0,31.78,21.45,26.18,25.28,31.78,20.89,35.38,20.77,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",102214,76228,16,,2026-09-13
+AIkill_Dynamic,2024-11-18_026CH,pre-b44 (Sept),7,0,24.50,16.26,8.32,5.88,24.50,16.26,11.58,5.02,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",56948,42161,16,,2026-09-13
+AIkill_Dynamic,2024-11-26_050EH,pre-b44 (Sept),7,0,22.71,13.73,12.88,10.41,22.71,13.73,15.08,7.94,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",111684,80558,16,,2026-09-13
+AIkill_Dynamic,2024-12-05_043AS,pre-b44 (Sept),7,1,22.82,10.15,16.10,12.72,22.82,10.15,16.50,10.04,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",88565,45424,16,,2026-09-13
+AIkill_Dynamic,2024-12-06_051VM,pre-b44 (Sept),8,0,15.66,9.91,5.48,2.44,15.79,9.90,6.12,2.44,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",88178,52607,16,,2026-09-13
+AIkill_Dynamic,2024-12-09_027JC,pre-b44 (Sept),9,2,20.49,14.46,8.18,5.29,20.49,13.96,8.51,5.29,"split: whitened |z|, Rician-corrected (untagged, pre-40d23a4)",70368,50729,16,,2026-09-13
+AIkill_Dynamic_2022,2022-02-02_AW,6b01071,8,1,19.0,9.8,nan,nan,19.0,9.8,,,none (gas-only acquisition),60839,38032,16,,
+AIkill_Dynamic_2022,2022-02-02_unk-MID16_merged,6b01071,12,8,8.2,6.5,nan,nan,9.3,6.5,,,none (gas-only acquisition),27531,13418,16,,
+AIkill_Dynamic_2022,2022-02-03_000ID,6b01071,9,0,15.5,13.6,nan,nan,16.7,13.2,,,none (gas-only acquisition),98495,66765,16,,
+AIkill_Dynamic_2022,2022-02-04_027CB,6b01071,9,15,9.8,7.2,nan,nan,10.1,7.2,,,none (gas-only acquisition),40377,21656,16,,
+AIkill_Dynamic_2022,2022-02-09_unk-MID38_merged,6b01071,7,0,31.3,22.8,nan,nan,31.4,22.3,,,none (gas-only acquisition),151690,116487,16,,
+AIkill_Dynamic_2022,2022-02-09_unk-MID74_merged,6b01071,8,0,23.8,16.3,nan,nan,23.8,15.9,,,none (gas-only acquisition),67564,51230,16,,
+AIkill_Dynamic_2022,2022-02-15_unk-MID159_merged,6b01071,7,0,39.8,17.7,nan,nan,39.8,17.7,,,none (gas-only acquisition),68830,38653,16,,
+AIkill_Dynamic_2022,2022-02-24_000HH_b,6b01071,5,14,17.6,12.3,nan,nan,17.6,12.0,,,none (gas-only acquisition),77153,53924,16,,
+AIkill_Dynamic_2022,2022-02-24_000HH_b0,6b01071,7,0,24.3,17.1,nan,nan,24.6,17.1,,,none (gas-only acquisition),88662,69394,16,,
+AIkill_Dynamic_2022,2022-02-25_054SK_merged,6b01071,7,0,28.3,13.6,nan,nan,28.7,13.6,,,none (gas-only acquisition),88271,43871,16,,
+AIkill_Dynamic_2022,2022-03-09_015MG_merged,6b01071,8,0,41.1,21.1,nan,nan,42.0,21.1,,,none (gas-only acquisition),83072,59925,16,,
+AIkill_Dynamic_2022,2022-03-10_006RL_A_merged,6b01071,7,0,7.4,6.4,nan,nan,7.4,6.4,,,none (gas-only acquisition),24778,8622,16,,
+AIkill_Dynamic_2022,2022-03-10_006RL_B_merged,6b01071,7,0,19.0,15.2,nan,nan,19.0,15.2,,,none (gas-only acquisition),63673,55797,16,,
+AIkill_Dynamic_2022,2022-03-25_016ID,6b01071,8,0,33.5,15.4,nan,nan,34.2,15.4,,,none (gas-only acquisition),138690,76792,16,,
+AIkill_Dynamic_2022,2022-03-30_020WC,6b01071,7,2,19.0,9.9,nan,nan,19.0,9.9,,,none (gas-only acquisition),80634,45171,16,,
+AIkill_Dynamic_2022,2022-04-13_000LL,6b01071,7,0,46.3,36.7,nan,nan,46.3,34.1,,,none (gas-only acquisition),100021,80973,16,,
+AIkill_Dynamic_2022,2022-04-19_000HH,6b01071,7,15,21.2,12.1,nan,nan,22.0,11.5,,,none (gas-only acquisition),130195,84050,16,,
+AIkill_Dynamic_2022,2022-04-20_017AK_b,6b01071,6,15,16.7,9.0,nan,nan,18.3,9.0,,,none (gas-only acquisition),69308,24408,16,,
+AIkill_Dynamic_2022,2022-04-20_017AK_b0,6b01071,6,15,30.8,12.5,nan,nan,32.6,12.5,,,none (gas-only acquisition),94693,43003,16,,
+AIkill_Dynamic_2022,2022-04-21_000HH_b,6b01071,7,0,19.5,9.6,nan,nan,20.2,9.6,,,none (gas-only acquisition),129132,88461,16,,
+AIkill_Dynamic_2022,2022-04-21_000HH_b0,6b01071,5,14,21.0,8.9,nan,nan,21.0,8.7,,,none (gas-only acquisition),128087,51864,16,,
+AIkill_Dynamic_2022,2022-04-22_000HH_b,6b01071,10,0,27.7,18.4,nan,nan,28.0,18.4,,,none (gas-only acquisition),134086,114291,16,,
+AIkill_Dynamic_2022,2022-04-22_000HH_b0,6b01071,5,14,35.6,26.4,nan,nan,36.3,24.5,,,none (gas-only acquisition),152134,128745,16,,
+AIkill_Dynamic_2022,2022-04-25_000LL_b,6b01071,7,0,39.6,24.8,nan,nan,40.5,24.1,,,none (gas-only acquisition),102236,75057,16,,
+AIkill_Dynamic_2022,2022-04-25_000LL_b0,6b01071,6,15,46.4,30.4,nan,nan,46.4,30.4,,,none (gas-only acquisition),107376,80255,16,,
+AIkill_Dynamic_2022,2022-04-26_000ID_b,6b01071,7,0,32.6,21.3,nan,nan,32.8,21.0,,,none (gas-only acquisition),109077,77854,16,,
+AIkill_Dynamic_2022,2022-04-26_000ID_b0,6b01071,6,0,40.2,28.4,nan,nan,40.2,28.2,,,none (gas-only acquisition),118553,86543,16,,
+AIkill_Dynamic_2022,2022-04-29_018BI_b,6b01071,8,0,25.0,15.9,nan,nan,25.0,15.4,,,none (gas-only acquisition),69983,46981,16,,
+AIkill_Dynamic_2022,2022-04-29_018BI_b0,6b01071,7,15,34.2,21.5,nan,nan,34.2,20.7,,,none (gas-only acquisition),77867,53094,16,,
+AIkill_Dynamic_2022,2022-05-02_020ST_b,6b01071,8,0,37.0,30.3,nan,nan,41.5,29.1,,,none (gas-only acquisition),90996,61953,16,,
+AIkill_Dynamic_2022,2022-05-02_020ST_b0,6b01071,7,0,43.5,37.1,nan,nan,49.1,36.7,,,none (gas-only acquisition),99012,71283,16,,
+AIkill_Dynamic_2022,2022-06-02_008LL,6b01071,8,14,7.6,6.7,nan,nan,7.6,6.7,,,none (gas-only acquisition),49389,16819,16,,
+AIkill_Dynamic_2022,2022-06-27_000LL,6b01071,4,13,26.0,15.5,1.3,1.3,26.0,14.6,1.4,1.0,"unsplit: whitened |z|, Rician-corrected",125140,70340,16,,
+AIkill_Dynamic_2022,2022-06-28_019WR,6b01071,9,0,38.0,23.0,nan,nan,42.2,23.0,,,none (gas-only acquisition),111410,65531,16,,
+AIkill_Dynamic_2022,2022-07-05_021JM,6b01071,6,0,17.8,15.9,nan,nan,18.1,14.8,,,none (gas-only acquisition),51899,33296,16,,
+AIkill_Dynamic_2022,2022-07-06_000HH,6b01071,14,7,30.6,27.4,39.6,40.2,33.4,22.6,51.9,25.5,"unsplit: whitened |z|, Rician-corrected",155452,114219,16,,
+AIkill_Dynamic_2022,2022-07-07_001SW,6b01071,1,15,15.9,14.3,15.3,16.3,32.9,14.0,29.4,14.9,"unsplit: whitened |z|, Rician-corrected",208507,178545,16,,
+AIkill_Dynamic_2022,2022-07-08_000HH,6b01071,9,14,39.2,28.6,1.3,1.7,40.8,28.6,2.1,1.2,"unsplit: whitened |z|, Rician-corrected",195810,160318,16,,
+AIkill_Dynamic_2022,2022-07-18_025VP,6b01071,4,8,12.3,8.3,nan,nan,12.7,8.3,,,none (gas-only acquisition),46281,33231,16,,
+AIkill_Dynamic_2022,2022-07-20_023DB,6b01071,5,15,32.6,16.2,16.9,7.0,32.6,16.2,21.7,7.0,"unsplit: whitened |z|, Rician-corrected",160758,115166,16,,
+AIkill_Dynamic_2022,2022-07-21_014JW,6b01071,8,0,29.9,21.5,5.6,5.0,32.3,20.8,7.5,5.0,"unsplit: whitened |z|, Rician-corrected",127544,68489,16,,
+AIkill_Dynamic_2022,2022-08-12_000LL,6b01071,7,0,26.8,15.9,5.7,4.6,26.8,15.4,5.9,4.4,"unsplit: whitened |z|, Rician-corrected",84871,63267,16,,
+AIkill_Dynamic_2022,2022-08-22_026ED,ee3c91f,6,0,41.1,24.0,12.8,6.4,41.4,23.5,13.0,6.4,"unsplit: whitened |z|, Rician-corrected",88496,54357,16,,
+AIkill_Dynamic_2022,2022-09-21_027GB,6b01071,8,0,40.1,18.8,9.1,6.7,43.7,18.3,12.1,6.4,"unsplit: whitened |z|, Rician-corrected",72425,37427,16,,
+AIkill_Dynamic_2022,2022-09-26_025VP,ee3c91f,8,3,26.4,11.1,4.1,2.1,26.4,11.1,4.1,2.1,"unsplit: whitened |z|, Rician-corrected",83395,44925,16,,
+AIkill_Dynamic_2022,2022-09-27_021JM,6b01071,8,0,29.1,16.2,5.3,5.4,30.7,15.9,6.6,4.1,"unsplit: whitened |z|, Rician-corrected",105329,42634,16,,
+AIkill_Dynamic_2022,2022-09-28_017AK,6b01071,7,1,34.9,12.5,5.0,2.4,35.0,12.5,5.0,2.4,"unsplit: whitened |z|, Rician-corrected",85211,38580,16,,
+AIkill_Dynamic_2022,2022-09-30_029CK,6b01071,7,0,37.5,17.8,7.6,4.9,38.3,17.5,7.7,4.3,"unsplit: whitened |z|, Rician-corrected",79058,40666,16,,
+AIkill_Dynamic_2022,2022-10-06_019WR,6b01071,7,0,41.5,18.6,8.1,2.9,41.5,18.5,8.6,2.9,"unsplit: whitened |z|, Rician-corrected",111790,67460,16,,
+AIkill_Dynamic_2022,2022-10-10_001SW,6b01071,9,0,37.2,24.2,7.1,4.9,38.7,24.2,8.7,4.9,"unsplit: whitened |z|, Rician-corrected",108881,72071,16,,
+AIkill_Dynamic_2022,2022-10-11_011BA,6b01071,7,15,32.0,15.0,6.5,3.9,32.1,15.0,7.5,3.9,"unsplit: whitened |z|, Rician-corrected",80660,43841,16,,
+AIkill_Dynamic_2022,2022-10-19_023DB,6b01071,9,0,32.2,20.6,6.6,4.4,33.7,20.4,6.7,4.4,"unsplit: whitened |z|, Rician-corrected",93321,68346,16,,
+AIkill_Dynamic_2022,2022-10-26_000HHfast,6b01071,8,0,10.7,6.5,1.1,1.1,10.7,6.5,1.1,0.9,"unsplit: whitened |z|, Rician-corrected",135658,27187,16,,
+AIkill_Dynamic_2022,2022-10-26_000HHslow,ee3c91f,5,15,34.0,9.3,3.1,1.6,35.4,9.3,4.4,1.4,"unsplit: whitened |z|, Rician-corrected",184405,67441,16,,
+AIkill_Dynamic_2022,2022-10-27_000HH,6b01071,8,0,11.6,8.6,1.1,1.2,11.7,8.6,1.4,0.9,"unsplit: whitened |z|, Rician-corrected",137323,83615,16,,
+AIkill_Dynamic_2022,2022-10-31_000LL,6b01071,6,15,45.0,34.4,nan,nan,47.9,33.9,,,none (gas-only acquisition),105710,82907,16,,
+AIkill_Dynamic_2022,2022-11-04_000HH,6b01071,,,,,,,,,,,,,,,ValueError: All-NaN slice encountered,
+AIkill_Dynamic_2022,2022-11-07_000HH,6b01071,3,0,7.4,7.9,1.9,1.2,7.9,6.3,2.2,1.2,"unsplit: whitened |z|, Rician-corrected",65316,4136,16,,
+AIkill_Dynamic_2022,2022-11-08_018BI,ee3c91f,6,14,35.5,19.5,23.9,16.0,36.5,19.5,25.2,15.4,"unsplit: whitened |z|, Rician-corrected",86140,55590,16,,
+AIkill_Dynamic_2022,2022-11-09_030DN,6b01071,7,0,37.1,19.3,21.6,15.0,38.0,19.1,24.6,14.8,"unsplit: whitened |z|, Rician-corrected",107567,61404,16,,
+AIkill_Dynamic_2022,2022-12-02_032WS,ee3c91f,6,0,34.8,19.1,20.6,12.9,36.5,19.1,22.8,12.9,"unsplit: whitened |z|, Rician-corrected",112721,74050,16,,
+AIkill_Dynamic_2022,2022-12-06_019WR,ee3c91f,7,0,30.6,13.3,11.0,4.9,30.6,13.3,11.2,4.8,"unsplit: whitened |z|, Rician-corrected",111733,67439,16,,
+AIkill_Dynamic_2022,2023-01-24_000LL,6b01071,4,7,6.7,nan,6.8,nan,6.8,6.3,8.7,4.1,"unsplit: whitened |z|, Rician-corrected",5453,0,16,,
+AIkill_Dynamic_2022,2023-11-09_000HH_b,6b01071,8,1,13.9,8.0,nan,nan,14.0,8.0,,,none (gas-only acquisition),114903,62928,16,,
+AIkill_Dynamic_2022,2023-11-09_000HH_b0,6b01071,8,1,18.0,10.3,nan,nan,18.2,10.3,,,none (gas-only acquisition),131602,88553,16,,
+AIkill_Dynamic_b44d,2023-01-31_000LL,?,7,15,25.9,9.7,18.2,7.5,27.9,9.7,20.8,7.5,"split: whitened |z|, Rician-corrected",90015,48894,16,,
+AIkill_Dynamic_b44d,2023-02-17_000LL,6b01071,7,0,46.4,29.1,nan,nan,46.4,28.3,,,none (gas-only acquisition),96083,75475,16,,
+AIkill_Dynamic_b44d,2023-03-02_000LL,6b01071,7,0,20.6,10.9,22.6,8.3,20.6,10.8,22.6,7.8,"unsplit: whitened |z|, Rician-corrected",96403,60740,16,,
+AIkill_Dynamic_b44d,2023-05-02_011BA,?,8,0,29.5,12.4,15.6,8.7,29.6,12.2,16.1,8.3,"split: whitened |z|, Rician-corrected",90076,44812,16,,
+AIkill_Dynamic_b44d,2023-05-02_012SR,?,7,0,23.8,12.4,13.5,12.1,24.9,11.7,16.0,10.6,"split: whitened |z|, Rician-corrected",79228,37835,16,,
+AIkill_Dynamic_b44d,2023-05-15_035EK,?,6,0,30.2,14.3,16.6,8.2,31.3,13.1,16.6,8.2,"split: whitened |z|, Rician-corrected",128654,75399,16,,
+AIkill_Dynamic_b44d,2023-05-18_000SV,?,8,0,24.1,12.0,12.0,9.6,24.8,11.9,16.0,9.2,"split: whitened |z|, Rician-corrected",133976,71572,16,,
+AIkill_Dynamic_b44d,2023-09-25_032WS,?,8,15,26.9,16.9,19.8,14.0,28.1,16.0,31.3,14.0,"split: whitened |z|, Rician-corrected",105703,73260,16,,
+AIkill_Dynamic_b44d,2023-11-02_036RL,?,7,0,21.3,11.6,10.8,6.4,21.3,11.6,11.4,6.3,"split: whitened |z|, Rician-corrected",103831,71636,16,,
+AIkill_Dynamic_b44d,2023-11-17_005DS,?,9,0,22.0,16.5,6.8,3.7,22.0,15.4,7.7,3.6,"split: whitened |z|, Rician-corrected",71833,50958,16,,
+AIkill_Dynamic_b44d,2024-02-19_037GD,?,6,0,12.2,6.2,9.9,3.6,12.3,6.1,11.3,3.3,"split: whitened |z|, Rician-corrected",95915,15235,16,,
+AIkill_Dynamic_b44d,2024-02-21_043AS,?,7,0,33.1,12.6,26.8,13.0,34.0,12.6,39.6,13.0,"split: whitened |z|, Rician-corrected",102606,56785,16,,
+AIkill_Dynamic_b44d,2024-02-26_029CK,?,8,0,29.9,19.3,21.3,19.7,30.0,18.3,23.4,16.1,"split: whitened |z|, Rician-corrected",90913,51456,16,,
+AIkill_Dynamic_b44d,2024-02-27_009JT,?,6,13,18.1,14.1,8.7,4.7,18.1,13.6,9.2,4.6,"split: whitened |z|, Rician-corrected",115875,99850,16,,
+AIkill_Dynamic_b44d,2024-03-06_030DN,?,7,0,21.8,9.0,13.7,9.9,23.2,9.0,17.0,8.9,"split: whitened |z|, Rician-corrected",92655,31550,16,,
+AIkill_Dynamic_b44d,2024-03-11_039CP,?,6,0,26.2,15.2,21.1,16.8,26.8,15.2,28.9,14.6,"split: whitened |z|, Rician-corrected",76971,59023,16,,
+AIkill_Dynamic_b44d,2024-03-12_006KL,?,9,1,24.3,21.6,12.2,10.0,24.6,21.0,13.8,10.0,"split: whitened |z|, Rician-corrected",61161,50130,16,,
+AIkill_Dynamic_b44d,2024-03-12_044DY,?,7,0,22.5,14.0,21.6,14.8,22.5,13.3,22.9,12.4,"split: whitened |z|, Rician-corrected",87563,73545,16,,
+AIkill_Dynamic_b44d,2024-03-14_038RL,?,7,0,24.4,15.5,36.9,18.2,24.7,15.4,36.9,18.2,"split: whitened |z|, Rician-corrected",84444,56636,16,,
+AIkill_Dynamic_b44d,2024-03-21_032WS,?,7,15,31.3,16.9,23.9,14.8,32.2,16.4,24.0,11.7,"split: whitened |z|, Rician-corrected",109207,68977,16,,
+AIkill_Dynamic_b44d,2024-03-21_036RL,?,6,0,27.4,16.7,30.0,15.4,27.9,16.7,36.1,14.3,"split: whitened |z|, Rician-corrected",101100,68461,16,,
+AIkill_Dynamic_b44d,2024-03-28_010AJ,?,9,2,24.7,16.7,11.0,6.7,24.7,16.7,12.1,6.7,"split: whitened |z|, Rician-corrected",60386,47545,16,,
+AIkill_Dynamic_b44d,2024-04-01_008CR,?,8,4,24.6,18.9,15.0,7.3,24.7,18.8,15.0,6.1,"split: whitened |z|, Rician-corrected",85046,74209,16,,
+AIkill_Dynamic_b44d,2024-04-03_040RP,?,10,1,14.0,12.4,12.7,10.6,14.3,12.2,13.0,8.2,"split: whitened |z|, Rician-corrected",84974,71047,16,,
+AIkill_Dynamic_b44d,2024-04-09_019WR,?,8,1,22.6,15.7,17.8,14.3,22.6,15.7,18.0,12.6,"split: whitened |z|, Rician-corrected",98677,70465,16,,
+AIkill_Dynamic_b44d,2024-04-22_025VP,?,7,14,22.5,18.1,22.3,17.4,22.5,18.1,23.4,13.5,"split: whitened |z|, Rician-corrected",55401,47131,16,,
+AIkill_Dynamic_b44d,2024-05-02_023DB,?,7,0,26.7,18.1,20.8,16.3,26.7,18.1,22.4,14.5,"split: whitened |z|, Rician-corrected",106905,74316,16,,
+AIkill_Dynamic_b44d,2024-05-06_043AS,?,6,0,32.2,14.0,24.1,14.4,33.8,14.0,34.4,14.4,"split: whitened |z|, Rician-corrected",96240,55133,16,,
+AIkill_Dynamic_b44d,2024-05-08_012EB,?,8,1,16.9,10.5,14.3,12.3,17.5,10.5,14.3,10.5,"split: whitened |z|, Rician-corrected",43821,21344,16,,
+AIkill_Dynamic_b44d,2024-05-13_002ZS,?,8,0,13.0,8.2,10.3,9.1,13.0,8.2,10.3,7.2,"split: whitened |z|, Rician-corrected",47051,27617,16,,
+AIkill_Dynamic_b44d,2024-06-18_003PM,?,8,0,23.8,19.0,17.2,16.3,23.8,17.9,20.4,11.6,"split: whitened |z|, Rician-corrected",55992,42564,16,,
+AIkill_Dynamic_b44d,2024-07-03_044DY,?,7,0,28.7,15.8,31.0,16.4,28.7,15.8,31.3,16.4,"split: whitened |z|, Rician-corrected",82341,58861,16,,
+AIkill_Dynamic_b44d,2024-07-29_004DS,?,4,14,18.2,15.0,9.8,9.6,18.2,14.9,11.9,8.3,"split: whitened |z|, Rician-corrected",53537,46088,16,,
+AIkill_Dynamic_b44d,2024-08-12_013VM,?,7,0,24.0,16.0,10.2,6.0,24.8,16.0,11.2,6.0,"split: whitened |z|, Rician-corrected",99377,67213,16,,
+AIkill_Dynamic_b44d,2024-08-19_015HK,?,8,0,32.9,19.4,22.7,17.3,32.9,19.4,24.6,16.0,"split: whitened |z|, Rician-corrected",100391,58316,16,,
+AIkill_Dynamic_b44d,2024-08-21_044DY,?,7,0,25.4,17.5,24.5,21.0,25.4,17.1,28.7,15.6,"split: whitened |z|, Rician-corrected",83939,65602,16,,
+AIkill_Dynamic_b44d,2024-08-23_016PG,?,6,15,18.5,8.1,14.0,6.6,20.7,8.1,17.8,6.6,"split: whitened |z|, Rician-corrected",149170,67543,16,,
+AIkill_Dynamic_b44d,2024-08-30_014KS,?,8,0,32.9,17.7,39.7,25.5,33.1,16.7,46.8,22.0,"split: whitened |z|, Rician-corrected",90628,59588,16,,
+AIkill_Dynamic_b44d,2024-09-03_041WF,?,7,0,23.9,14.9,20.6,15.1,24.9,14.9,22.3,14.9,"split: whitened |z|, Rician-corrected",116744,70955,16,,
+AIkill_Dynamic_b44d,2024-09-09_043AS,?,7,0,30.6,16.1,23.6,17.5,30.6,16.1,30.2,14.2,"split: whitened |z|, Rician-corrected",80866,49245,16,,
+AIkill_Dynamic_b44d,2024-09-10_008TP,?,7,0,26.8,20.9,25.0,17.3,26.9,20.3,27.8,16.0,"split: whitened |z|, Rician-corrected",88650,70215,16,,
+AIkill_Dynamic_b44d,2024-09-10_045VS,?,6,15,39.8,20.6,49.1,28.4,39.8,20.1,51.7,25.9,"split: whitened |z|, Rician-corrected",57330,37385,16,,
+AIkill_Dynamic_b44d,2024-09-24_039CP,?,7,0,33.0,18.2,31.0,14.8,33.1,17.6,33.6,13.8,"split: whitened |z|, Rician-corrected",95200,63531,16,,
+AIkill_Dynamic_b44d,2024-09-24_046AA,?,7,0,22.7,10.6,22.6,13.2,22.7,10.6,22.6,12.0,"split: whitened |z|, Rician-corrected",103784,56035,16,,
+AIkill_Dynamic_b44d,2024-09-26_009ML,?,7,0,28.4,16.7,25.8,17.0,28.4,16.7,31.3,16.1,"split: whitened |z|, Rician-corrected",92282,66540,16,,
+AIkill_Dynamic_b44d,2024-09-27_036RL,?,6,15,23.6,14.0,18.0,11.4,24.1,14.0,19.1,11.4,"split: whitened |z|, Rician-corrected",88780,59208,16,,
+AIkill_Dynamic_b44d,2024-10-02_011CN,?,8,1,22.6,16.7,13.0,6.6,22.6,16.4,13.0,6.1,"split: whitened |z|, Rician-corrected",82593,70712,16,,
+AIkill_Dynamic_b44d,2024-10-02_018CS,?,7,1,16.5,13.0,8.0,4.6,16.5,13.0,8.1,4.5,"split: whitened |z|, Rician-corrected",92707,67589,16,,
+AIkill_Dynamic_b44d,2024-10-08_009JT,?,9,3,18.0,14.5,6.9,4.4,18.0,14.5,7.7,4.4,"split: whitened |z|, Rician-corrected",92200,78139,16,,
+AIkill_Dynamic_b44d,2024-10-10_019LR,?,10,1,26.3,17.3,11.4,8.6,26.3,16.9,15.9,7.1,"split: whitened |z|, Rician-corrected",98590,68357,16,,
+AIkill_Dynamic_b44d,2024-10-16_020JS,?,6,0,18.9,11.8,4.8,2.4,18.9,11.7,5.0,2.4,"unsplit: whitened |z|, Rician-corrected",114652,72288,16,,
+AIkill_Dynamic_b44d,2024-10-16_047SS,?,9,1,19.1,13.6,10.7,6.1,19.1,13.6,11.0,5.4,"split: whitened |z|, Rician-corrected",85206,65402,16,,
+AIkill_Dynamic_b44d,2024-10-17_048JJ,?,8,0,22.8,15.1,17.9,10.2,22.8,15.1,17.9,10.2,"split: whitened |z|, Rician-corrected",101677,71305,16,,
+AIkill_Dynamic_b44d,2024-10-22_021CH,?,9,1,22.6,17.6,10.7,7.1,22.6,16.8,11.7,6.4,"split: whitened |z|, Rician-corrected",78156,62721,16,,
+AIkill_Dynamic_b44d,2024-10-28_022VT,?,10,2,17.8,12.0,5.3,3.1,17.8,11.9,5.7,2.3,"split: whitened |z|, Rician-corrected",73480,49420,16,,
+AIkill_Dynamic_b44d,2024-10-29_049WG,?,8,1,18.7,9.9,10.3,5.8,18.9,9.9,11.5,5.5,"split: whitened |z|, Rician-corrected",88148,44792,16,,
+AIkill_Dynamic_b44d,2024-11-05_023LL,?,9,0,30.6,26.0,13.5,13.9,31.9,24.0,16.3,8.5,"split: whitened |z|, Rician-corrected",54452,42664,16,,
+AIkill_Dynamic_b44d,2024-11-13_025JC,?,7,0,27.5,18.4,22.2,21.4,27.5,18.0,30.4,17.5,"split: whitened |z|, Rician-corrected",97360,73366,16,,
+AIkill_Dynamic_b44d,2024-11-18_026CH,?,7,0,21.9,14.5,7.2,5.1,21.9,14.5,10.0,4.2,"split: whitened |z|, Rician-corrected",51921,37611,16,,
+AIkill_Dynamic_b44d,2024-11-26_050EH,?,7,0,20.0,12.0,11.2,9.0,20.0,12.0,13.1,6.8,"split: whitened |z|, Rician-corrected",104751,75002,16,,
+AIkill_Dynamic_b44d,2024-12-05_043AS,?,8,1,19.3,8.9,13.9,11.0,19.7,8.9,14.0,8.6,"split: whitened |z|, Rician-corrected",84947,40726,16,,
+AIkill_Dynamic_b44d,2024-12-06_051VM,?,9,0,13.9,8.8,5.2,2.0,13.9,8.8,5.2,2.0,"unsplit: whitened |z|, Rician-corrected",81375,45168,16,,
+AIkill_Dynamic_b44d,2024-12-09_027JC,?,9,2,18.1,13.0,7.1,4.6,18.1,12.4,7.4,4.6,"split: whitened |z|, Rician-corrected",65896,45882,16,,

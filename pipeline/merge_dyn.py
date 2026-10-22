@@ -111,6 +111,13 @@ def build_merged(datadir, mids, gp_traj, dp_traj, out_mrd, binning='DIAPHRAGM',
             img = arr[..., nspec:]                          # drop B's cal block
             gap = t0 - report['parts'][-1]['mdh_t1']
             info.update(gap_before_s=round(gap, 1), stripped_cal_lines=nspec)
+            if i < len(files) - 1:
+                # a middle file is followed by another arm-0 restart -> trim it to whole cycles too (3+ file merges,
+                # e.g. early-2022 dynamics the scanner split into 100-rep chunks; a 2-file merge never gets here)
+                ngas = img.shape[2] // p
+                keep_gas = (ngas // cycle) * cycle
+                info.update(gas_ilv=ngas, kept_gas_ilv=keep_gas, trimmed_lines=int(img.shape[2] - keep_gas * p))
+                img = img[..., :keep_gas * p]
             parts.append(img)
             # timing must match; numspec may differ (025VP MID02743 has NO cal block at all,
             # numspec_raw 0 -> nothing to strip; the head file's block is the one used)

@@ -6,7 +6,7 @@ import scipy.io as sio
 from scipy import ndimage as ndi
 from scipy.stats import skew, kurtosis
 
-ROOT = '/Volumes/HoomHamExt/AIkill_Dynamic_b44'
+ROOT = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44'
 
 
 def corners(n=100, c=12):

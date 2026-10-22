@@ -1,7 +1,7 @@
 """Scratch: rerun Steve's spectral fit (raw.load_from_arr, CPU) and compare the RBC/TP split's
 assumed phase separation (2*pi*df*TEeff, i.e. the t=0 intercept) with the phase difference
 measured at the first spectral sample (t = TE + killpts*dtspec). Evidence for 2steve/05.
-usage: python _f59_check.py <session> [<session> ...]   (sessions under /Volumes/HoomHamExt/AIkill_Dynamic)
+usage: python _f59_check.py <session> [<session> ...]   (sessions under /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic)
 writes workspace/outputs/f59_te_term_2026-09-24/{f59.json, 05_rbctp_split_te_term.png}
 """
 import sys, json, numpy as np, mrd, warnings
@@ -48,7 +48,7 @@ def run(p):
           f"model={d['model_deg']:.1f} (gain {d['gain_model']:.1f}) measured={d['measured_first_deg']:.1f} (gain {d['gain_measured']:.2f}) "
           f"gap={wrap(d['measured_first_deg']-d['model_deg']):.1f} 2pi*df*TE={d['TEterm_deg']:.1f}")
     return d
-res=[r for r in (run(f'/Volumes/HoomHamExt/AIkill_Dynamic/{s}/d/input.mrd') for s in sys.argv[1:]) if r]
+res=[r for r in (run(f'/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic/{s}/d/input.mrd') for s in sys.argv[1:]) if r]
 json.dump(res, open(f'{OUT}/f59.json','w'), indent=1)
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
 fig,ax=plt.subplots(1,2,figsize=(12,4.6))

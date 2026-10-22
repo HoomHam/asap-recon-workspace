@@ -38,7 +38,7 @@ def one(key, sigmas):
         # container gate left this session unsplit (stability refit > 10 deg): the dissolved item is the raw
         # complex image; take angle + target from the offline XeCS re-split row (same fit, offline gate)
         import scipy.io as sio
-        r = sio.loadmat(f'/Volumes/HoomHamExt/AIkill_Dynamic/{key}/d/recon_resplit_xecs.mat',
+        r = sio.loadmat(f'/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic/{key}/d/recon_resplit_xecs.mat',
                         variable_names=['dphi_new_deg', 'target'])
         phi = np.radians(float(r['dphi_new_deg'].ravel()[0])); target = float(r['target'].ravel()[0])
         # raw complex -> rotate into the stored-basis convention via one global sweep so that 'sigma 0' is comparable

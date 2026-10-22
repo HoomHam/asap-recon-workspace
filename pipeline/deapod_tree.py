@@ -18,8 +18,8 @@ import numpy as np
 import scipy.io as sio
 import mrd
 
-SRC = '/Volumes/HoomHamExt/AIkill_Dynamic_b44'
-RAW = '/Volumes/HoomHamExt/AIkill_Dynamic'
+SRC = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44'
+RAW = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic'
 DST = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d'
 IMAGES = ('gas_phase', 'gas_phase_magnitude', 'dissolved_phase_real', 'dissolved_phase_imag', 'dissolved_phase_magnitude')
 KDIST0SQ = 0.2   # recon.py cudarecon kernel; results.KDIST0SQ in the fork

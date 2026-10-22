@@ -10,7 +10,7 @@ Two ways to point it at the data:
 
     # explicit folders
     python dyn_recon.py --data-dir /Volumes/HoomHamExt/_5t_images_roundtrip/Images/2024-09-10/008TP \
-                        --out-dir  /Volumes/HoomHamExt/AIkill_Dynamic/2024-09-10_008TP
+                        --out-dir  /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic/2024-09-10_008TP
 
 What it does (mirrors the manual run, nothing in the root repo is modified):
   1. resolve    find the raw folder, the *largest* dynamic spiral .dat, its
@@ -67,7 +67,7 @@ LETTER_BINNING = {v: k for k, v in BINNING_LETTER.items()}
 
 # defaults for the --date/--id resolve mode (HoomHam died; data now on Ext)
 DEFAULT_DATA_ROOT = '/Volumes/HoomHamExt/_5t_images_roundtrip/Images'
-DEFAULT_OUT_ROOT  = '/Volumes/HoomHamExt/AIkill_Dynamic'
+DEFAULT_OUT_ROOT  = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic'
 
 PY = sys.executable  # same interpreter that launched this script
 
@@ -187,9 +187,11 @@ def resolve(args):
         outbase = Path(args.out_root) / f'{date}_{subj_id}{"_merged" if merge else ""}'
     _log(f'output base: {outbase}  (methods -> s/p/d subfolders)')
 
+    if args.excluderanges or args.sigmin_n is not None:
+        _log(f'exclude    : {args.excluderanges or "(auto only)"}   SIGNAL EE half-window: {args.sigmin_n or 50}')
     return dict(datadir=str(datadir), seqname=seqname, gp=gp, dp=dp,
                 pneumo=pneumo, outbase=outbase, date=date, id=subj_id,
-                merge=merge, ref=args.ref)
+                merge=merge, ref=args.ref, excluderanges=args.excluderanges, sigmin_n=args.sigmin_n)
 
 
 # --- stage 2: convert --------------------------------------------------------
@@ -237,6 +239,11 @@ def convert(ds, run_dir, binning):
         cmd += ['--dp-traj', ds['dp']]
     if ds['pneumo']:
         cmd += ['--pneumotach', ds['pneumo']]
+    # Steve's exclude ranges / SIGNAL EE half-window (fork 262b16f+); only convert_mixed_adc.py takes these flags
+    if ds.get('excluderanges'):
+        cmd += ['--excluderanges', ds['excluderanges']]
+    if ds.get('sigmin_n') is not None:
+        cmd += ['--sigmin-n', str(ds['sigmin_n'])]
     _log(f'converting ({binning}) -> {input_mrd}')
     if subprocess.run(cmd).returncode != 0:
         _die('conversion failed')
@@ -398,6 +405,10 @@ def main():
                                     'one input (acquisition order; first keeps its cal block). '
                                     'Output folder gets a _merged suffix; p binning is skipped.')
     ap.add_argument('--ref', help='breath-hold MID stored as reference_acquisition (with --merge)')
+    ap.add_argument('--excluderanges', help="Steve's exclude ranges, integer seconds on the gas-interleave clock "
+                                            "iilv*TR, e.g. '0-12, 66-93' (needs ASAP_CONVERTER=convert_mixed_adc.py)")
+    ap.add_argument('--sigmin-n', type=int, default=None,
+                    help='SIGNAL EE-minimum half-window in gas interleaves (Steve: 50; needs convert_mixed_adc.py)')
     ap.add_argument('--codespec', default=str(TYGER_SPEC),
                     help=f'Tyger run spec (pins the image sha; default {TYGER_SPEC.name})')
     ap.add_argument('--runs-dir', default=str(RUNS_DIR),
@@ -437,7 +448,9 @@ def main():
     for binning in binnings:
         letter = BINNING_LETTER[binning]
         target = ds['outbase'] / letter
-        if (target / 'output.mrd').is_file() and not args.force:
+        # recon.mat counts as done too: output.mrd may be pruned from finished trees (Ext, 2026-10-21; recon.mat
+        # holds the same arrays)
+        if ((target / 'output.mrd').is_file() or (target / 'recon.mat').is_file()) and not args.force:
             _log(f'==================== {binning} -> {target}  (already done, skip) ====================')
             continue
 

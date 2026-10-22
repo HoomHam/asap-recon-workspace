@@ -2,7 +2,7 @@
 # Re-run DIAPHRAGM recons with the fork image f5ac7c5 (complex gas export) from the stored d/input.mrd.
 # Usage: run_gascplx_2026-09-25.sh <key> [<key> ...]   e.g. 2024-09-10_045VS
 SPEC=/Users/hoomham/Hooman/Work/Codes/2026_ASAP_Recon/workspace/pipeline/recon_codespec_c8366c3.yml
-SRC=/Volumes/HoomHamExt/AIkill_Dynamic
+SRC=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic
 DST=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tyger_bexport_2026-09-25
 for key in "$@"; do
   # MOUNT GUARD: never write into an unmounted /Volumes path

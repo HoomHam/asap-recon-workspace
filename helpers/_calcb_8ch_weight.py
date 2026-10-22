@@ -9,7 +9,7 @@ from steve_kernel_numpy import steve_recon
 from scipy.optimize import curve_fit
 from gtypes import gvar, imgtype, graddir
 from raw import traj, raw as R
-s=sys.argv[1]; run=f'/Volumes/HoomHamExt/AIkill_Dynamic/{s}/d'
+s=sys.argv[1]; run=f'/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic/{s}/d'
 OUT=os.path.join(ASAP,'workspace/outputs/calcb_imprint_2026-09-24'); os.makedirs(OUT,exist_ok=True)
 header,arrs=read_input_mrd(os.path.join(run,'input.mrd'))
 ul={p.name:p.value for p in header.user_parameters.user_parameter_long}; ud={p.name:p.value for p in header.user_parameters.user_parameter_double}

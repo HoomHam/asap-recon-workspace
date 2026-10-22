@@ -22,7 +22,7 @@ for name, w in W.items():
     xa = L.recon(raw, k, A, dcf, N, DX, win=w); xb = L.recon(raw, k, B, dcf, N, DX, win=w)
     img[name] = (xa, xb)
     print('done', name, flush=True)
-np.savez('/Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/apod_images.npz', **{n.replace(' ','_'): np.stack(v).astype(np.float32) for n, v in img.items()})
+np.savez('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_1H/2024-03-12_006KL/apod_images.npz', **{n.replace(' ','_'): np.stack(v).astype(np.float32) for n, v in img.items()})
 if os.environ.get('RECON_ONLY'): sys.exit(0)
 # masks from the full-readout image
 x0 = 0.5 * (img['full (2.56 ms)'][0] + img['full (2.56 ms)'][1]); xs = ndi.gaussian_filter(x0, 1.5)
@@ -52,4 +52,4 @@ for a, (name, (xa, xb)) in zip(ax, img.items()):
     a.contour(lung[:, ap, :].T, [0.5], colors='c', linewidths=.5)
     a.set_title(f'{name}\nlung SNR {res[name]["lung_SNR"]:.1f}', fontsize=9); a.axis('off')
 fig.tight_layout(); fig.savefig(os.path.join(out, 'apod_compare.png'), dpi=80)
-np.save('/Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/apod_full_vs_matched.npy', np.stack([0.5*sum(img['full (2.56 ms)']), 0.5*sum(img['matched exp(-t/2ms)'])]).astype(np.float32))
+np.save('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_1H/2024-03-12_006KL/apod_full_vs_matched.npy', np.stack([0.5*sum(img['full (2.56 ms)']), 0.5*sum(img['matched exp(-t/2ms)'])]).astype(np.float32))

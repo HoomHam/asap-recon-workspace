@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # ⚠ SUSPECT-DEPENDENCY [F47]: dp pages use dissolved_phase_magnitude = |aRBC+i·aTP|, which for RBC/TP-split sessions is noise-amplified by Steve's ill-conditioned split (not |dissolved|) — see workspace/canon/facts.md
-"""Gas + dissolved atlas over /Volumes/HoomHamExt/AIkill_Dynamic.
+"""Gas + dissolved atlas over /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic.
 
 Groups sessions by subject ID (dates sorted). Per ID:
   - one panel page, rows grouped ORIENTATION-major:
@@ -40,7 +40,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import imageio.v2 as imageio
 from PIL import Image, ImageDraw
 
-SRC = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+SRC = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 OUT = Path(__file__).resolve().parents[2] / 'outputs' / 'aikill_atlas'
 VID = OUT / 'videos'
 THRESH = 0.15          # gas data mask: > 15% of max

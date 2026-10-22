@@ -69,7 +69,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-DYN = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+DYN = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 WS = Path(__file__).resolve().parents[1]
 OUT = WS / 'outputs' / 'structure_rank'
 SNR_CSV = WS / 'outputs' / 'snr_2026-09-13' / 'snr_table.csv'

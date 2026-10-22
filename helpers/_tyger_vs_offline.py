@@ -13,7 +13,7 @@ from pathlib import Path
 
 key = sys.argv[1]
 NEW = Path(sys.argv[2] if len(sys.argv) > 2 else '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tyger_specfit_2026-09-24') / key / 'd'
-OLD = Path('/Volumes/HoomHamExt/AIkill_Dynamic') / key / 'd'
+OLD = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic') / key / 'd'
 
 # meta from the new output.mrd
 meta = {}

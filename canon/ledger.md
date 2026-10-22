@@ -982,3 +982,72 @@ session-7 header, belong to THIS session — left in place, append-only.)
 - STOPPED for a system restart (02:15): all-coil reruns done 021JM, 017AK, 029CK, 019WR(10-06); left 001SW, 011BA,
   023DB, 2022-10-27_000HH (001SW run dir moved to pipeline_runs/_aborted_*). _pick_best_2022.py NOT applied yet.
 - BRANCH: prev2-calib (B33), parent B32 — ● open. ★ → B33.
+
+## 2026-10-21 · session 18 (Opus 5.5) — every reconstructable leftover session through Tyger (in progress; full entry at /leave)
+- Asked "how many undone recons" → 43 by the 10-03 inventory (6 Ext diffusion/saturation parked, 4 failed, 33 BigMac-only).
+  Hooman: "finish all that we can do". Unparked by that order.
+- NOTE: no ledger entries exist for the work between 10-04 and today (all-coil reruns finished, _pick_best_2022 applied,
+  fork 262b16f + `_win`/`s2022cut` runs, pipeline_runs → Ext 10-17); handoff-report.md still describes 10-04.
+- Saturation (seq 0602 = gas imaging + DP_Gauss sat pulses): 019WR 06-28, 021JM 07-05 → gas-only Tyger, sharp (F123).
+- Diffusion: new `ASAP_BSET=b0|b` in pipeline/convert_mixed_adc.py (C56) — b-set split, rule auto (12-block or plain
+  alternation), TR ×2 (F122). 9 sessions × 2 sets (Ext 4, WorkVault 5 incl. 2022-02-24 000HH).
+- BigMac-only set exists on WorkVault (Estate witness 10-21: 38/38 sessions, sizes = 10-14 sha index) → read IN PLACE
+  (read-only), outputs on Ext. 23 post-entry-4 sessions + 10 pre-entry-4 checked; families from header + k0 probe.
+- Early 2022 is NOT calibration-less (F124, retracts F120's "need entries 1–2" clause): Faraz entries 1/2 (32×15 arms) +
+  local traj_2022-02-24 fit; 027CB matches Faraz's dynvent. Chunked 100-rep files = one dynamic → merged (F125);
+  merge_dyn fixed to trim every non-last chunk.
+- Failures found and handled: converter size-sort ≠ dyn_recon log on equal-size files (000ID, F126); dyn_recon exit 0
+  on a failed Tyger run; GP-DP without dp traj → CUDA 700 → gas-only MRD rewrite (F127).
+- Closed as not reconstructable (F128): 2023-07-24 019WR (no Xe signal; output → quarantine/…_nosignal), 000LL 2024 ×3
+  (aborted fragments), 2022-01-28 000HH (1H), 2022-02-01 (FOV 415), 2022-02-08 000HH (11-leaf non-fancy seq).
+- Weak/odd, for Hooman: 2022-11-04 000HH MID00209 = noise (17 calcb fallbacks; 5 smaller sibling files untested,
+  WorkVault unplugged); 2022-06-02 008LL = dissolved-only set-up (flip 31°, no DP pulse) → `008LL_dptraj` (SUSPECT);
+  weak but real: 2023-01-24 000LL, 2022-02-03 000ID, 2022-03-10 006RL_A.
+- Ext pressure: today's outputs ≈ 86 GB (input.mrd 53); Ext 99 % (22 GiB free). Lossless frees listed for Hooman
+  (s/input.mrd duplicates 26.4 GB, superseded single-chunk dirs 4.9 GB, nosignal quarantine 1.6 GB) — nothing deleted
+  except my own duplicate 2022-02-03_000ID_MID142 (0.9 GB, same recon as 2022-02-03_000ID).
+- QC: helpers/_contact_2026_10_21.py → outputs/leftover_recon_2026-10-21/contact_d.png + qc_d.csv.
+- Late (13:30–13:50): 2022-02-03 000ID MID00143 rebuilt from the first run's reference slot → clean lungs (SNR ~70);
+  made canonical `2022-02-03_000ID` (CHOSEN.txt), MID00142 → `_MID142`. 02-02_2 merged gas-only rewrite runs but shows
+  one static bright point, not a lung → `NOT_LUNG.txt`. Ext dropped 13:19–13:20 (System): none of my jobs crossed it.
+- Tally: of the 43 → 36 reconstructed (2 flagged: 008LL dissolved-only?, 11-04 HH noise), 7 not possible; + 3 sessions
+  not in the inventory (02-02 AW ok, 02-02_2 not a lung, 02-15 unk ok). outputs/leftover_recon_2026-10-21/undone43_outcome.csv.
+- Ext free (Hooman ruling 10-21 "free the 33 GB on Ext first"): 19.6 → 49.6 GiB. (1) 52 s/input.mrd duplicates of
+  today's dirs (50 AIkill_Dynamic_2022 + 2 _b44d) removed after a full streaming compare vs d/input.mrd (52/52 identical
+  except the binning string at byte 30176); each s/ has `input.mrd_REMOVED.txt`. 22 older s/input.mrd untouched.
+  (2) superseded single-chunk dirs 02-09 unk-MID38/74, 02-15 unk-MID159, 02-25 054SK, 03-09 015MG, 03-10 006RL
+  deleted (all `_merged` replacements complete in s+d). (3) quarantine/2023-07-24_019WR_nosignal: input/output/recon.mat
+  removed, logs/PNGs/NO_SIGNAL.txt kept (raw stays on Ext _5t_images_roundtrip).
+- System lifted its run/copy hold after the free, condition: keep ≥ 30 GiB free on HoomHamExt (df before each batch,
+  stop the batch before crossing). Ext-root AIkill_Dynamic* move + deapod_tree.py path patch still wait on Hooman.
+- Ext-root trees moved under the mirror path (Hooman 10-21 "yes move them and patch the paths"): AIkill_Dynamic (109),
+  AIkill_Dynamic_b44, AIkill_Dynamic_1H + AIkill_Dynamic_b44_batch.log → /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/ (same-volume rename, 0
+  bytes copied). Path prefix patched in 60 live code files (ASAP pipeline 9 + helpers 24, XeCS helpers ~25, PCA helpers 2)
+  + 2 EXT-joins (XeCS b44_reg_inputs.py, PCA implant_test.py) + memory pointers; records (outputs/canon/archive/notes)
+  left as written. Symlinks: 1H 006KL_filt/orig/d/output.mrd → relative; PCA data/recon/002BB.mat → new path. XeCS/PCA
+  edits are uncommitted in their workspace repos.
+
+## 2026-10-21/22 · session 18 (Opus 5.5) — leftover recon, Ext prune, SNR for all (CLOSE)
+- Recon now covers every reconstructable session: 160 Xe dynamic sessions (2022 52 · 2023 41 · 2024 67) + 1 proton; all
+  have s + d, p for every session with a pneumotach (94). The one gap (2023-11-09 000HH diffusion b0/b, run_adc4 ran s,d)
+  closed 10-22 by pipeline/run_adc_p_2026-10-22.sh (lungs in all 16 bins). Count matches the inventory: 164 − 7 + 3 = 160.
+- Ext prune, Hooman's ruling via Estate 10-21: A (s/p input.mrd byte-dups, pipeline_runs scratch, quarantine) + B
+  (output.mrd in AIkill_Dynamic + _2022, after readers patched) → Ext Trash, mirrored paths under
+  `.Trashes/501/ASAP_prune_{A,B}_2026-10-21/` (flat Trash would collide on identical names). B: 461 files 88.4 GB, gate
+  461/461 recon.mat present + newer, full value compare 24/24 (F130). A: pipeline_runs 38 dirs 22.8 GB (logs/ kept),
+  quarantine 0.63 GB (README + NO_SIGNAL kept). 22 laptop symlinks in pipeline/runs now point into Trash (Estate told).
+- Readers patched before B: ASAP done-checks (dyn_recon, batch_recon, todo_batch.sh, _roundtrip_audit, build_status_tab)
+  accept recon.mat; XeCS wrote recon/aikill_io.py (its repo) covering all its readers incl. s/p input.mrd → d fallback.
+- Machine rebooted 10-22 ~15:32: /tmp scratch lost, A s/p verify restarted with its log in
+  outputs/ext_prune_2026-10-21/ (reboot-safe). Ext remounted as disk7; Trash folders intact.
+- SNR for all (B36): outputs/snr_2026-10-22/ — 171 rows, d binning, production recon per session (b44d, else 2022 tree,
+  else Sept build) + Sept value alongside. Medians gas EI 23.8 (b44d) / 30.2 (2022) / 25.9 (Sept). Production/Sept ratio
+  0.88 is mostly a corner-σ artifact of deapod (gain 1.23 corners vs 1.02 lung, F129). 2022 DP unsplit (F131).
+- DECIDED: Ext prune A yes · B yes after reader patches · C (tyger_* trials, b44 output.mrd) NOT decided, untouched ·
+  D (d/input.mrd) + every recon.mat keep · deletes go to Ext Trash, only Hooman empties it (Hooman via Estate 10-21).
+- DECIDED: keep ≥ 30 GiB free on HoomHamExt; df before each batch (System 10-21).
+- DECIDED: SNR table as computed is fine for now; rolloff-corrected σ parked (Hooman 10-22).
+- BRANCH: leftover-recon-2 (B34), parent: B33 — ✅. BRANCH: ext-prune (B35), parent: B34 — ★ open (A finishing, C open).
+  BRANCH: snr-all (B36), parent: B16 — ✅. B33 prev2-calib → ✅.
+- Reconciled: session-17 run scripts (run_hh_k0win, run_s2022, run_s2022cut, run_allcoil4) + outputs hh_2021_scans,
+  hh_k0bin_2026-10-04, s2022_check had no cards → C58 (untagged).

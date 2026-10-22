@@ -17,7 +17,7 @@ HERE=${0:A:h}
 PY=/opt/homebrew/Caskroom/miniforge/base/bin/python3   # has mrd + mapvbvd (F15)
 R=/Volumes/HoomHamExt/_5t_images_roundtrip/Images
 S=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/staged_src   # symlinked loose-layout sessions
-OUT=/Volumes/HoomHamExt/AIkill_Dynamic
+OUT=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic
 LOGS=/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/pipeline_runs/logs
 mkdir -p $LOGS
 
@@ -59,7 +59,7 @@ for line in $WORKLIST; do
       --methods s,p,d --codespec $SPEC ${FORCE:+--force} >> $log 2>&1
   rc=$?
   done_m=""
-  for m in s p d; do [[ -s $OUT/${d}_${id}/$m/output.mrd ]] && done_m+=$m || done_m+=-; done
+  for m in s p d; do [[ -s $OUT/${d}_${id}/$m/output.mrd || -s $OUT/${d}_${id}/$m/recon.mat ]] && done_m+=$m || done_m+=-; done
   echo "$(date +%F_%T) ${d}_${id} rc=$rc outputs=$done_m" >> $LOGS/SUMMARY.txt
   echo "[batch $(date +%H:%M:%S)] END   ${d}_${id} rc=$rc outputs=$done_m"
 done

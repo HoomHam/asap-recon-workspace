@@ -18,7 +18,7 @@ gp/rbc/tm, and one mp4 per ID per kind cycling the 16 bins.
 
 Outputs: workspace/outputs/aikill_atlas/rbc_tm_atlas.pdf, videos_rbctm/<ID>_{gp,rbc,tm}.mp4,
          rbc_tm_atlas_sessions.csv (what went in, angle, F_lump, bin shown)
-Usage: rbc_tm_atlas.py [--only ID] [--no-video] [--no-full] [--root /Volumes/HoomHamExt/AIkill_Dynamic_b44 [--tag b44]]
+Usage: rbc_tm_atlas.py [--only ID] [--no-video] [--no-full] [--root /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44 [--tag b44]]
   --root: production tree with the container split in recon.mat (C49/C50); outputs go to outputs/aikill_atlas_<tag>/
 """
 from __future__ import annotations
@@ -41,7 +41,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dis_atlas import (ORIENTS, orient, montage, THRESH, MINVOX, PAD, NSEL, DPI,
                        FPS, REPEATS, UPSCALE)
 
-SRC = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+SRC = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 WS = Path(__file__).resolve().parents[2]
 OUT = WS / 'outputs' / 'aikill_atlas'
 VID = OUT / 'videos_rbctm'

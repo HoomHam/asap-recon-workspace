@@ -21,7 +21,7 @@ WS = os.path.dirname(HERE)
 CACHE = '/Volumes/HoomHamExt/Work/Codes/2026_XeCS_Recon/h1challenge/cache_006KL_1H.npz'
 EXT = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/h1challenge'
 OUT = os.path.join(WS, 'outputs', 'h1challenge_2026-10-02')
-TYGER_P = '/Volumes/HoomHamExt/AIkill_Dynamic_1H/2024-03-12_006KL/p/recon.mat'
+TYGER_P = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_1H/2024-03-12_006KL/p/recon.mat'
 NILV, NPTS, KILL, DWELL = 832, 512, 2, 5e-6
 N, DX = 100, 3.5
 

@@ -21,7 +21,7 @@ Stages (run in this order; all idempotent):
   fig     <key> [...]          before/after figure -> fig/<key>_before_after.png
   cohort                       cohort scatter (angles, corr, TP<0) -> fig/cohort_before_after.png
 
-Inputs : /Volumes/HoomHamExt/AIkill_Dynamic/<key>/d/{input.mrd, recon.mat, tyger.log}
+Inputs : /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic/<key>/d/{input.mrd, recon.mat, tyger.log}
 Outputs: workspace/outputs/resplit_2026-09-24/{fits,rows,logs,fig}/, resplit_summary.csv
          <Ext>/<key>/d/recon_resplit.mat   (aRBC, aTP float32 (nbins,z,y,x) + scalars)
 
@@ -47,7 +47,7 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]                        # 2026_ASAP_Recon (Steve's code, read-only)
 OUT = HERE.parent / 'outputs' / 'resplit_2026-09-24'
-DYN = Path('/Volumes/HoomHamExt/AIkill_Dynamic')
+DYN = Path('/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic')
 PY = sys.executable
 GAMMA_HZ_PER_PPM = 11.777e6 * 1.494 * 1e-6    # 129Xe at the Avanto (F54): 17.6 Hz/ppm
 RBC_PPM = 218.0                               # RBC resonance used for the expected fRBC

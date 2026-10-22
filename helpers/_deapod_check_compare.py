@@ -8,7 +8,7 @@ import scipy.io as sio
 
 TY = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/tyger_deapod_check_2026-09-28'
 OFF = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44d'
-B44 = '/Volumes/HoomHamExt/AIkill_Dynamic_b44'
+B44 = '/Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44'
 IM = ('gas_phase', 'gas_phase_magnitude', 'dissolved_phase_real', 'dissolved_phase_imag', 'dissolved_phase_magnitude')
 lines = ['# Deapod check 2026-09-28: Tyger ee3c91f vs offline tree (b44 / A)\n',
          '| key | variable | relerr Tyger vs offline | relerr Tyger vs b44 (undivided) | max abs diff / max |\n|---|---|---|---|---|\n']

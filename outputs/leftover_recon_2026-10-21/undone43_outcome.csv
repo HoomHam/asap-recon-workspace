@@ -1,0 +1,47 @@
+date,id,group_10-21,outcome,output_key(s),how,quality_note
+2022-04-21,000HH,Ext parked diffusion,DONE,2022-04-21_000HH_b0 / _b,ASAP_BSET 12-block,clean
+2022-04-22,000HH,Ext parked diffusion,DONE,2022-04-22_000HH_b0 / _b,ASAP_BSET 12-block,clean
+2022-04-29,018BI,Ext parked diffusion,DONE,2022-04-29_018BI_b0 / _b,ASAP_BSET 12-block,clean
+2023-11-09,000HH,Ext parked diffusion,DONE,2023-11-09_000HH_b0 / _b,ASAP_BSET 12-block (1 ch),clean
+2022-06-28,019WR,Ext parked saturation,DONE,2022-06-28_019WR,seq 0602 -> v2 gp (gas-only),sharp
+2022-07-05,021JM,Ext parked saturation,DONE,2022-07-05_021JM,seq 0602 -> v2 gp (gas-only),sharp
+2023-07-24,019WR,Ext failed,NOT POSSIBLE,quarantine/2023-07-24_019WR_nosignal,6b01071 guard ran,no Xe signal in raw (k0/noise 1.0-1.3)
+2024-06-18,000LL,Ext failed,NOT POSSIBLE,-,-,aborted 1-ch fragments (<=788 scans)
+2024-09-09,000LL,Ext failed,NOT POSSIBLE,-,-,aborted 1-ch fragments (<=123 scans)
+2024-09-20,000LL,Ext failed,NOT POSSIBLE,-,-,aborted 1-ch fragments (<=420 scans)
+2022-01-28,000HH,BigMac early,NOT POSSIBLE,-,-,1H scan (not Xe)
+2022-02-01,?,BigMac early,NOT POSSIBLE,-,-,FOV 415: no calibration
+2022-02-03,000ID,BigMac early,DONE,2022-02-03_000ID (=MID00143 canonical) + 2022-02-03_000ID_MID142,Faraz entry 1,MID00143 clean (SNR~70); MID00142 weak (SNR~16)
+2022-02-04,027CB,BigMac early,DONE,2022-02-04_027CB,Faraz entry 1,matches Faraz dynvent; arc artifact as in Faraz
+2022-02-08,000HH,BigMac early,NOT POSSIBLE,-,-,fa_spiral_dyn_20220208: 11 leaves coronal: no calibration
+2022-02-09,?,BigMac early,DONE,2022-02-09_unk-MID38_merged + 2022-02-09_unk-MID74_merged,entry 1 + chunk merge,clean (subject IDs unknown: folders 02-09_000HH / 02-09_006RL exist)
+2022-02-24,000HH,BigMac early,DONE,2022-02-24_000HH_b0 / _b,local traj 02-24 + ASAP_BSET alternation,clean
+2022-02-25,054SK,BigMac early,DONE,2022-02-25_054SK_merged,local traj 02-24 + chunk merge,clean
+2022-03-09,015MG,BigMac early,DONE,2022-03-09_015MG_merged,entry 2 (coronal) + chunk merge,clean
+2022-03-10,006RL,BigMac early,DONE,2022-03-10_006RL_A_merged + _B_merged,local traj 02-24 + chunk merge,A weak / B good
+2022-03-25,016ID,BigMac,DONE,2022-03-25_016ID,seq 0323 -> v2 (gas-only),clean
+2022-03-30,020WC,BigMac,DONE,2022-03-30_020WC,seq 0323 -> v2 (gas-only),clean
+2022-04-13,000LL,BigMac,DONE,2022-04-13_000LL,seq 0323 -> v2 (gas-only),clean
+2022-04-19,000HH,BigMac,DONE,2022-04-19_000HH,seq 0323 -> v2 (gas-only),clean
+2022-04-20,017AK,BigMac,DONE,2022-04-20_017AK_b0 / _b,ASAP_BSET alternation,clean
+2022-04-25,000LL,BigMac,DONE,2022-04-25_000LL_b0 / _b,ASAP_BSET 12-block,clean
+2022-04-26,000ID,BigMac,DONE,2022-04-26_000ID_b0 / _b,ASAP_BSET 12-block,clean
+2022-05-02,020ST,BigMac,DONE,2022-05-02_020ST_b0 / _b,ASAP_BSET 12-block,clean
+2022-06-02,008LL,BigMac,DONE (SUSPECT),2022-06-02_008LL (gp) + 2022-06-02_008LL_dptraj,dissolved-only set-up?,gp = blob; dp traj = two noisy lungs - Hooman's call
+2022-06-27,000LL,BigMac,DONE,2022-06-27_000LL,seq 0602 GP-DP,clean
+2022-07-06,000HH,BigMac,DONE,2022-07-06_000HH,seq 0705 GP-DP -> v2 gp+dp,clean
+2022-07-07,001SW,BigMac,DONE,2022-07-07_001SW,seq 0705 GP-DP (largest of 3 separate scans),clean
+2022-07-08,000HH,BigMac,DONE,2022-07-08_000HH,seq 0705 GP-DP,clean
+2022-07-18,025VP,BigMac,DONE,2022-07-18_025VP,seq 0711 (gas-only),moderate
+2022-07-20,023DB,BigMac,DONE,2022-07-20_023DB,seq 0718 GP-DP-DP,clean
+2022-07-21,014JW,BigMac,DONE,2022-07-21_014JW,seq 0721 GP-DP-DP,clean
+2022-08-12,000LL,BigMac,DONE,2022-08-12_000LL,acq7 mixed-ADC reader,clean
+2022-10-31,000LL,BigMac,DONE,2022-10-31_000LL,seq 0812 (gas-only config; largest of 2),clean
+2022-11-04,000HH,BigMac,DONE (NOISE),2022-11-04_000HH,ASAP_GASPHASE=3 on MID00209,noise: weak scan; 5 smaller sibling files untested
+2022-11-07,000HH,BigMac,DONE,2022-11-07_000HH,seq 1103 GP-DP-DP,ok
+2023-01-24,000LL,BigMac,DONE,2023-01-24_000LL,seq 1103 GP-DP-DP (largest of 3),weak
+2023-02-17,000LL,BigMac v2,DONE,AIkill_Dynamic_b44d/2023-02-17_000LL,v2,clean
+2023-03-02,000LL,BigMac v2,DONE,AIkill_Dynamic_b44d/2023-03-02_000LL,v2 (largest of 4),clean
+2022-02-02,AW (from Faraz's AW_fancy_20220202.mat),extra (not in inventory),DONE,2022-02-02_AW,entry 1 (seq 20220201_v4),ok
+2022-02-02,?,extra (not in inventory),DONE,2022-02-02_unk-MID16_merged,entry 1 + chunk merge + gas-only rewrite (GP-DP no dp calib),NOT A LUNG: static bright point (phantom? artifact?) - unverified
+2022-02-15,? (011BA or 012SR folders exist),extra (not in inventory),DONE,2022-02-15_unk-MID159_merged,entry 2 + chunk merge,clean

@@ -4,7 +4,7 @@
 Writes: gas_phase (real(F*b)), gas_phase_magnitude (|F*b|, nch=1), dissolved_phase_real/imag (= aRBC / aTP when
 rbc_tp_separated == 1, else the unsplit complex image), dissolved_phase_magnitude, calcb_b (complex, nch=1),
 rbc_tp_* meta as scalars/strings, navigator arrays if present.
-Usage: mrd_to_mat.py <session_dir_with_d> [...]   (e.g. /Volumes/HoomHamExt/AIkill_Dynamic_b44/2024-09-10_045VS)
+Usage: mrd_to_mat.py <session_dir_with_d> [...]   (e.g. /Volumes/HoomHamExt/Work/Codes/2026_ASAP_Recon/AIkill_Dynamic_b44/2024-09-10_045VS)
 """
 from __future__ import annotations
 
