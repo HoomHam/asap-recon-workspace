@@ -1055,3 +1055,7 @@ session-7 header, belong to THIS session — left in place, append-only.)
   (AIkill_Dynamic s 23.4 + p 14.9, _2022 s 14.3, _1H s 0.1 = 52.7 GB; input.mrd_REMOVED.txt in each). 3 FAIL = p/ files
   52–719 KB larger than d/ (pneumotach trace) → kept. Prune totals in Trash: A 76.1 GB + B 88.4 GB = 164.5 GB; freed only
   when Hooman empties Ext Trash. Log outputs/ext_prune_2026-10-21/A_verify.out.
+
+## 2026-10-26 · session 18 (addendum, re-/leave)
+- Ext Trash emptied by Hooman (`.Trashes/501/` empty; HoomHamExt 198 GiB free, was 47). Prune A + B (164.5 GB) final —
+  no restore path anymore. C (tyger_* trials, b44 output.mrd) still undecided, untouched. No other work since 10-22.
