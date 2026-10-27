@@ -121,7 +121,7 @@ if _BSET or _GASPHASE:
 
 # extra MRD header user parameters read by tyger_recon.py from fork 262b16f on: 'excluderanges' (Steve's GUI
 # exclude string, integer seconds on the gas-interleave clock iilv*TR) and 'sigminN' (SIGNAL EE-minimum half-window)
-_EXTRA_LONG, _EXTRA_STR = {}, {}
+_EXTRA_LONG, _EXTRA_STR, _EXTRA_DBL = {}, {}, {}
 _orig_write_header = C.mrd.BinaryMrdWriter.write_header
 
 
@@ -131,8 +131,10 @@ def _write_header_extra(self, header):
         C.mrd.UserParameterLongType(name=k, value=int(v)) for k, v in _EXTRA_LONG.items()]
     up.user_parameter_string = list(up.user_parameter_string) + [
         C.mrd.UserParameterStringType(name=k, value=str(v)) for k, v in _EXTRA_STR.items()]
-    if _EXTRA_LONG or _EXTRA_STR:
-        print(f'convert_mixed_adc: header extras {_EXTRA_LONG} {_EXTRA_STR}', flush=True)
+    up.user_parameter_double = list(up.user_parameter_double) + [
+        C.mrd.UserParameterDoubleType(name=k, value=float(v)) for k, v in _EXTRA_DBL.items()]
+    if _EXTRA_LONG or _EXTRA_STR or _EXTRA_DBL:
+        print(f'convert_mixed_adc: header extras {_EXTRA_LONG} {_EXTRA_STR} {_EXTRA_DBL}', flush=True)
     return _orig_write_header(self, header)
 
 
@@ -154,7 +156,9 @@ if __name__ == '__main__':
     p.add_argument('--gplb', type=int, default=gvar.gplb)
     p.add_argument('--dplb', type=int, default=gvar.dplb)
     p.add_argument('--freqfilter', type=int, default=gvar.freqfilter)
-    p.add_argument('--binning', default='SIGNAL', choices=['SIGNAL', 'PNEUMOTACH', 'DIAPHRAGM'])
+    p.add_argument('--binning', default='SIGNAL', choices=['SIGNAL', 'PNEUMOTACH', 'DIAPHRAGM', 'MIX'])
+    p.add_argument('--binsigma', type=float, default=None, help='soft-bin kernel width in bins (fork MIX patch; 1.0 = Steve)')
+    p.add_argument('--binpou', type=int, default=None, help='1: partition-of-unity bin weights (fork MIX patch)')
     p.add_argument('--excluderanges', default=None, help="Steve's exclude ranges, e.g. '0-12, 66-93' (s, iilv*TR)")
     p.add_argument('--sigmin-n', type=int, default=None, help='SIGNAL EE-minimum half-window (Steve: 50)')
     a = p.parse_args()
@@ -162,6 +166,10 @@ if __name__ == '__main__':
         _EXTRA_STR['excluderanges'] = a.excluderanges
     if a.sigmin_n is not None:
         _EXTRA_LONG['sigminN'] = a.sigmin_n
+    if a.binsigma is not None:
+        _EXTRA_DBL['binsigma'] = a.binsigma
+    if a.binpou is not None:
+        _EXTRA_LONG['binpou'] = a.binpou
     params = dict(MS=a.ms, IS=a.IS, nbins=a.nbins, griddx=a.griddx, bindt=a.bindt, gplb=a.gplb, dplb=a.dplb,
                   freqfilter=a.freqfilter, binning=a.binning)
     C.convert_siemens_to_mrd(a.input, a.output, a.gp_traj, a.dp_traj, pneumotach_file=a.pneumotach, killpts=2,

@@ -41,7 +41,9 @@ from PIL import Image
 # MRD readers
 
 NAV_KEYS = ('nav_coronal', 'nav_diaphragm_z', 'nav_time',
-            'nav_volume', 'nav_ilvtime', 'nav_volmeastime')
+            'nav_volume', 'nav_ilvtime', 'nav_volmeastime',
+            'ilvbin', 'ilvtime', 'ee_times', 'bin_weff', 'bin_mode', 'mix_tau_I', 'mix_n_insp', 'mix_tB_med', 'mix_T_med',
+            'pneumo_clock_mapped', 'pneumo_clock_offset_s', 'pneumo_clock_T_cal_s', 'pneumo_clock_ilv_true_ms', 'pneumo_clock_chk_a', 'pneumo_clock_chk_b', 'pneumo_clock_chk_n_matched', 'pneumo_clock_chk_n_ee', 'pneumo_clock_chk_resid_sd_s', 'pneumo_clock_chk_ok', 'pneumo_time_aligned', 'pneumo_vol_aligned')
 
 
 def read_output_mrd(mrd_path):

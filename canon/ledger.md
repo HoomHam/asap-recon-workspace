@@ -1059,3 +1059,42 @@ session-7 header, belong to THIS session — left in place, append-only.)
 ## 2026-10-26 · session 18 (addendum, re-/leave)
 - Ext Trash emptied by Hooman (`.Trashes/501/` empty; HoomHamExt 198 GiB free, was 47). Prune A + B (164.5 GB) final —
   no restore path anymore. C (tyger_* trials, b44 output.mrd) still undecided, untouched. No other work since 10-22.
+
+## 2026-10-26/27 · session 19 (ASAP lane of the three-session Step-1 work)
+- BRANCH mix-binning (B34) opened. PCA Step 1 served: bin timing, headers, session pool, dissolved scale, k0 budget audit,
+  b44d-image SIGNAL rerun (5 sessions), exact Tyger membership + auto-exclusion discovery (whole 832-ilv sets < half
+  mean k0 dropped; 014KS dead window 14–29 s), diaphragm tables, phase convention (gas real projection; dissolved
+  oblique aRBC/aTP basis; RBC/TP ratio fixed to target per bin by construction).
+- DECIDED (Hooman, via PCA): no binning change before ≥ 50 sessions show the same stats → 108-session export,
+  91 valid (62 v3): two-anchor structure confirmed, split must be per session (E′ad). Hooman's vote 10-27: against
+  adopting (navigator fails on low-SNR sessions; bolus-based criteria not future-proof with proportional delivery;
+  keep studying s/d/p differences) → apply MIX ONCE to three subjects, call it mix-binning, compare with s/d/p.
+- Fork commit 508b329 (diaphragm-recon, pushed to hooman): MIX mode, binsigma/binpou knobs (defaults bit-exact),
+  bin export. Root otherwise untouched (uncommitted basefolder edit kept local).
+- 10-27 (late): Hooman's orders executed — MIX applied once (fork 508b329/efde661/36f67fb; stacks
+  Ext/AIkill_Dynamic_mix/<key>/m for 015HK/016PG/014KS, verified 0.000-bin match, flatness ±2 %), videos
+  outputs/mix_video_2026-10-27/; pneumotach clock patch APPLIED (fork 0209c1a + 40c248b: MDH-timestamp mapping, check
+  fit vendored, exports) and p rerun for the three (mapped, check a≈1 b −0.1…+0.6 s, 24–29/24–29 EE). Hooman's stance:
+  not convinced by mix (SNR drop, mixing); four-way comparison s/d/p/mix on the three is the deliverable for PCA next
+  session; next step per Hooman = back to the global per-breath budget with corrected timings.
+  Root: fork commits only on diaphragm-recon → hooman; gtypes basefolder edit kept local. Nothing committed in workspace yet.
+
+## 2026-10-27 · session 19 close (/leave; Fable 5.1)
+- Correction: the branch opened this session is **B37 mix-binning** (B34 was already leftover-recon-2); every "B34"
+  written in the 10-26/27 entries above and in cards C59/C60 means B37.
+- Delivered: four-way s/d/p/mix stacks on 015HK / 016PG / 014KS (s = AIkill_Dynamic_b44d_sig, d = AIkill_Dynamic_b44d,
+  p + m = AIkill_Dynamic_mix on fork images 36f67fb / 40c248b) with exact bin export; videos
+  outputs/mix_video_2026-10-27/<key>_{mix_vs_diaphragm,fourway}.mp4; 108-session timing export + session_index.csv
+  (91 valid); decision draft notes/Binning_Decision_Draft_2026-10-26.md §1–25; BinTiming_Facts §1–13.
+- Fork (diaphragm-recon → hooman, 5 commits): 508b329 MIX + kernel knobs + bin export; efde661 converter MIX; 36f67fb
+  int-params regression fix; 0209c1a pneumotach clock mapping from MDH timestamps + vendored check; 40c248b image COPY +
+  trailing-line fix. Defaults bit-exact; root gtypes basefolder edit stays local, never committed.
+- DECIDED (Hooman): no binning change adopted; MIX is a one-off comparison arm ("mix-binning"), reservations = SNR drop
+  and phase mixing, proportional delivery coming (bolus-based criteria not future-proof), low-SNR sessions have no
+  navigator.
+- DECIDED (Hooman): ≥ 50 sessions must reproduce any binning statistic before a fork default changes.
+- DECIDED (Hooman): pneumotach clock patch applied; p rerun for the three.
+- DECIDED (Hooman via PCA): next session returns to the GLOBAL per-breath budget on the subject subset with corrected
+  timings before any further image-binning comparison.
+- BRANCH: mix-binning (B37), parent: B29 tyger-tuning (soft-bin knobs) — ● open: four-way read by PCA, registration
+  bench (PCA) decides the geometry stack; B35 ext-prune C still undecided; B32 h1-challenge ruling still pending.

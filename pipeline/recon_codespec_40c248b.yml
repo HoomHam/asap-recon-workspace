@@ -1,0 +1,23 @@
+job:
+  codespec:
+    image: ghcr.io/hoomham/xe-tyger-recon:40c248bb811564380a8d86bc3c9d4a737274cb37
+    buffers:
+      inputs: ["input"]
+      outputs: ["output"]
+    args:
+      - --input
+      - $(INPUT_PIPE)
+      - --output
+      - $(OUTPUT_PIPE)
+  buffers:
+
+  tags:
+    version: 1.0
+
+  nodePool: gpunp
+
+  replicas: 1
+
+cluster: tep-centralus-1
+
+timeoutSeconds: 43200

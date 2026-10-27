@@ -65,6 +65,8 @@ Retro-filled 2026-07-12; all origins R. Quick table regenerated from bodies by /
 | C40 | helpers/atlas/split_trust.py | aikill-atlas (B12) | DONE 2026-09-25 — trust grade; `--root/--tag` = production tree → split_trust_b44/ (A18/B23/C13/D5, F82) |
 | C57 | pipeline/run_*_2026-10-21.sh + run_adc_p_2026-10-22.sh | leftover-recon-2 (B34) | WORKS 2026-10-22 — 36/43 leftover sessions + p for HH diffusion → Ext AIkill_Dynamic_2022 (F122–F128) |
 | C58 | session-17 run scripts + 3 outputs (reconciled) | prev2-calib (B33) | untagged — verify before trust |
+| C59 | pipeline/_patch_mix_binning.py · run_sig_b44d.sh · run_mix3.sh · recon_codespec_{508b329,36f67fb,0209c1a,40c248b}.yml · mrd_to_mat.py | B37 mix-binning | APPLIED (fork 508b329…40c248b); MIX one-off, not adopted (F137) |
+| C60 | pipeline/_patch_pneumo_clock.py · pneumoclock.py (root, vendored) · helpers/_mix_check.py | B37 mix-binning | APPLIED (fork 0209c1a + 40c248b, F139); p stacks for 3 sessions |
 
 ## Cards
 
@@ -688,3 +690,29 @@ Note: root CLAUDE.md still lists cs_recon.py / cs_recon_4d.py under helpers/reco
   outputs/hh_2021_scans/, outputs/hh_k0bin_2026-10-04/, outputs/s2022_check/
 - origin: C (session 17) · branch: prev2-calib (B33) · facts: ?
 - status: untagged — verify before trust (reconciled; no card was written at the time)
+
+### C59 · MIX binning fork patch + binning decision work (session 19, 2026-10-26/27)
+- pipeline/_patch_mix_binning.py (applied once → fork commit 508b329 on diaphragm-recon, pushed to `hooman`, image
+  ghcr.io/hoomham/xe-tyger-recon:508b329…), pipeline/recon_codespec_508b329.yml, pipeline/run_mix3.sh (m + p for
+  015HK/016PG/014KS → Ext AIkill_Dynamic_mix/<key>/{m,p}), pipeline/run_sig_b44d.sh (s on the b44d image, 5 sessions →
+  Ext AIkill_Dynamic_b44d_sig), pipeline/mrd_to_mat.py (now any dir with output.mrd, merges keys, new bin-export keys)
+- helpers/_bin_timing*.py, _tyger_bins_local.py (fork raw.load_from_arr offline → exact SIGNAL EE / exclusions / ilvbin),
+  _bins_from_tyger.py, _bins_diaphragm_tyger.py, _sig_vs_d_check.py, _binning_eval.py (A/B/C/D/E/F/E′ offline
+  candidates + metrics), _session_index.py (108-session index with injection profile)
+- outputs/bin_timing_2026-10-26/ (per-session tables, session_index.csv, _EXCLUDED_mixed_adc.txt),
+  outputs/binning_eval_2026-10-26/
+- notes/BinTiming_Facts_2026-10-26.md §1–13, notes/Binning_Decision_Draft_2026-10-26.md §1–19, notes/ForkPatch_BinExport_2026-10-26.md
+- origin: H (Hooman via PCA session; Hooman's vote 10-27: MIX once on 3 subjects, compare with s/d/p, NOT adopted) ·
+  branch: mix-binning (B37) · facts: F132–F141
+- why: PCA Step-1 needs bin timing / exact membership; Ismail §2.3 vs abs-time vs two-anchor audit with PCA + XeCS;
+  Hooman's reservations (SNR-poor navigators, bolus-dependent criteria vs proportional delivery, keep s/d/p study).
+
+### C60 · pneumotach clock alignment (PREPARED, not applied) — session 19, 2026-10-27
+- pipeline/_patch_pneumo_clock.py (spec only; raises on run), helpers/_mix_check.py (MIX/p output verifier)
+- origin: C (PCA session's clock scan, helper 2026_PCA_registration/workspace/helpers/scripts/_pneumo_clock_fit.py)
+  · branch: mix-binning (B37) · facts: F138–F140; every old-tree p/ recon mis-binned; no Steve knob (gvar.bindt unused)
+- why: p is one of the four stacks Hooman wants compared; as coded it is not a stack. APPLIED 10-27 (see UPDATE).
+- UPDATE 10-27: C60 APPLIED — fork commit 0209c1a (pneumoclock.py vendored, converter MDH-timestamp map, raw.py
+  mapping + check, tyger export); `pipeline/_patch_pneumo_clock.py` now the applied patch script;
+  `pipeline/recon_codespec_0209c1a.yml`; run_mix3.sh passes --pneumoclock for p. Validation offline 015HK: a 1.0003,
+  b −0.10 s, 29/29 EE after mapping.

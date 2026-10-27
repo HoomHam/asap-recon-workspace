@@ -1,0 +1,27 @@
+MIX: T_med 4.00 s, tB_med 1.34 s (28 breaths), tau_I 1.68 s, n_insp 7, 2352 inspiratory + 3217 exhale interleaves binned, 1054 dropped (short breath / excluded), 5569 of 7017 total
+MIX: T_med 7.64 s, tB_med 1.44 s (23 breaths), tau_I 2.86 s, n_insp 6, 3674 inspiratory + 6980 exhale interleaves binned, 704 dropped (short breath / excluded), 10654 of 11664 total
+MIX: T_med 5.13 s, tB_med 1.34 s (27 breaths), tau_I 1.92 s, n_insp 6, 2576 inspiratory + 4548 exhale interleaves binned, 1206 dropped (short breath / excluded), 7124 of 8945 total
+   bin_mode 3; binned 5569/7017; ee_times n 29; tau_I 1.677 s n_insp 7 tB_med 1.34 T_med 4.00
+   hard counts [347, 336, 336, 336, 336, 336, 336, 347, 357, 358, 357, 357, 358, 357, 358, 357] cv 0.028 min/max 0.94
+   exported bin_weff == recomputed: True
+   Sigma_FOV gas / k0_wmean (norm): [0.992, 0.989, 0.996, 0.986, 0.996, 1.007, 1.01, 1.01, 1.017, 1.015, 1.011, 0.995, 1.002, 0.989, 0.994, 0.991] range 0.986 1.017
+   corner sigma per bin: [660.0, 634.0, 615.0, 685.0, 888.0, 1218.0, 1047.0, 851.0, 755.0, 802.0, 743.0, 751.0, 679.0, 663.0, 597.0, 654.0]
+   offline MIX re-derivation: binned 5569 vs exported 5569; max |dbin| 0.0000; tau 1.677 n_insp 7
+   median t after EE per bin (s): [3.75, 0.23, 0.47, 0.71, 0.95, 1.2, 1.44, 1.69, 1.94, 2.22, 2.48, 2.75, 3.01, 3.27, 3.56, 3.78]
+   within-bin nav z sd (vox): [0.92, 1.04, 1.27, 1.49, 1.38, 1.07, 0.93, 0.76, 0.42, 0.52, 0.69, 0.77, 0.7, 0.54, 0.33, 0.36]
+   bin_mode 3; binned 10654/11664; ee_times n 24; tau_I 2.864 s n_insp 6 tB_med 1.44 T_med 7.64
+   hard counts [657, 616, 616, 616, 594, 616, 657, 698, 698, 698, 698, 698, 698, 698, 698, 698] cv 0.059 min/max 0.85
+   exported bin_weff == recomputed: True
+   Sigma_FOV gas / k0_wmean (norm): [0.986, 0.983, 0.996, 1.001, 1.007, 1.011, 1.017, 1.011, 1.009, 1.007, 1.005, 1.001, 0.996, 0.99, 0.991, 0.989] range 0.983 1.017
+   corner sigma per bin: [547.0, 676.0, 730.0, 673.0, 728.0, 645.0, 608.0, 531.0, 575.0, 561.0, 538.0, 597.0, 494.0, 431.0, 459.0, 523.0]
+   offline MIX re-derivation: binned 10654 vs exported 10654; max |dbin| 0.0000; tau 2.864 n_insp 6
+   median t after EE per bin (s): [9.12, 0.47, 0.95, 1.44, 1.91, 2.38, 2.98, 4.66, 4.63, 4.19, 4.64, 5.27, 5.8, 5.56, 7.63, 8.79]
+   within-bin nav z sd (vox): [2.77, 2.97, 2.27, 1.95, 1.92, 1.94, 2.72, 1.04, 0.57, 0.53, 0.43, 0.54, 0.5, 0.5, 0.67, 0.92]
+   bin_mode 3; binned 7124/8945; ee_times n 28; tau_I 1.922 s n_insp 6 tB_med 1.34 T_med 5.13
+   hard counts [457, 414, 437, 437, 414, 437, 434, 455, 455, 455, 455, 454, 455, 455, 455, 455] cv 0.032 min/max 0.91
+   exported bin_weff == recomputed: True
+   Sigma_FOV gas / k0_wmean (norm): [0.984, 0.972, 0.994, 1.006, 1.007, 1.011, 1.017, 1.022, 1.016, 1.001, 0.999, 1.0, 0.992, 0.992, 0.991, 0.996] range 0.972 1.022
+   corner sigma per bin: [644.0, 820.0, 840.0, 964.0, 890.0, 973.0, 1005.0, 862.0, 739.0, 721.0, 546.0, 630.0, 536.0, 572.0, 566.0, 586.0]
+   offline MIX re-derivation: binned 7124 vs exported 7124; max |dbin| 0.0000; tau 1.922 n_insp 6
+   median t after EE per bin (s): [0.15, 0.32, 0.64, 0.96, 1.28, 1.6, 1.94, 2.3, 2.61, 2.94, 3.25, 3.59, 3.9, 4.27, 4.58, 4.68]
+   within-bin nav z sd (vox): [0.82, 0.87, 1.22, 1.35, 1.19, 1.07, 0.94, 0.42, 0.56, 0.79, 0.54, 0.53, 0.74, 0.67, 0.34, 0.31]

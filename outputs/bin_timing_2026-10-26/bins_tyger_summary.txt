@@ -1,0 +1,40 @@
+== 2024-08-19_015HK: EE 29, excluded ilv 1203 (of which binned 1055)
+    vs fid-affine bins (bins.csv): binned tyger 6643 mine 6655 both 6643; |dbin| > 0.5: 208 (3.1 %), max 0.73
+    vs raw-k0 bins (bins_raw.csv): binned tyger 6643 mine 6643 both 6643; |dbin| > 0.5: 0 (0.0 %), max 0.00
+    img_sum_all/k0 (tyger membership, kept only) norm: [0.991, 0.987, 0.989, 0.995, 1.002, 1.008, 1.012, 1.013, 1.012, 1.011, 1.005, 1.0, 0.999, 0.993, 0.992, 0.992] range 0.987 1.013
+    t_after_EE wmean (s): [1.96, 0.86, 0.6, 0.78, 1.03, 1.29, 1.54, 1.79, 2.05, 2.31, 2.57, 2.82, 3.08, 3.33, 3.49, 3.14]
+    t_after_anchorEE wmean (s): [0.0, 0.26, 0.51, 0.77, 1.03, 1.29, 1.54, 1.79, 2.05, 2.31, 2.57, 2.82, 3.08, 3.34, 3.59, 3.85]
+    n_hard kept: [354, 358, 353, 360, 358, 357, 355, 356, 348, 341, 339, 342, 343, 344, 338, 342]
+    per-set k0 sum / mean (auto-exclude drops < 0.5): [1.34, 1.25, 1.3, 1.2, 1.18, 1.13, 1.14, 0.44, 0.02]
+== 2024-08-30_014KS: EE 28, excluded ilv 1504 (of which binned 1207)
+    vs fid-affine bins (bins.csv): binned tyger 8364 mine 8400 both 8364; |dbin| > 0.5: 2761 (33.0 %), max 7.99
+    vs raw-k0 bins (bins_raw.csv): binned tyger 8364 mine 8364 both 8364; |dbin| > 0.5: 0 (0.0 %), max 0.00
+    img_sum_all/k0 (tyger membership, kept only) norm: [0.978, 0.98, 0.992, 0.999, 1.002, 1.003, 1.007, 1.012, 1.014, 1.011, 1.008, 1.004, 1.002, 1.002, 0.998, 0.989] range 0.978 1.014
+    t_after_EE wmean (s): [2.39, 1.11, 0.89, 1.2, 1.59, 1.99, 2.37, 2.7, 2.96, 3.14, 3.3, 3.56, 3.87, 4.18, 4.37, 3.9]
+    t_after_anchorEE wmean (s): [0.05, 0.42, 0.8, 1.19, 1.59, 1.99, 2.37, 2.7, 2.96, 3.14, 3.3, 3.56, 3.87, 4.19, 4.51, 4.84]
+    n_hard kept: [443, 473, 477, 474, 475, 475, 498, 489, 458, 435, 413, 408, 410, 409, 412, 408]
+    per-set k0 sum / mean (auto-exclude drops < 0.5): [1.16, 0.09, 1.07, 1.37, 1.32, 1.24, 1.15, 1.23, 1.34, 0.96, 0.06]
+== 2024-09-24_039CP: EE 29, excluded ilv 562 (of which binned 0)
+    vs fid-affine bins (bins.csv): binned tyger 7666 mine 7669 both 7666; |dbin| > 0.5: 346 (4.5 %), max 0.96
+    vs raw-k0 bins (bins_raw.csv): binned tyger 7666 mine 7666 both 7666; |dbin| > 0.5: 0 (0.0 %), max 0.00
+    img_sum_all/k0 (tyger membership, kept only) norm: [0.977, 0.983, 0.994, 1.002, 1.008, 1.014, 1.016, 1.017, 1.015, 1.01, 1.004, 1.003, 1.0, 0.992, 0.984, 0.98] range 0.977 1.017
+    t_after_EE wmean (s): [2.33, 1.02, 0.7, 0.9, 1.19, 1.49, 1.79, 2.09, 2.38, 2.68, 2.98, 3.28, 3.57, 3.87, 4.05, 3.68]
+    t_after_anchorEE wmean (s): [-0.0, 0.3, 0.6, 0.89, 1.19, 1.49, 1.79, 2.09, 2.38, 2.68, 2.98, 3.28, 3.57, 3.87, 4.17, 4.46]
+    n_hard kept: [472, 480, 482, 479, 480, 477, 480, 480, 478, 480, 480, 477, 480, 479, 482, 480]
+    per-set k0 sum / mean (auto-exclude drops < 0.5): [1.05, 1.06, 1.24, 1.12, 1.16, 1.06, 1.1, 1.01, 1.04, 1.07, 0.09]
+== 2024-08-23_016PG: EE 24, excluded ilv 850 (of which binned 705)
+    vs fid-affine bins (bins.csv): binned tyger 11396 mine 11411 both 11396; |dbin| > 0.5: 924 (8.1 %), max 8.00
+    vs raw-k0 bins (bins_raw.csv): binned tyger 11396 mine 11396 both 11396; |dbin| > 0.5: 0 (0.0 %), max 0.00
+    img_sum_all/k0 (tyger membership, kept only) norm: [0.991, 0.991, 0.996, 1.002, 1.007, 1.011, 1.011, 1.009, 1.006, 1.002, 1.001, 1.0, 0.996, 0.991, 0.993, 0.994] range 0.991 1.011
+    t_after_EE wmean (s): [4.49, 1.97, 1.36, 1.76, 2.33, 2.91, 3.5, 4.08, 4.65, 5.23, 5.81, 6.4, 6.98, 7.55, 7.92, 7.16]
+    t_after_anchorEE wmean (s): [0.01, 0.59, 1.17, 1.75, 2.33, 2.91, 3.5, 4.08, 4.65, 5.23, 5.81, 6.4, 6.98, 7.56, 8.14, 8.71]
+    n_hard kept: [667, 684, 685, 682, 688, 684, 686, 683, 683, 650, 651, 649, 653, 647, 650, 649]
+    per-set k0 sum / mean (auto-exclude drops < 0.5): [1.64, 1.44, 1.24, 1.21, 1.26, 1.14, 0.89, 1.43, 0.9, 0.74, 0.82, 0.84, 1.22, 0.22, 0.0]
+== 2024-11-13_025JC: EE 30, excluded ilv 1166 (of which binned 995)
+    vs fid-affine bins (bins.csv): binned tyger 6622 mine 6630 both 6622; |dbin| > 0.5: 879 (13.3 %), max 7.99
+    vs raw-k0 bins (bins_raw.csv): binned tyger 6622 mine 6622 both 6622; |dbin| > 0.5: 0 (0.0 %), max 0.00
+    img_sum_all/k0 (tyger membership, kept only) norm: [0.995, 1.0, 1.003, 0.998, 1.0, 1.005, 1.006, 1.007, 1.004, 0.999, 0.998, 0.999, 0.998, 0.997, 0.995, 0.995] range 0.995 1.007
+    t_after_EE wmean (s): [1.76, 0.8, 0.63, 0.83, 1.07, 1.27, 1.45, 1.66, 1.89, 2.13, 2.36, 2.6, 2.83, 3.06, 3.21, 2.86]
+    t_after_anchorEE wmean (s): [0.03, 0.29, 0.55, 0.83, 1.07, 1.27, 1.45, 1.66, 1.89, 2.13, 2.36, 2.6, 2.83, 3.07, 3.31, 3.55]
+    n_hard kept: [356, 376, 379, 378, 376, 365, 339, 337, 344, 337, 339, 342, 338, 341, 342, 338]
+    per-set k0 sum / mean (auto-exclude drops < 0.5): [1.21, 1.21, 1.31, 1.29, 1.28, 1.23, 1.25, 0.21, 0.01]

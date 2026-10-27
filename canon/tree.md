@@ -44,8 +44,9 @@ flowchart TD
   B33["✅ prev2-calib (10-03/04)<br/>HH fast/slow = 2022-10-26_000HH (BigMac HD4) · video Faraz + Tyger<br/>2022 calib = Faraz entry 4/10 = v2 npy (F114) · acq7 mixed ADC → C56 reader (F115)<br/>17 sessions through Tyger · fork 6b01071 calcb guard · weak coil 1 (F118)<br/>inventory 164 sessions / 83 subjects (F120) · all-coil reruns + pick-best done (10-04/05)"]
   B32["● h1-challenge (10-02)<br/>ASAP × XeCS, 006KL proton cine · kit v2 + phantom agreed, cross-scored<br/>forward model: full field (F109) + receiver band-limit (F107) · thermal noise 12× lower (F108)<br/>4D LS + motion coupling + one-pass prior (F111): lung variation 0.148 → 0.014, excursion 10.0 mm · level with XeCS<br/>negatives F112 · phantom limits F113 · delivered, joint summary signed<br/>next: Hooman rules"]
   B34["✅ leftover-recon-2 (10-21/22)<br/>36 of 43 undone through Tyger: diffusion b-sets (F122) · saturation (F123)<br/>early 2022 = Faraz entries 1/2 + chunk merges (F124 F125) · BigMac read in place on WorkVault<br/>traps F126 F127 · 7 not possible (F128) · 160 Xe sessions all s+d, p wherever a pneumotach"]
-  B35["★ ext-prune (10-21/22)<br/>33 GB freed · Ext-root trees moved to mirror path (60 scripts patched, ASAP+XeCS+PCA)<br/>Hooman: A yes · B after patches · C open · D + recon.mat keep<br/>A 76.1 + B 88.4 GB → Ext Trash, emptied by Hooman 10-26 (final) · output.mrd ⊆ recon.mat (F130)<br/>next: Hooman rules on C"]
+  B35["● ext-prune (10-21/22)<br/>33 GB freed · Ext-root trees moved to mirror path (60 scripts patched, ASAP+XeCS+PCA)<br/>Hooman: A yes · B after patches · C open · D + recon.mat keep<br/>A 76.1 + B 88.4 GB → Ext Trash, emptied by Hooman 10-26 (final) · output.mrd ⊆ recon.mat (F130)<br/>next: Hooman rules on C"]
   B36["✅ snr-all (10-22)<br/>all 160 sessions, d binning, 171 rows (outputs/snr_2026-10-22)<br/>corner-σ bias on deapod trees ≈0.84× (F129) · 2022 DP unsplit (F131)<br/>σ fix parked (Hooman: fine for now)"]
+  B37["★ mix-binning (10-26/27)<br/>PCA Step-1 service: exact membership + auto-exclusions (F132 F133) · phase convention (F134)<br/>binning audit ASAP×PCA×XeCS: two-anchor physics on 62 v3 (F135) · kernel σ first lever (F136)<br/>MIX one-off on 3 sessions, NOT adopted (F137) · pneumotach clock fixed, p rerun (F138 F139) · anchors (F140)"]
   STEM --> B1 --> B2
   B2 --> B3 --> B4 --> B5 --> B9
   B1 --> B6 --> B7 --> B8 --> B10
@@ -72,6 +73,8 @@ flowchart TD
   B33 --> B34 --> B35
   B16 --> B36
   B34 -.160 sessions.-> B36
+  B29 --> B37
+  B30 -.b44d image.-> B37
 ```
 
 ## Node → artifacts
@@ -182,3 +185,18 @@ first) → Ext Trash; C (tyger_* trials, b44 output.mrd) undecided. 10-22: p for
 **Next: confirm the A s/p trash finished (outputs/ext_prune_2026-10-21/A_verify.out); Hooman empties Ext Trash and rules
 on C; optional: rolloff-corrected σ in the SNR table (F129), production d recon for the 43 Sept-build sessions,
 008LL / 11-04 HH siblings (WorkVault), RBC/TP for 2022 needs a new method (F131).**
+
+Session 19 (2026-10-26/27, Fable 5.1): B37 mix-binning. Served PCA's Step 1 (bin timing, headers, session pool,
+dissolved scale, k0 budget audit, b44d-image SIGNAL rerun on 5 sessions); found Steve's silent auto-exclusion of
+whole 832-interleave sets and the fid_signal/EE mismatch (F132 F133), fixed the per-bin tables with the fork loader
+run offline; phase convention written (F134). Three-session binning audit (Ismail 2025 §2.3 vs abs-time vs
+two-anchor): two-anchor structure holds on 62 v3 sessions, split must be per session, kernel σ is the first lever
+(F135 F136). Hooman: not convinced (SNR, mixing, proportional delivery) → MIX applied once on 015HK/016PG/014KS as a
+fourth stack (F137), videos; pneumotach clock found ~30 s + 1 % off on every p/ recon, patch applied from the MDH
+timestamps, p rerun for the three (F138 F139); anchor offsets F140. Five fork commits on diaphragm-recon → hooman.
+★ → B37.
+**Next (Hooman via PCA): back to the GLOBAL per-breath budget on the subject subset with corrected timings
+(bin_timing export + XeCS clock constants + patched p) before any more image-binning comparison; the four-way
+s/d/p/mix read on the three sessions is PCA's; registration bench (PCA) decides the geometry stack. ASAP open:
+p reruns for sessions beyond the three need per-session offsets for 042DR/019LR/009JT (F139); mixed-ADC raw-k0
+export (F141); Steve questions DP pulse shape + adFree[0]; B35 C ruling; B32 ruling.**

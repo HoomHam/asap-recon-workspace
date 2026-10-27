@@ -17,3 +17,10 @@ outputs/proton_dyn_2026-10-01/**/*.mp4
 outputs/proton_dyn_2026-10-01/**/*.gif
 # h1 challenge outputs: cines are regenerable (arrays + delivery on Ext Work/Codes/2026_ASAP_Recon/h1challenge/)
 outputs/h1challenge_2026-10-02/**/*.mp4
+# bin timing export: per-interleave tables (146 MB, regenerable from Ext input.mrd via helpers/_tyger_bins_local.py + _bin_timing_rawk0.py)
+outputs/bin_timing_2026-10-26/*_ilv.csv
+outputs/bin_timing_2026-10-26/*_ilv_raw.csv
+outputs/bin_timing_2026-10-26/*_ilvbin_tyger.csv
+outputs/bin_timing_2026-10-26/*_ilvbin_diaphragm_tyger.csv
+# video frame dumps (regenerable)
+outputs/mix_video_2026-10-27/_frames*/

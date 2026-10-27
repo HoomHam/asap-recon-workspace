@@ -15,12 +15,18 @@ import numpy as np
 import scipy.io as sio
 import mrd
 
-NAV_KEYS = ('nav_coronal', 'nav_diaphragm_z', 'nav_time', 'nav_volume', 'nav_ilvtime', 'nav_volmeastime')
+NAV_KEYS = ('nav_coronal', 'nav_diaphragm_z', 'nav_time', 'nav_volume', 'nav_ilvtime', 'nav_volmeastime',
+            'ilvbin', 'ilvtime', 'ee_times', 'bin_weff', 'bin_mode', 'mix_tau_I', 'mix_n_insp', 'mix_tB_med', 'mix_T_med',
+            'pneumo_clock_mapped', 'pneumo_clock_offset_s', 'pneumo_clock_T_cal_s', 'pneumo_clock_ilv_true_ms', 'pneumo_clock_chk_a', 'pneumo_clock_chk_b', 'pneumo_clock_chk_n_matched', 'pneumo_clock_chk_n_ee', 'pneumo_clock_chk_resid_sd_s', 'pneumo_clock_chk_ok', 'pneumo_time_aligned', 'pneumo_vol_aligned')
 
 
 def convert(sess_dir):
-    d = Path(sess_dir) / 'd'
+    # <session>/d by default; a path that itself holds output.mrd (e.g. the SIGNAL tree's <session>/s) is used as is
+    d = Path(sess_dir) if (Path(sess_dir) / 'output.mrd').is_file() else Path(sess_dir) / 'd'
     out = {}
+    # keep keys an earlier recon.mat already carries (post_process.py: fid_signal, pneumo_*, diaphragm_pos)
+    if (d / 'recon.mat').is_file():
+        out.update({k: v for k, v in sio.loadmat(str(d / 'recon.mat')).items() if not k.startswith('__')})
     with mrd.BinaryMrdReader(str(d / 'output.mrd')) as r:
         r.read_header()
         for it in r.read_data():

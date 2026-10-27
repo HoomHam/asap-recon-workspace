@@ -1,0 +1,334 @@
+== 2023-01-31_000LL 21:44:33
+2023-01-31_000LL: binning=DIAPHRAGM nilv 13511 TR 0.0149 EE 33 | exclude ranges (s) [(199, 210)] -> 119 ilv excluded, 12930 binned, 12930 binned & kept
+2023-01-31_000LL: nav AIkill_Dynamic_b44d; 27523 lines = 500 spec + 2x13511; TR 14.9 ms; 33 EE, period 5.97 s; RAW k0 B/A median 9.95 (IQR 9.36-10.85); diss/gas sum8 at A 0.176, coh8 0.152
+== 2023-03-08_017AK 21:44:41
+2023-03-08_017AK: binning=DIAPHRAGM nilv 9971 TR 0.0223 EE 45 | exclude ranges (s) [(0, 15), (199, 228)] -> 1705 ilv excluded, 9654 binned, 8266 binned & kept
+2023-03-08_017AK: nav AIkill_Dynamic; 29934 lines = 9992 spec + 2x9971; TR 22.3 ms; 46 EE, period 5.70 s; RAW k0 B/A median 41.06 (IQR 13.24-50.42); diss/gas sum8 at A 1.348, coh8 1.564
+== 2023-03-09_023DB 21:45:21
+2023-03-09_023DB: binning=DIAPHRAGM nilv 9941 TR 0.0223 EE 46 | exclude ranges (s) [(0, 15), (199, 228)] -> 1675 ilv excluded, 9680 binned, 8266 binned & kept
+2023-03-09_023DB: nav AIkill_Dynamic; 29843 lines = 9960 spec + 2x9941; TR 22.3 ms; 46 EE, period 4.43 s; RAW k0 B/A median 19.63 (IQR 11.50-49.87); diss/gas sum8 at A 6.042, coh8 12.690
+== 2023-03-10_004LR 21:46:15
+2023-03-10_004LR: binning=DIAPHRAGM nilv 13168 TR 0.0223 EE 47 | exclude ranges (s) [(0, 15), (270, 300)] -> 1712 ilv excluded, 12749 binned, 11456 binned & kept
+2023-03-10_004LR: nav AIkill_Dynamic; 39526 lines = 13190 spec + 2x13168; TR 22.3 ms; 53 EE, period 5.92 s; RAW k0 B/A median 50.87 (IQR 11.08-76.99); diss/gas sum8 at A 1.386, coh8 1.789; pneumo tidal amplitude trend +1468.5 %/min over 5-303 s (71 cycles, pneumo clock)
+== 2023-03-24_029CK 21:47:45
+2023-03-24_029CK: binning=DIAPHRAGM nilv 15352 TR 0.0223 EE 71 | exclude ranges (s) [(0, 15), (327, 342)] -> 1335 ilv excluded, 14833 binned, 14017 binned & kept
+2023-03-24_029CK: nav AIkill_Dynamic; 46077 lines = 15372 spec + 2x15352; TR 22.3 ms; 91 EE, period 3.21 s; RAW k0 B/A median 15.55 (IQR 7.11-23.23); diss/gas sum8 at A 3.132, coh8 5.828; pneumo tidal amplitude trend -14.6 %/min over 6-367 s (81 cycles, pneumo clock)
+== 2023-03-27_02BB 21:49:12
+2023-03-27_02BB: binning=DIAPHRAGM nilv 11791 TR 0.0223 EE 63 | exclude ranges (s) [(0, 15), (256, 271)] -> 964 ilv excluded, 11341 binned, 10735 binned & kept
+2023-03-27_02BB: nav AIkill_Dynamic; 35395 lines = 11812 spec + 2x11791; TR 22.3 ms; 116 EE, period 2.11 s; RAW k0 B/A median 9.01 (IQR 6.10-12.05); diss/gas sum8 at A 1.376, coh8 1.771; pneumo tidal amplitude trend -4.8 %/min over 3-279 s (74 cycles, pneumo clock)
+== 2023-03-31_032WS 21:49:56
+2023-03-31_032WS: binning=DIAPHRAGM nilv 20682 TR 0.0223 EE 94 | exclude ranges (s) [(455, 471)] -> 241 ilv excluded, 20410 binned, 20385 binned & kept
+2023-03-31_032WS: nav AIkill_Dynamic; 62068 lines = 20704 spec + 2x20682; TR 22.3 ms; 193 EE, period 2.20 s; RAW k0 B/A median 8.27 (IQR 5.96-10.45); diss/gas sum8 at A 2.251, coh8 4.772
+== 2023-04-07_030DN 21:52:12
+2023-04-07_030DN: binning=DIAPHRAGM nilv 11195 TR 0.0223 EE 43 | exclude ranges (s) [(0, 15), (227, 257)] -> 1671 ilv excluded, 10946 binned, 9524 binned & kept
+2023-04-07_030DN: nav AIkill_Dynamic; 34086 lines = 11696 spec + 2x11195; TR 22.3 ms; 46 EE, period 4.72 s; RAW k0 B/A median 54.33 (IQR 18.57-110.44); diss/gas sum8 at A 1.840, coh8 3.514; pneumo tidal amplitude trend -1.5 %/min over 1-273 s (55 cycles, pneumo clock)
+== 2023-04-11_000KR 21:52:19
+2023-04-11_000KR: binning=DIAPHRAGM nilv 31197 TR 0.0074 EE 73 | exclude ranges (s) [(0, 20), (204, 234)] -> 6432 ilv excluded, 30818 binned, 24765 binned & kept
+IndexError: index 15598 is out of bounds for axis 0 with size 15598
+2023-04-11_000KR: FAILED index 15598 is out of bounds for axis 0 with size 15598
+== 2023-04-14_000KR 21:52:25
+2023-04-14_000KR: binning=DIAPHRAGM nilv 26415 TR 0.0074 EE 53 | exclude ranges (s) [(0, 15), (175, 200)] -> 4880 ilv excluded, 26134 binned, 21535 binned & kept
+IndexError: index 13207 is out of bounds for axis 0 with size 13207
+2023-04-14_000KR: FAILED index 13207 is out of bounds for axis 0 with size 13207
+== 2023-04-18_021JM 21:52:31
+2023-04-18_021JM: binning=DIAPHRAGM nilv 12577 TR 0.0149 EE 37 | exclude ranges (s) [(181, 191)] -> 429 ilv excluded, 12063 binned, 12018 binned & kept
+2023-04-18_021JM: nav AIkill_Dynamic; 25654 lines = 500 spec + 2x12577; TR 14.9 ms; 37 EE, period 4.97 s; RAW k0 B/A median 9.50 (IQR 8.84-10.31); diss/gas sum8 at A 0.239, coh8 0.220; pneumo tidal amplitude trend -1.1 %/min over 5-213 s (45 cycles, pneumo clock)
+== 2023-04-26_023DB 21:52:37
+2023-04-26_023DB: binning=DIAPHRAGM nilv 14114 TR 0.0149 EE 47 | exclude ranges (s) [(181, 220)] -> 1966 ilv excluded, 13645 binned, 11753 binned & kept
+2023-04-26_023DB: nav AIkill_Dynamic; 28729 lines = 500 spec + 2x14114; TR 14.9 ms; 47 EE, period 4.47 s; RAW k0 B/A median 3.36 (IQR 3.14-3.74); diss/gas sum8 at A 0.122, coh8 0.117; pneumo tidal amplitude trend -6.3 %/min over 4-232 s (69 cycles, pneumo clock)
+== 2023-05-02_011BA 21:52:44
+2023-05-02_011BA: binning=DIAPHRAGM nilv 16020 TR 0.0149 EE 44 | exclude ranges (s) [(200, 248)] -> 2597 ilv excluded, 15768 binned, 13348 binned & kept
+2023-05-02_011BA: nav AIkill_Dynamic_b44d; 32541 lines = 500 spec + 2x16020; TR 14.9 ms; 44 EE, period 5.48 s; RAW k0 B/A median 9.33 (IQR 8.23-9.84); diss/gas sum8 at A 0.164, coh8 0.146; pneumo tidal amplitude trend -2.9 %/min over 4-277 s (58 cycles, pneumo clock)
+== 2023-05-02_012SR 21:52:52
+2023-05-02_012SR: binning=DIAPHRAGM nilv 15300 TR 0.0149 EE 47 | exclude ranges (s) [(162, 182), (209, 229)] -> 2615 ilv excluded, 15137 binned, 12578 binned & kept
+2023-05-02_012SR: nav AIkill_Dynamic_b44d; 31101 lines = 500 spec + 2x15300; TR 14.9 ms; 47 EE, period 4.92 s; RAW k0 B/A median 6.80 (IQR 6.20-7.22); diss/gas sum8 at A 0.249, coh8 0.228; pneumo tidal amplitude trend -4.6 %/min over 1-262 s (78 cycles, pneumo clock)
+== 2023-05-04_034LR 21:52:59
+2023-05-04_034LR: binning=DIAPHRAGM nilv 15043 TR 0.0149 EE 42 | exclude ranges (s) [(0, 10), (200, 229)] -> 2292 ilv excluded, 14792 binned, 12751 binned & kept
+2023-05-04_034LR: nav AIkill_Dynamic; 30586 lines = 500 spec + 2x15043; TR 14.9 ms; 42 EE, period 5.45 s; RAW k0 B/A median 3.06 (IQR 2.93-3.27); diss/gas sum8 at A 0.119, coh8 0.116; pneumo tidal amplitude trend -47.8 %/min over 1-257 s (72 cycles, pneumo clock)
+== 2023-05-15_000SK 21:53:05
+2023-05-15_000SK: binning=DIAPHRAGM nilv 12978 TR 0.0149 EE 40 | exclude ranges (s) [(171, 201)] -> 1501 ilv excluded, 12475 binned, 11168 binned & kept
+2023-05-15_000SK: nav AIkill_Dynamic; 26457 lines = 500 spec + 2x12978; TR 14.9 ms; 40 EE, period 4.98 s; RAW k0 B/A median 5.46 (IQR 4.82-6.27); diss/gas sum8 at A 0.188, coh8 0.179; pneumo tidal amplitude trend +7.4 %/min over 3-213 s (45 cycles, pneumo clock)
+== 2023-05-15_035EK 21:53:12
+2023-05-15_035EK: binning=DIAPHRAGM nilv 14120 TR 0.0149 EE 32 | exclude ranges (s) [(209, 220)] -> 93 ilv excluded, 13651 binned, 13651 binned & kept
+2023-05-15_035EK: nav AIkill_Dynamic_b44d; 28740 lines = 500 spec + 2x14120; TR 14.9 ms; 32 EE, period 6.47 s; RAW k0 B/A median 5.56 (IQR 5.32-6.04); diss/gas sum8 at A 0.095, coh8 0.089
+== 2023-05-18_000SV 21:53:22
+2023-05-18_000SV: binning=DIAPHRAGM nilv 13435 TR 0.0149 EE 40 | exclude ranges (s) [(171, 201)] -> 1958 ilv excluded, 13112 binned, 11341 binned & kept
+2023-05-18_000SV: nav AIkill_Dynamic_b44d; 27371 lines = 500 spec + 2x13435; TR 14.9 ms; 40 EE, period 4.93 s; RAW k0 B/A median 6.05 (IQR 5.33-6.49); diss/gas sum8 at A 0.158, coh8 0.153; pneumo tidal amplitude trend +1.8 %/min over 1-219 s (48 cycles, pneumo clock)
+== 2023-08-24_030DN 21:53:29
+2023-08-24_030DN: binning=DIAPHRAGM nilv 13171 TR 0.0149 EE 40 | exclude ranges (s) [(0, 20), (181, 201)] -> 2366 ilv excluded, 12625 binned, 10805 binned & kept
+2023-08-24_030DN: nav AIkill_Dynamic; 26843 lines = 500 spec + 2x13171; TR 14.9 ms; 39 EE, period 5.45 s; RAW k0 B/A median 5.24 (IQR 4.87-5.73); diss/gas sum8 at A 0.147, coh8 0.146; pneumo tidal amplitude trend -9.3 %/min over 0-207 s (45 cycles, pneumo clock)
+== 2023-09-25_032WS 21:53:35
+2023-09-25_032WS: binning=DIAPHRAGM nilv 12221 TR 0.0149 EE 33 | exclude ranges (s) [(162, 191)] -> 1348 ilv excluded, 11787 binned, 10774 binned & kept
+2023-09-25_032WS: nav AIkill_Dynamic_b44d; 24942 lines = 500 spec + 2x12221; TR 14.9 ms; 33 EE, period 5.48 s; RAW k0 B/A median 4.77 (IQR 4.52-4.97); diss/gas sum8 at A 0.134, coh8 0.132; pneumo tidal amplitude trend +673.2 %/min over 1-117 s (40 cycles, pneumo clock)
+== 2023-10-10_002BB 21:53:42
+2023-10-10_002BB: binning=DIAPHRAGM nilv 9299 TR 0.0149 EE 35 | exclude ranges (s) [(0, 10), (123, 144)] -> 1715 ilv excluded, 8925 binned, 7584 binned & kept
+2023-10-10_002BB: nav AIkill_Dynamic; 19099 lines = 500 spec + 2x9299; TR 14.9 ms; 35 EE, period 3.48 s; RAW k0 B/A median 3.69 (IQR 2.92-5.37); diss/gas sum8 at A 0.053, coh8 0.048; pneumo tidal amplitude trend +15.9 %/min over 4-146 s (43 cycles, pneumo clock)
+== 2023-10-20_001JM 21:53:46
+2023-10-20_001JM: binning=DIAPHRAGM nilv 17711 TR 0.0149 EE 44 | exclude ranges (s) [(0, 29), (247, 268)] -> 3080 ilv excluded, 17347 binned, 14631 binned & kept
+2023-10-20_001JM: nav AIkill_Dynamic; 35923 lines = 500 spec + 2x17711; TR 14.9 ms; 44 EE, period 7.54 s; RAW k0 B/A median 4.70 (IQR 3.86-5.43); diss/gas sum8 at A 0.068, coh8 0.048; pneumo tidal amplitude trend -333.3 %/min over 21-286 s (57 cycles, pneumo clock)
+== 2023-10-25_002JM 21:53:53
+2023-10-25_002JM: binning=DIAPHRAGM nilv 2696 TR 0.0149 EE 8 | exclude ranges (s) [(28, 48)] -> 816 ilv excluded, 2015 binned, 1505 binned & kept
+2023-10-25_002JM: nav AIkill_Dynamic; 5893 lines = 500 spec + 2x2696; TR 14.9 ms; 8 EE, period 4.28 s; RAW k0 B/A median 1.39 (IQR 1.28-9.01); diss/gas sum8 at A 0.250, coh8 0.086
+== 2023-10-27_000LL 21:53:56
+2023-10-27_000LL: binning=DIAPHRAGM nilv 5321 TR 0.0149 EE 24 | exclude ranges (s) [(76, 86)] -> 220 ilv excluded, 5009 binned, 4952 binned & kept
+2023-10-27_000LL: nav AIkill_Dynamic; 11142 lines = 500 spec + 2x5321; TR 14.9 ms; 24 EE, period 3.19 s; RAW k0 B/A median 2.82 (IQR 2.73-2.98); diss/gas sum8 at A 0.145, coh8 0.144; pneumo tidal amplitude trend -3.0 %/min over 2-160 s (49 cycles, pneumo clock)
+== 2023-10-31_003KH 21:54:01
+2023-10-31_003KH: binning=DIAPHRAGM nilv 14976 TR 0.0149 EE 37 | exclude ranges (s) [(190, 201), (209, 229)] -> 1687 ilv excluded, 13984 binned, 12990 binned & kept
+2023-10-31_003KH: nav AIkill_Dynamic; 30453 lines = 500 spec + 2x14976; TR 14.9 ms; 37 EE, period 5.70 s; RAW k0 B/A median 4.44 (IQR 4.04-4.82); diss/gas sum8 at A 0.036, coh8 0.034; pneumo tidal amplitude trend +1.9 %/min over 7-244 s (49 cycles, pneumo clock)
+== 2023-11-02_025VP_merged_REJECTED 21:54:07
+2023-11-02_025VP_merged_REJECTED: binning=DIAPHRAGM nilv 5937 TR 0.0149 EE 33 | exclude ranges (s) [(19, 29), (85, 96)] -> 903 ilv excluded, 5725 binned, 4945 binned & kept
+2023-11-02_025VP_merged_REJECTED: nav AIkill_Dynamic; 12375 lines = 500 spec + 2x5937; TR 14.9 ms; 33 EE, period 2.79 s; RAW k0 B/A median 2.51 (IQR 2.31-3.31); diss/gas sum8 at A 0.155, coh8 0.134
+== 2023-11-02_025VP 21:54:11
+2023-11-02_025VP: binning=DIAPHRAGM nilv 4657 TR 0.0149 EE 26 | exclude ranges (s) [(0, 10), (66, 77)] -> 899 ilv excluded, 4430 binned, 3758 binned & kept
+2023-11-02_025VP: nav AIkill_Dynamic; 9315 lines = 0 spec + 2x4657; TR 14.9 ms; 26 EE, period 2.83 s; RAW k0 B/A median 2.53 (IQR 2.13-3.26); diss/gas sum8 at A 0.145, coh8 0.133; pneumo tidal amplitude trend -0.2 %/min over 2-99 s (34 cycles, pneumo clock)
+== 2023-11-02_036RL 21:54:15
+2023-11-02_036RL: binning=DIAPHRAGM nilv 5324 TR 0.0149 EE 19 | exclude ranges (s) [(76, 86)] -> 223 ilv excluded, 5099 binned, 4962 binned & kept
+2023-11-02_036RL: nav AIkill_Dynamic_b44d; 11149 lines = 500 spec + 2x5324; TR 14.9 ms; 19 EE, period 4.09 s; RAW k0 B/A median 3.13 (IQR 2.93-3.78); diss/gas sum8 at A 0.099, coh8 0.096; pneumo tidal amplitude trend +7.5 %/min over 2-151 s (40 cycles, pneumo clock)
+== 2023-11-03_000LL 21:54:19
+2023-11-03_000LL: binning=DIAPHRAGM nilv 20268 TR 0.0074 EE 64 | exclude ranges (s) [(0, 19), (129, 155)] -> 5463 ilv excluded, 19800 binned, 14805 binned & kept
+IndexError: index 10134 is out of bounds for axis 0 with size 10134
+2023-11-03_000LL: FAILED index 10134 is out of bounds for axis 0 with size 10134
+== 2023-11-06_002ZS 21:54:24
+2023-11-06_002ZS: binning=DIAPHRAGM nilv 10445 TR 0.0149 EE 33 | exclude ranges (s) [(0, 10), (152, 163)] -> 915 ilv excluded, 9813 binned, 9530 binned & kept
+2023-11-06_002ZS: nav AIkill_Dynamic; 21391 lines = 500 spec + 2x10445; TR 14.9 ms; 33 EE, period 4.35 s; RAW k0 B/A median 3.88 (IQR 3.69-4.29); diss/gas sum8 at A 0.133, coh8 0.124; pneumo tidal amplitude trend +16.7 %/min over 3-176 s (57 cycles, pneumo clock)
+== 2023-11-13_037GD 21:54:29
+2023-11-13_037GD: binning=DIAPHRAGM nilv 9967 TR 0.0149 EE 35 | exclude ranges (s) [(133, 153)] -> 1040 ilv excluded, 9680 binned, 8758 binned & kept
+2023-11-13_037GD: nav AIkill_Dynamic; 20435 lines = 500 spec + 2x9967; TR 14.9 ms; 35 EE, period 4.30 s; RAW k0 B/A median 3.39 (IQR 3.23-3.55); diss/gas sum8 at A 0.123, coh8 0.121; pneumo tidal amplitude trend +0.9 %/min over 4-182 s (63 cycles, pneumo clock)
+== 2023-11-16_038RL 21:54:34
+2023-11-16_038RL: binning=DIAPHRAGM nilv 10938 TR 0.0149 EE 41 | exclude ranges (s) [(143, 172)] -> 1340 ilv excluded, 10355 binned, 9342 binned & kept
+2023-11-16_038RL: nav AIkill_Dynamic; 22377 lines = 500 spec + 2x10938; TR 14.9 ms; 41 EE, period 3.92 s; RAW k0 B/A median 4.01 (IQR 3.72-4.22); diss/gas sum8 at A 0.239, coh8 0.239; pneumo tidal amplitude trend -23729.0 %/min over 3-653 s (191 cycles, pneumo clock)
+== 2023-11-17_005DS 21:54:41
+2023-11-17_005DS: binning=DIAPHRAGM nilv 8392 TR 0.0149 EE 28 | exclude ranges (s) [(114, 134)] -> 740 ilv excluded, 7447 binned, 7447 binned & kept
+2023-11-17_005DS: nav AIkill_Dynamic_b44d; 17284 lines = 500 spec + 2x8392; TR 14.9 ms; 28 EE, period 4.08 s; RAW k0 B/A median 2.95 (IQR 2.87-3.11); diss/gas sum8 at A 0.049, coh8 0.042; pneumo tidal amplitude trend -21.8 %/min over 5-152 s (46 cycles, pneumo clock)
+== 2023-11-21_039CP 21:54:47
+2023-11-21_039CP: binning=DIAPHRAGM nilv 12074 TR 0.0149 EE 39 | exclude ranges (s) [(162, 182)] -> 1201 ilv excluded, 11636 binned, 10552 binned & kept
+2023-11-21_039CP: nav AIkill_Dynamic; 24649 lines = 500 spec + 2x12074; TR 14.9 ms; 39 EE, period 4.67 s; RAW k0 B/A median 3.65 (IQR 3.32-4.34); diss/gas sum8 at A 0.127, coh8 0.124; pneumo tidal amplitude trend -17138.2 %/min over 3-751 s (212 cycles, pneumo clock)
+== 2023-12-06_003PM 21:54:53
+2023-12-06_003PM: binning=DIAPHRAGM nilv 9397 TR 0.0149 EE 28 | exclude ranges (s) [(123, 144)] -> 1141 ilv excluded, 9199 binned, 8199 binned & kept
+2023-12-06_003PM: nav AIkill_Dynamic; 19295 lines = 500 spec + 2x9397; TR 14.9 ms; 28 EE, period 4.96 s; RAW k0 B/A median 3.90 (IQR 3.55-4.24); diss/gas sum8 at A 0.088, coh8 0.085; pneumo tidal amplitude trend +17.6 %/min over 7-161 s (40 cycles, pneumo clock)
+== 2023-12-11_040RP 21:54:57
+2023-12-11_040RP: binning=DIAPHRAGM nilv 12253 TR 0.0149 EE 32 | exclude ranges (s) [(171, 191)] -> 776 ilv excluded, 12115 binned, 11408 binned & kept
+2023-12-11_040RP: nav AIkill_Dynamic; 25006 lines = 500 spec + 2x12253; TR 14.9 ms; 32 EE, period 6.09 s; RAW k0 B/A median 6.67 (IQR 5.58-7.25); diss/gas sum8 at A 0.155, coh8 0.148; pneumo tidal amplitude trend -9.2 %/min over 5-206 s (61 cycles, pneumo clock)
+== 2023-12-15_003KH 21:55:04
+2023-12-15_003KH: binning=DIAPHRAGM nilv 10767 TR 0.0149 EE 38 | exclude ranges (s) [(123, 134), (152, 163)] -> 1303 ilv excluded, 10497 binned, 9361 binned & kept
+2023-12-15_003KH: nav AIkill_Dynamic; 22034 lines = 500 spec + 2x10767; TR 14.9 ms; 37 EE, period 4.17 s; RAW k0 B/A median 3.43 (IQR 3.08-4.16); diss/gas sum8 at A 0.043, coh8 0.034; pneumo tidal amplitude trend -7.5 %/min over 2-180 s (46 cycles, pneumo clock)
+== 2023-12-19_041WF 21:55:10
+2023-12-19_041WF: binning=DIAPHRAGM nilv 6829 TR 0.0150 EE 33 | exclude ranges (s) [(86, 106)] -> 1095 ilv excluded, 6461 binned, 5527 binned & kept
+2023-12-19_041WF: nav AIkill_Dynamic; 14259 lines = 600 spec + 2x6829; TR 15.0 ms; 33 EE, period 2.92 s; RAW k0 B/A median 3.33 (IQR 2.98-3.58); diss/gas sum8 at A 0.124, coh8 0.121; pneumo tidal amplitude trend +9.3 %/min over 1-135 s (44 cycles, pneumo clock)
+== 2024-01-16_004DS 21:55:17
+2024-01-16_004DS: binning=DIAPHRAGM nilv 2470 TR 0.0150 EE 15 | exclude ranges (s) [(28, 39)] -> 603 ilv excluded, 2151 binned, 1805 binned & kept
+2024-01-16_004DS: nav AIkill_Dynamic; 5541 lines = 600 spec + 2x2470; TR 15.0 ms; 15 EE, period 1.85 s; RAW k0 B/A median 1.75 (IQR 1.49-1.88); diss/gas sum8 at A 0.049, coh8 0.046; pneumo tidal amplitude trend +8.8 %/min over 2-62 s (19 cycles, pneumo clock)
+== 2024-01-17_042DR 21:55:21
+2024-01-17_042DR: binning=DIAPHRAGM nilv 20630 TR 0.0074 EE 77 | exclude ranges (s) [(0, 13), (135, 155)] -> 4210 ilv excluded, 20442 binned, 16420 binned & kept
+IndexError: index 10315 is out of bounds for axis 0 with size 10315
+2024-01-17_042DR: FAILED index 10315 is out of bounds for axis 0 with size 10315
+== 2024-01-18_001JM 21:55:46
+2024-01-18_001JM: binning=DIAPHRAGM nilv 26000 TR 0.0074 EE 46 | exclude ranges (s) [] -> 0 ilv excluded, 25489 binned, 25489 binned & kept
+IndexError: index 13000 is out of bounds for axis 0 with size 13000
+2024-01-18_001JM: FAILED index 13000 is out of bounds for axis 0 with size 13000
+== 2024-01-22_007RA 21:56:18
+2024-01-22_007RA: binning=DIAPHRAGM nilv 26000 TR 0.0074 EE 60 | exclude ranges (s) [(0, 31), (61, 68), (74, 81), (191, 198)] -> 6351 ilv excluded, 25128 binned, 19128 binned & kept
+IndexError: index 13000 is out of bounds for axis 0 with size 13000
+2024-01-22_007RA: FAILED index 13000 is out of bounds for axis 0 with size 13000
+== 2024-01-31_008CR_merged 21:56:48
+2024-01-31_008CR_merged: binning=DIAPHRAGM nilv 20650 TR 0.0074 EE 61 | exclude ranges (s) [(0, 19), (55, 75), (148, 155)] -> 5980 ilv excluded, 20318 binned, 14670 binned & kept
+IndexError: index 10325 is out of bounds for axis 0 with size 10325
+2024-01-31_008CR_merged: FAILED index 10325 is out of bounds for axis 0 with size 10325
+== 2024-01-31_008CR 21:57:14
+2024-01-31_008CR: binning=DIAPHRAGM nilv 13162 TR 0.0074 EE 33 | exclude ranges (s) [(0, 19), (92, 99)] -> 3337 ilv excluded, 12835 binned, 9825 binned & kept
+IndexError: index 6581 is out of bounds for axis 0 with size 6581
+2024-01-31_008CR: FAILED index 6581 is out of bounds for axis 0 with size 6581
+== 2024-02-02_000LL 21:57:30
+2024-02-02_000LL: binning=DIAPHRAGM nilv 4118 TR 0.0259 EE 37 | exclude ranges (s) [] -> 0 ilv excluded, 3800 binned, 3800 binned & kept
+2024-02-02_000LL: nav AIkill_Dynamic; 13134 lines = 4898 spec + 2x4118; TR 25.9 ms; 32 EE, period 3.19 s; RAW k0 B/A median 17.71 (IQR 10.60-18.61); diss/gas sum8 at A 1.452, coh8 2.146
+== 2024-02-02_005DS 21:57:46
+2024-02-02_005DS: binning=DIAPHRAGM nilv 8143 TR 0.0172 EE 40 | exclude ranges (s) [(114, 144)] -> 1515 ilv excluded, 7756 binned, 6355 binned & kept
+2024-02-02_005DS: nav AIkill_Dynamic; 17067 lines = 780 spec + 2x8143; TR 17.2 ms; 40 EE, period 3.16 s; RAW k0 B/A median 3.21 (IQR 2.00-4.12); diss/gas sum8 at A 0.076, coh8 0.053; pneumo tidal amplitude trend -27.4 %/min over 5-174 s (52 cycles, pneumo clock)
+== 2024-02-19_037GD 21:58:09
+2024-02-19_037GD: binning=DIAPHRAGM nilv 11835 TR 0.0172 EE 32 | exclude ranges (s) [(200, 215)] -> 207 ilv excluded, 11097 binned, 11097 binned & kept
+2024-02-19_037GD: nav AIkill_Dynamic_b44d; 24450 lines = 780 spec + 2x11835; TR 17.2 ms; 32 EE, period 5.97 s; RAW k0 B/A median 4.48 (IQR 4.20-4.63); diss/gas sum8 at A 0.116, coh8 0.095; pneumo tidal amplitude trend -15.5 %/min over 5-241 s (59 cycles, pneumo clock)
+== 2024-02-21_043AS 21:58:16
+2024-02-21_043AS: binning=DIAPHRAGM nilv 13884 TR 0.0172 EE 31 | exclude ranges (s) [(228, 244)] -> 628 ilv excluded, 13391 binned, 12854 binned & kept
+2024-02-21_043AS: nav AIkill_Dynamic_b44d; 28549 lines = 780 spec + 2x13884; TR 17.2 ms; 31 EE, period 7.72 s; RAW k0 B/A median 7.62 (IQR 6.60-8.71); diss/gas sum8 at A 0.119, coh8 0.117; pneumo tidal amplitude trend -25.5 %/min over 5-278 s (73 cycles, pneumo clock)
+== 2024-02-26_029CK 21:58:24
+2024-02-26_029CK: binning=DIAPHRAGM nilv 7328 TR 0.0172 EE 35 | exclude ranges (s) [(114, 129)] -> 700 ilv excluded, 7163 binned, 6541 binned & kept
+2024-02-26_029CK: nav AIkill_Dynamic_b44d; 15437 lines = 780 spec + 2x7328; TR 17.2 ms; 35 EE, period 3.58 s; RAW k0 B/A median 4.63 (IQR 4.38-4.85); diss/gas sum8 at A 0.114, coh8 0.112; pneumo tidal amplitude trend -1.7 %/min over 5-165 s (45 cycles, pneumo clock)
+== 2024-02-27_009JT 21:58:30
+2024-02-27_009JT: binning=DIAPHRAGM nilv 10077 TR 0.0172 EE 35 | exclude ranges (s) [(157, 187)] -> 949 ilv excluded, 9757 binned, 9005 binned & kept
+2024-02-27_009JT: nav AIkill_Dynamic_b44d; 20935 lines = 780 spec + 2x10077; TR 17.2 ms; 35 EE, period 4.95 s; RAW k0 B/A median 3.00 (IQR 2.74-3.23); diss/gas sum8 at A 0.030, coh8 0.028; pneumo tidal amplitude trend -4.5 %/min over 2-214 s (54 cycles, pneumo clock)
+== 2024-03-06_030DN_merged 21:58:37
+2024-03-06_030DN_merged: binning=DIAPHRAGM nilv 13340 TR 0.0172 EE 34 | exclude ranges (s) [(128, 144), (214, 244)] -> 1829 ilv excluded, 12702 binned, 11388 binned & kept
+2024-03-06_030DN_merged: nav AIkill_Dynamic; 27460 lines = 780 spec + 2x13340; TR 17.2 ms; 34 EE, period 7.55 s; RAW k0 B/A median 10.06 (IQR 7.69-11.03); diss/gas sum8 at A 0.150, coh8 0.133
+== 2024-03-06_030DN 21:58:44
+2024-03-06_030DN: binning=DIAPHRAGM nilv 7677 TR 0.0172 EE 17 | exclude ranges (s) [(128, 144)] -> 235 ilv excluded, 7495 binned, 7319 binned & kept
+2024-03-06_030DN: nav AIkill_Dynamic_b44d; 16135 lines = 780 spec + 2x7677; TR 17.2 ms; 17 EE, period 7.52 s; RAW k0 B/A median 10.22 (IQR 9.59-10.86); diss/gas sum8 at A 0.130, coh8 0.121; pneumo tidal amplitude trend -464.7 %/min over 4-223 s (51 cycles, pneumo clock)
+== 2024-03-11_039CP 21:58:50
+2024-03-11_039CP: binning=DIAPHRAGM nilv 7765 TR 0.0172 EE 33 | exclude ranges (s) [(114, 144)] -> 1137 ilv excluded, 7326 binned, 6541 binned & kept
+2024-03-11_039CP: nav AIkill_Dynamic_b44d; 16310 lines = 780 spec + 2x7765; TR 17.2 ms; 33 EE, period 3.94 s; RAW k0 B/A median 2.82 (IQR 2.45-3.28); diss/gas sum8 at A 0.109, coh8 0.106; pneumo tidal amplitude trend -8.2 %/min over 3-167 s (44 cycles, pneumo clock)
+== 2024-03-12_006KL 21:58:57
+2024-03-12_006KL: binning=DIAPHRAGM nilv 6197 TR 0.0172 EE 31 | exclude ranges (s) [(100, 115)] -> 383 ilv excluded, 5875 binned, 5707 binned & kept
+2024-03-12_006KL: nav AIkill_Dynamic_b44d; 13175 lines = 780 spec + 2x6197; TR 17.2 ms; 31 EE, period 3.31 s; RAW k0 B/A median 2.73 (IQR 2.28-2.92); diss/gas sum8 at A 0.042, coh8 0.039; pneumo tidal amplitude trend -5810.4 %/min over 2-866 s (266 cycles, pneumo clock)
+== 2024-03-12_044DY 21:59:03
+2024-03-12_044DY: binning=DIAPHRAGM nilv 5943 TR 0.0172 EE 32 | exclude ranges (s) [(85, 115)] -> 1001 ilv excluded, 5488 binned, 4728 binned & kept
+2024-03-12_044DY: nav AIkill_Dynamic_b44d; 12666 lines = 780 spec + 2x5943; TR 17.2 ms; 32 EE, period 2.96 s; RAW k0 B/A median 2.01 (IQR 1.80-2.13); diss/gas sum8 at A 0.082, coh8 0.081; pneumo tidal amplitude trend -27.8 %/min over 3-134 s (43 cycles, pneumo clock)
+== 2024-03-14_038RL 21:59:08
+2024-03-14_038RL: binning=DIAPHRAGM nilv 8780 TR 0.0172 EE 35 | exclude ranges (s) [(128, 158)] -> 1338 ilv excluded, 8552 binned, 7319 binned & kept
+2024-03-14_038RL: nav AIkill_Dynamic_b44d; 18341 lines = 780 spec + 2x8780; TR 17.2 ms; 35 EE, period 4.54 s; RAW k0 B/A median 3.88 (IQR 2.85-4.34); diss/gas sum8 at A 0.146, coh8 0.143; pneumo tidal amplitude trend -8.2 %/min over 3-230 s (71 cycles, pneumo clock)
+== 2024-03-21_032WS 21:59:16
+2024-03-21_032WS: binning=DIAPHRAGM nilv 10812 TR 0.0172 EE 34 | exclude ranges (s) [(157, 187)] -> 1684 ilv excluded, 10532 binned, 8991 binned & kept
+2024-03-21_032WS: nav AIkill_Dynamic_b44d; 22405 lines = 780 spec + 2x10812; TR 17.2 ms; 34 EE, period 5.62 s; RAW k0 B/A median 5.10 (IQR 4.89-5.61); diss/gas sum8 at A 0.098, coh8 0.096; pneumo tidal amplitude trend -2889.1 %/min over 7-347 s (105 cycles, pneumo clock)
+== 2024-03-21_036RL 21:59:23
+2024-03-21_036RL: binning=DIAPHRAGM nilv 8846 TR 0.0172 EE 29 | exclude ranges (s) [(128, 158)] -> 1404 ilv excluded, 8460 binned, 7375 binned & kept
+2024-03-21_036RL: nav AIkill_Dynamic_b44d; 18472 lines = 780 spec + 2x8846; TR 17.2 ms; 29 EE, period 4.73 s; RAW k0 B/A median 3.75 (IQR 3.57-4.12); diss/gas sum8 at A 0.095, coh8 0.095; pneumo tidal amplitude trend -1.1 %/min over 3-207 s (68 cycles, pneumo clock)
+== 2024-03-28_010AJ 21:59:30
+2024-03-28_010AJ: binning=DIAPHRAGM nilv 5451 TR 0.0172 EE 35 | exclude ranges (s) [(71, 101)] -> 1323 ilv excluded, 5178 binned, 3986 binned & kept
+2024-03-28_010AJ: nav AIkill_Dynamic_b44d; 11683 lines = 780 spec + 2x5451; TR 17.2 ms; 35 EE, period 2.52 s; RAW k0 B/A median 2.26 (IQR 2.04-2.39); diss/gas sum8 at A 0.051, coh8 0.048; pneumo tidal amplitude trend -3.4 %/min over 1-137 s (53 cycles, pneumo clock)
+== 2024-04-01_008CR 21:59:35
+2024-04-01_008CR: binning=DIAPHRAGM nilv 9705 TR 0.0172 EE 35 | exclude ranges (s) [(143, 172)] -> 1391 ilv excluded, 9361 binned, 8032 binned & kept
+2024-04-01_008CR: nav AIkill_Dynamic_b44d; 20190 lines = 780 spec + 2x9705; TR 17.2 ms; 34 EE, period 4.99 s; RAW k0 B/A median 4.34 (IQR 3.48-4.66); diss/gas sum8 at A 0.038, coh8 0.036; pneumo tidal amplitude trend -23742.8 %/min over 4-854 s (242 cycles, pneumo clock)
+== 2024-04-03_040RP 21:59:41
+2024-04-03_040RP: binning=DIAPHRAGM nilv 4389 TR 0.0172 EE 35 | exclude ranges (s) [(57, 86)] -> 1075 ilv excluded, 4106 binned, 3172 binned & kept
+2024-04-03_040RP: nav AIkill_Dynamic_b44d; 9558 lines = 780 spec + 2x4389; TR 17.2 ms; 35 EE, period 1.87 s; RAW k0 B/A median 2.03 (IQR 1.83-2.25); diss/gas sum8 at A 0.060, coh8 0.059; pneumo tidal amplitude trend +23.9 %/min over 3-107 s (36 cycles, pneumo clock)
+== 2024-04-09_019WR 21:59:47
+2024-04-09_019WR: binning=DIAPHRAGM nilv 7321 TR 0.0172 EE 36 | exclude ranges (s) [(100, 129)] -> 1507 ilv excluded, 7021 binned, 5596 binned & kept
+2024-04-09_019WR: nav AIkill_Dynamic_b44d; 15423 lines = 780 spec + 2x7321; TR 17.2 ms; 36 EE, period 3.65 s; RAW k0 B/A median 2.61 (IQR 2.03-2.99); diss/gas sum8 at A 0.096, coh8 0.093; pneumo tidal amplitude trend -65.8 %/min over 4-315 s (92 cycles, pneumo clock)
+== 2024-04-22_025VP 21:59:53
+2024-04-22_025VP: binning=DIAPHRAGM nilv 7451 TR 0.0172 EE 43 | exclude ranges (s) [(85, 129)] -> 2509 ilv excluded, 7314 binned, 4869 binned & kept
+2024-04-22_025VP: nav AIkill_Dynamic_b44d; 15682 lines = 780 spec + 2x7451; TR 17.2 ms; 43 EE, period 3.00 s; RAW k0 B/A median 2.31 (IQR 2.07-2.64); diss/gas sum8 at A 0.089, coh8 0.086; pneumo tidal amplitude trend -5027.8 %/min over 3-529 s (155 cycles, pneumo clock)
+== 2024-04-25_042DR 22:00:00
+2024-04-25_042DR: binning=DIAPHRAGM nilv 7029 TR 0.0172 EE 28 | exclude ranges (s) [(114, 129)] -> 401 ilv excluded, 6537 binned, 6453 binned & kept
+2024-04-25_042DR: nav AIkill_Dynamic; 14839 lines = 780 spec + 2x7029; TR 17.2 ms; 28 EE, period 4.11 s; RAW k0 B/A median 2.45 (IQR 2.16-3.16); diss/gas sum8 at A 0.130, coh8 0.126; pneumo tidal amplitude trend +9.7 %/min over 4-159 s (38 cycles, pneumo clock)
+== 2024-04-29_011CN 22:00:05
+2024-04-29_011CN: binning=DIAPHRAGM nilv 2068 TR 0.0172 EE 0 | exclude ranges (s) [(14, 43)] -> 1254 ilv excluded, 0 binned, 0 binned & kept
+IndexError: arrays used as indices must be of integer (or boolean) type
+2024-04-29_011CN: FAILED arrays used as indices must be of integer (or boolean) type
+== 2024-05-02_023DB 22:00:08
+2024-05-02_023DB: binning=DIAPHRAGM nilv 7939 TR 0.0172 EE 32 | exclude ranges (s) [(128, 144)] -> 497 ilv excluded, 7685 binned, 7386 binned & kept
+2024-05-02_023DB: nav AIkill_Dynamic_b44d; 16658 lines = 780 spec + 2x7939; TR 17.2 ms; 32 EE, period 4.25 s; RAW k0 B/A median 3.11 (IQR 2.78-3.47); diss/gas sum8 at A 0.084, coh8 0.083; pneumo tidal amplitude trend -17473.5 %/min over 2-277 s (84 cycles, pneumo clock)
+== 2024-05-06_043AS 22:00:14
+2024-05-06_043AS: binning=DIAPHRAGM nilv 13951 TR 0.0172 EE 34 | exclude ranges (s) [(228, 244)] -> 695 ilv excluded, 13742 binned, 13179 binned & kept
+2024-05-06_043AS: nav AIkill_Dynamic_b44d; 28683 lines = 780 spec + 2x13951; TR 17.2 ms; 34 EE, period 6.66 s; RAW k0 B/A median 6.76 (IQR 5.93-7.85); diss/gas sum8 at A 0.114, coh8 0.111; pneumo tidal amplitude trend -16.7 %/min over 5-286 s (60 cycles, pneumo clock)
+== 2024-05-08_012EB 22:00:22
+2024-05-08_012EB: binning=DIAPHRAGM nilv 9139 TR 0.0172 EE 55 | exclude ranges (s) [(143, 158)] -> 825 ilv excluded, 8859 binned, 8117 binned & kept
+2024-05-08_012EB: nav AIkill_Dynamic_b44d; 19058 lines = 780 spec + 2x9139; TR 17.2 ms; 55 EE, period 2.58 s; RAW k0 B/A median 4.00 (IQR 3.67-4.88); diss/gas sum8 at A 0.138, coh8 0.100; pneumo tidal amplitude trend -2.8 %/min over 1-191 s (69 cycles, pneumo clock)
+== 2024-05-13_002ZS 22:00:28
+2024-05-13_002ZS: binning=DIAPHRAGM nilv 5014 TR 0.0172 EE 33 | exclude ranges (s) [(71, 101)] -> 886 ilv excluded, 4702 binned, 4001 binned & kept
+2024-05-13_002ZS: nav AIkill_Dynamic_b44d; 10809 lines = 780 spec + 2x5014; TR 17.2 ms; 33 EE, period 2.41 s; RAW k0 B/A median 2.31 (IQR 2.05-2.50); diss/gas sum8 at A 0.077, coh8 0.069; pneumo tidal amplitude trend +4.6 %/min over 2-117 s (48 cycles, pneumo clock)
+== 2024-05-13_005JJ 22:00:34
+2024-05-13_005JJ: binning=DIAPHRAGM nilv 7148 TR 0.0172 EE 34 | exclude ranges (s) [(114, 129)] -> 520 ilv excluded, 6606 binned, 6410 binned & kept
+2024-05-13_005JJ: nav AIkill_Dynamic; 14868 lines = 572 spec + 2x7148; TR 17.2 ms; 34 EE, period 3.37 s; RAW k0 B/A median 2.16 (IQR 2.04-2.31); diss/gas sum8 at A 0.087, coh8 0.077; pneumo tidal amplitude trend +0.2 %/min over 2-147 s (44 cycles, pneumo clock)
+== 2024-06-18_003PM 22:00:39
+2024-06-18_003PM: binning=DIAPHRAGM nilv 5654 TR 0.0172 EE 32 | exclude ranges (s) [(85, 101)] -> 712 ilv excluded, 5427 binned, 4842 binned & kept
+2024-06-18_003PM: nav AIkill_Dynamic_b44d; 12089 lines = 780 spec + 2x5654; TR 17.2 ms; 32 EE, period 2.99 s; RAW k0 B/A median 2.60 (IQR 2.41-2.81); diss/gas sum8 at A 0.080, coh8 0.077; pneumo tidal amplitude trend +18.6 %/min over 3-128 s (42 cycles, pneumo clock)
+== 2024-07-03_044DY 22:00:44
+2024-07-03_044DY: binning=DIAPHRAGM nilv 6217 TR 0.0172 EE 27 | exclude ranges (s) [(85, 115)] -> 1275 ilv excluded, 5957 binned, 4764 binned & kept
+2024-07-03_044DY: nav AIkill_Dynamic_b44d; 13215 lines = 780 spec + 2x6217; TR 17.2 ms; 27 EE, period 3.94 s; RAW k0 B/A median 2.67 (IQR 2.26-3.27); diss/gas sum8 at A 0.113, coh8 0.112
+== 2024-07-29_004DS 22:00:52
+2024-07-29_004DS: binning=DIAPHRAGM nilv 4807 TR 0.0172 EE 28 | exclude ranges (s) [(71, 86)] -> 679 ilv excluded, 4328 binned, 3971 binned & kept
+2024-07-29_004DS: nav AIkill_Dynamic_b44d; 10395 lines = 780 spec + 2x4807; TR 17.2 ms; 28 EE, period 2.60 s; RAW k0 B/A median 1.97 (IQR 1.92-2.21); diss/gas sum8 at A 0.048, coh8 0.046; pneumo tidal amplitude trend +5.0 %/min over 2-122 s (47 cycles, pneumo clock)
+== 2024-08-12_013VM_merged 22:00:58
+2024-08-12_013VM_merged: binning=DIAPHRAGM nilv 7840 TR 0.0172 EE 25 | exclude ranges (s) [(128, 144)] -> 398 ilv excluded, 7289 binned, 7266 binned & kept
+2024-08-12_013VM_merged: nav AIkill_Dynamic; 16461 lines = 780 spec + 2x7840; TR 17.2 ms; 25 EE, period 5.47 s; RAW k0 B/A median 4.03 (IQR 3.21-4.58); diss/gas sum8 at A 0.052, coh8 0.050
+== 2024-08-12_013VM 22:01:03
+2024-08-12_013VM: binning=DIAPHRAGM nilv 5344 TR 0.0172 EE 18 | exclude ranges (s) [(85, 101)] -> 402 ilv excluded, 4914 binned, 4887 binned & kept
+2024-08-12_013VM: nav AIkill_Dynamic_b44d; 11469 lines = 780 spec + 2x5344; TR 17.2 ms; 18 EE, period 5.01 s; RAW k0 B/A median 3.59 (IQR 3.03-4.32); diss/gas sum8 at A 0.051, coh8 0.049; pneumo tidal amplitude trend -1.1 %/min over 3-137 s (37 cycles, pneumo clock)
+== 2024-08-15_006MM 22:01:10
+2024-08-15_006MM: binning=DIAPHRAGM nilv 8326 TR 0.0172 EE 31 | exclude ranges (s) [(128, 158)] -> 884 ilv excluded, 7866 binned, 7192 binned & kept
+2024-08-15_006MM: nav AIkill_Dynamic; 17432 lines = 780 spec + 2x8326; TR 17.2 ms; 31 EE, period 4.28 s; RAW k0 B/A median 2.70 (IQR 2.52-2.86); diss/gas sum8 at A 0.064, coh8 0.063; pneumo tidal amplitude trend -2433.7 %/min over 5-303 s (79 cycles, pneumo clock)
+== 2024-08-19_015HK 22:01:17
+2024-08-19_015HK: binning=SIGNAL nilv 7017 TR 0.0172 EE 29 | exclude ranges (s) [(100, 129)] -> 1203 ilv excluded, 6643 binned, 5588 binned & kept
+2024-08-19_015HK: nav AIkill_Dynamic_b44d; 14814 lines = 780 spec + 2x7017; TR 17.2 ms; 29 EE, period 4.00 s; RAW k0 B/A median 4.47 (IQR 4.16-4.85); diss/gas sum8 at A 0.116, coh8 0.114; pneumo tidal amplitude trend -13.7 %/min over 6-164 s (46 cycles, pneumo clock)
+== 2024-08-21_044DY 22:01:26
+2024-08-21_044DY: binning=DIAPHRAGM nilv 5479 TR 0.0172 EE 32 | exclude ranges (s) [(85, 101)] -> 537 ilv excluded, 5157 binned, 4753 binned & kept
+2024-08-21_044DY: nav AIkill_Dynamic_b44d; 11739 lines = 780 spec + 2x5479; TR 17.2 ms; 32 EE, period 2.80 s; RAW k0 B/A median 2.37 (IQR 1.83-2.49); diss/gas sum8 at A 0.108, coh8 0.106
+== 2024-08-23_016PG 22:01:33
+2024-08-23_016PG: binning=SIGNAL nilv 11664 TR 0.0172 EE 24 | exclude ranges (s) [(186, 215)] -> 850 ilv excluded, 11396 binned, 10691 binned & kept
+2024-08-23_016PG: nav AIkill_Dynamic_b44d; 24109 lines = 780 spec + 2x11664; TR 17.2 ms; 24 EE, period 7.64 s; RAW k0 B/A median 5.57 (IQR 4.49-11.61); diss/gas sum8 at A 0.098, coh8 0.087; pneumo tidal amplitude trend -1376.5 %/min over 2-326 s (64 cycles, pneumo clock)
+== 2024-08-28_007IT 22:01:44
+2024-08-28_007IT: binning=DIAPHRAGM nilv 8457 TR 0.0172 EE 31 | exclude ranges (s) [(128, 158)] -> 1015 ilv excluded, 7992 binned, 7194 binned & kept
+2024-08-28_007IT: nav AIkill_Dynamic; 17695 lines = 780 spec + 2x8457; TR 17.2 ms; 31 EE, period 4.52 s; RAW k0 B/A median 3.76 (IQR 3.46-3.98); diss/gas sum8 at A 0.075, coh8 0.070; pneumo tidal amplitude trend -17.5 %/min over 2-185 s (48 cycles, pneumo clock)
+== 2024-08-30_014KS 22:01:50
+2024-08-30_014KS: binning=SIGNAL nilv 8945 TR 0.0172 EE 28 | exclude ranges (s) [(14, 29), (143, 158)] -> 1504 ilv excluded, 8364 binned, 7157 binned & kept
+2024-08-30_014KS: nav AIkill_Dynamic_b44d; 18671 lines = 780 spec + 2x8945; TR 17.2 ms; 28 EE, period 5.13 s; RAW k0 B/A median 4.54 (IQR 4.17-4.90); diss/gas sum8 at A 0.151, coh8 0.150; pneumo tidal amplitude trend +17.1 %/min over 7-199 s (50 cycles, pneumo clock)
+== 2024-09-03_041WF 22:02:01
+2024-09-03_041WF: binning=DIAPHRAGM nilv 5662 TR 0.0172 EE 27 | exclude ranges (s) [(85, 101)] -> 720 ilv excluded, 5340 binned, 4800 binned & kept
+2024-09-03_041WF: nav AIkill_Dynamic_b44d; 12105 lines = 780 spec + 2x5662; TR 17.2 ms; 27 EE, period 3.51 s; RAW k0 B/A median 3.78 (IQR 3.30-4.15); diss/gas sum8 at A 0.109, coh8 0.108; pneumo tidal amplitude trend -14.2 %/min over 2-139 s (41 cycles, pneumo clock)
+== 2024-09-09_043AS 22:02:07
+2024-09-09_043AS: binning=DIAPHRAGM nilv 8334 TR 0.0172 EE 30 | exclude ranges (s) [(128, 158)] -> 892 ilv excluded, 7993 binned, 7217 binned & kept
+2024-09-09_043AS: nav AIkill_Dynamic_b44d; 17448 lines = 780 spec + 2x8334; TR 17.2 ms; 30 EE, period 4.64 s; RAW k0 B/A median 4.30 (IQR 3.88-4.56); diss/gas sum8 at A 0.127, coh8 0.124; pneumo tidal amplitude trend +15.5 %/min over 4-182 s (54 cycles, pneumo clock)
+== 2024-09-10_008TP 22:02:15
+2024-09-10_008TP: binning=DIAPHRAGM nilv 6253 TR 0.0172 EE 31 | exclude ranges (s) [(100, 115)] -> 439 ilv excluded, 5947 binned, 5668 binned & kept
+2024-09-10_008TP: nav AIkill_Dynamic_b44d; 13286 lines = 780 spec + 2x6253; TR 17.2 ms; 31 EE, period 3.36 s; RAW k0 B/A median 2.69 (IQR 2.40-2.84); diss/gas sum8 at A 0.103, coh8 0.102; pneumo tidal amplitude trend -3.0 %/min over 3-163 s (49 cycles, pneumo clock)
+== 2024-09-10_045VS 22:02:22
+2024-09-10_045VS: binning=DIAPHRAGM nilv 7820 TR 0.0172 EE 29 | exclude ranges (s) [(128, 144)] -> 378 ilv excluded, 7308 binned, 7184 binned & kept
+2024-09-10_045VS: nav AIkill_Dynamic_b44d; 16421 lines = 780 spec + 2x7820; TR 17.2 ms; 29 EE, period 4.49 s; RAW k0 B/A median 4.75 (IQR 4.25-5.09); diss/gas sum8 at A 0.201, coh8 0.200; pneumo tidal amplitude trend -20.1 %/min over 3-174 s (64 cycles, pneumo clock)
+== 2024-09-24_039CP 22:02:29
+2024-09-24_039CP: binning=SIGNAL nilv 8876 TR 0.0172 EE 29 | exclude ranges (s) [(143, 158)] -> 562 ilv excluded, 7666 binned, 7666 binned & kept
+2024-09-24_039CP: nav AIkill_Dynamic_b44d; 18533 lines = 780 spec + 2x8876; TR 17.2 ms; 29 EE, period 4.76 s; RAW k0 B/A median 4.94 (IQR 4.39-5.62); diss/gas sum8 at A 0.091, coh8 0.089; pneumo tidal amplitude trend -23891.4 %/min over 2-443 s (124 cycles, pneumo clock)
+== 2024-09-24_046AA 22:02:39
+2024-09-24_046AA: binning=DIAPHRAGM nilv 9464 TR 0.0172 EE 36 | exclude ranges (s) [(143, 172)] -> 1150 ilv excluded, 9201 binned, 8187 binned & kept
+2024-09-24_046AA: nav AIkill_Dynamic_b44d; 19709 lines = 780 spec + 2x9464; TR 17.2 ms; 36 EE, period 4.63 s; RAW k0 B/A median 5.53 (IQR 5.10-5.81); diss/gas sum8 at A 0.150, coh8 0.147; pneumo tidal amplitude trend -13799.2 %/min over 2-367 s (107 cycles, pneumo clock)
+== 2024-09-25_017ED 22:02:45
+2024-09-25_017ED: binning=DIAPHRAGM nilv 6207 TR 0.0172 EE 29 | exclude ranges (s) [(100, 115)] -> 393 ilv excluded, 5760 binned, 5672 binned & kept
+2024-09-25_017ED: nav AIkill_Dynamic; 13195 lines = 780 spec + 2x6207; TR 17.2 ms; 28 EE, period 3.35 s; RAW k0 B/A median 2.76 (IQR 2.61-3.18); diss/gas sum8 at A 0.042, coh8 0.024; pneumo tidal amplitude trend -41.9 %/min over 5-230 s (62 cycles, pneumo clock)
+== 2024-09-26_009ML 22:02:49
+2024-09-26_009ML: binning=DIAPHRAGM nilv 5189 TR 0.0172 EE 26 | exclude ranges (s) [(85, 101)] -> 247 ilv excluded, 4904 binned, 4887 binned & kept
+2024-09-26_009ML: nav AIkill_Dynamic_b44d; 11029 lines = 650 spec + 2x5189; TR 17.2 ms; 26 EE, period 3.47 s; RAW k0 B/A median 2.95 (IQR 2.51-3.39); diss/gas sum8 at A 0.120, coh8 0.119; pneumo tidal amplitude trend -30.2 %/min over 5-133 s (39 cycles, pneumo clock)
+== 2024-09-27_036RL 22:02:55
+2024-09-27_036RL: binning=DIAPHRAGM nilv 8023 TR 0.0172 EE 30 | exclude ranges (s) [(128, 144)] -> 581 ilv excluded, 7728 binned, 7199 binned & kept
+2024-09-27_036RL: nav AIkill_Dynamic_b44d; 16827 lines = 780 spec + 2x8023; TR 17.2 ms; 30 EE, period 4.44 s; RAW k0 B/A median 3.75 (IQR 3.58-4.14); diss/gas sum8 at A 0.095, coh8 0.093; pneumo tidal amplitude trend -26.6 %/min over 5-207 s (58 cycles, pneumo clock)
+== 2024-10-02_011CN 22:03:02
+2024-10-02_011CN: binning=DIAPHRAGM nilv 6581 TR 0.0172 EE 24 | exclude ranges (s) [(100, 115)] -> 767 ilv excluded, 5615 binned, 5615 binned & kept
+2024-10-02_011CN: nav AIkill_Dynamic_b44d; 13943 lines = 780 spec + 2x6581; TR 17.2 ms; 24 EE, period 4.16 s; RAW k0 B/A median 3.07 (IQR 2.83-3.36); diss/gas sum8 at A 0.041, coh8 0.039; pneumo tidal amplitude trend -57.5 %/min over 2-250 s (71 cycles, pneumo clock)
+== 2024-10-02_018CS 22:03:07
+2024-10-02_018CS: binning=DIAPHRAGM nilv 8894 TR 0.0172 EE 31 | exclude ranges (s) [(128, 158)] -> 1452 ilv excluded, 8508 binned, 7184 binned & kept
+2024-10-02_018CS: nav AIkill_Dynamic_b44d; 18568 lines = 780 spec + 2x8894; TR 17.2 ms; 31 EE, period 4.78 s; RAW k0 B/A median 3.56 (IQR 3.27-3.86); diss/gas sum8 at A 0.048, coh8 0.043; pneumo tidal amplitude trend -1219.1 %/min over 6-370 s (86 cycles, pneumo clock)
+== 2024-10-08_009JT 22:03:12
+2024-10-08_009JT: binning=DIAPHRAGM nilv 6133 TR 0.0172 EE 22 | exclude ranges (s) [(85, 115)] -> 1191 ilv excluded, 5732 binned, 4766 binned & kept
+2024-10-08_009JT: nav AIkill_Dynamic_b44d; 13047 lines = 780 spec + 2x6133; TR 17.2 ms; 22 EE, period 4.52 s; RAW k0 B/A median 3.38 (IQR 3.11-3.51); diss/gas sum8 at A 0.034, coh8 0.029; pneumo tidal amplitude trend -0.0 %/min over 4-208 s (57 cycles, pneumo clock)
+== 2024-10-10_019LR 22:03:17
+2024-10-10_019LR: binning=DIAPHRAGM nilv 9514 TR 0.0172 EE 31 | exclude ranges (s) [(143, 172)] -> 1200 ilv excluded, 9188 binned, 8192 binned & kept
+2024-10-10_019LR: nav AIkill_Dynamic_b44d; 19808 lines = 780 spec + 2x9514; TR 17.2 ms; 31 EE, period 5.13 s; RAW k0 B/A median 3.65 (IQR 3.48-4.04); diss/gas sum8 at A 0.058, coh8 0.055; pneumo tidal amplitude trend -4783.3 %/min over 7-262 s (78 cycles, pneumo clock)
+== 2024-10-16_020JS 22:03:24
+2024-10-16_020JS: binning=DIAPHRAGM nilv 2861 TR 0.0172 EE 11 | exclude ranges (s) [(42, 58)] -> 419 ilv excluded, 2456 binned, 2255 binned & kept
+2024-10-16_020JS: nav AIkill_Dynamic_b44d; 6502 lines = 780 spec + 2x2861; TR 17.2 ms; 11 EE, period 4.33 s; RAW k0 B/A median 3.57 (IQR 3.25-3.81); diss/gas sum8 at A 0.037, coh8 0.032; pneumo tidal amplitude trend -8.3 %/min over 0-87 s (25 cycles, pneumo clock)
+== 2024-10-16_047SS 22:03:28
+2024-10-16_047SS: binning=DIAPHRAGM nilv 5818 TR 0.0172 EE 32 | exclude ranges (s) [(85, 101)] -> 876 ilv excluded, 5523 binned, 4853 binned & kept
+2024-10-16_047SS: nav AIkill_Dynamic_b44d; 12416 lines = 780 spec + 2x5818; TR 17.2 ms; 32 EE, period 2.87 s; RAW k0 B/A median 2.39 (IQR 2.25-2.51); diss/gas sum8 at A 0.048, coh8 0.047; pneumo tidal amplitude trend +3.5 %/min over 2-152 s (50 cycles, pneumo clock)
+== 2024-10-17_048JJ 22:03:34
+2024-10-17_048JJ: binning=DIAPHRAGM nilv 7738 TR 0.0172 EE 28 | exclude ranges (s) [(128, 144)] -> 296 ilv excluded, 6853 binned, 6853 binned & kept
+2024-10-17_048JJ: nav AIkill_Dynamic_b44d; 16257 lines = 780 spec + 2x7738; TR 17.2 ms; 28 EE, period 4.23 s; RAW k0 B/A median 3.43 (IQR 3.28-3.64); diss/gas sum8 at A 0.082, coh8 0.080; pneumo tidal amplitude trend -21.0 %/min over 4-166 s (45 cycles, pneumo clock)
+== 2024-10-22_021CH 22:03:40
+2024-10-22_021CH: binning=DIAPHRAGM nilv 6614 TR 0.0172 EE 34 | exclude ranges (s) [(100, 115)] -> 800 ilv excluded, 6283 binned, 5610 binned & kept
+2024-10-22_021CH: nav AIkill_Dynamic_b44d; 14009 lines = 780 spec + 2x6614; TR 17.2 ms; 34 EE, period 3.16 s; RAW k0 B/A median 3.26 (IQR 3.00-3.63); diss/gas sum8 at A 0.043, coh8 0.041; pneumo tidal amplitude trend -5.9 %/min over 4-149 s (45 cycles, pneumo clock)
+== 2024-10-23_047SS 22:03:46
+2024-10-23_047SS: binning=DIAPHRAGM nilv 5570 TR 0.0172 EE 32 | exclude ranges (s) [(85, 101)] -> 628 ilv excluded, 5285 binned, 4815 binned & kept
+2024-10-23_047SS: nav AIkill_Dynamic; 11921 lines = 780 spec + 2x5570; TR 17.2 ms; 32 EE, period 2.96 s; RAW k0 B/A median 2.40 (IQR 2.22-2.73); diss/gas sum8 at A 0.063, coh8 0.060; pneumo tidal amplitude trend +1.9 %/min over 3-138 s (47 cycles, pneumo clock)
+== 2024-10-28_022VT 22:03:51
+2024-10-28_022VT: binning=DIAPHRAGM nilv 7524 TR 0.0172 EE 37 | exclude ranges (s) [(114, 144)] -> 896 ilv excluded, 6979 binned, 6387 binned & kept
+2024-10-28_022VT: nav AIkill_Dynamic_b44d; 15828 lines = 780 spec + 2x7524; TR 17.2 ms; 37 EE, period 3.27 s; RAW k0 B/A median 3.21 (IQR 2.88-3.59); diss/gas sum8 at A 0.047, coh8 0.033; pneumo tidal amplitude trend -19.0 %/min over 3-176 s (54 cycles, pneumo clock)
+== 2024-10-29_049WG 22:03:57
+2024-10-29_049WG: binning=DIAPHRAGM nilv 6644 TR 0.0172 EE 32 | exclude ranges (s) [(100, 115)] -> 830 ilv excluded, 6424 binned, 5672 binned & kept
+2024-10-29_049WG: nav AIkill_Dynamic_b44d; 14068 lines = 780 spec + 2x6644; TR 17.2 ms; 32 EE, period 3.59 s; RAW k0 B/A median 4.35 (IQR 3.80-4.84); diss/gas sum8 at A 0.125, coh8 0.112; pneumo tidal amplitude trend +15.5 %/min over 3-150 s (42 cycles, pneumo clock)
+== 2024-11-05_023LL 22:04:03
+2024-11-05_023LL: binning=DIAPHRAGM nilv 6100 TR 0.0172 EE 31 | exclude ranges (s) [(100, 115)] -> 286 ilv excluded, 5691 binned, 5625 binned & kept
+2024-11-05_023LL: nav AIkill_Dynamic_b44d; 12981 lines = 780 spec + 2x6100; TR 17.2 ms; 31 EE, period 3.25 s; RAW k0 B/A median 2.97 (IQR 2.70-3.23); diss/gas sum8 at A 0.053, coh8 0.051; pneumo tidal amplitude trend -16.4 %/min over 4-142 s (43 cycles, pneumo clock)
+== 2024-11-13_025JC 22:04:09
+2024-11-13_025JC: binning=SIGNAL nilv 6980 TR 0.0172 EE 30 | exclude ranges (s) [(100, 129)] -> 1166 ilv excluded, 6622 binned, 5627 binned & kept
+2024-11-13_025JC: nav AIkill_Dynamic_b44d; 14740 lines = 780 spec + 2x6980; TR 17.2 ms; 30 EE, period 3.63 s; RAW k0 B/A median 2.84 (IQR 2.68-2.98); diss/gas sum8 at A 0.125, coh8 0.123; pneumo tidal amplitude trend +7.6 %/min over 3-154 s (46 cycles, pneumo clock)
+== 2024-11-18_026CH 22:04:17
+2024-11-18_026CH: binning=DIAPHRAGM nilv 5437 TR 0.0172 EE 35 | exclude ranges (s) [(85, 101)] -> 495 ilv excluded, 5109 binned, 4741 binned & kept
+2024-11-18_026CH: nav AIkill_Dynamic_b44d; 11654 lines = 780 spec + 2x5437; TR 17.2 ms; 35 EE, period 2.61 s; RAW k0 B/A median 2.27 (IQR 1.93-2.41); diss/gas sum8 at A 0.049, coh8 0.042; pneumo tidal amplitude trend -52.6 %/min over 1-242 s (85 cycles, pneumo clock)
+== 2024-11-26_050EH 22:04:22
+2024-11-26_050EH: binning=DIAPHRAGM nilv 7041 TR 0.0172 EE 36 | exclude ranges (s) [(100, 129)] -> 1227 ilv excluded, 6646 binned, 5610 binned & kept
+2024-11-26_050EH: nav AIkill_Dynamic_b44d; 14863 lines = 780 spec + 2x7041; TR 17.2 ms; 36 EE, period 3.32 s; RAW k0 B/A median 2.94 (IQR 2.66-3.45); diss/gas sum8 at A 0.076, coh8 0.072
+== 2024-12-05_043AS 22:04:28
+2024-12-05_043AS: binning=DIAPHRAGM nilv 8162 TR 0.0172 EE 32 | exclude ranges (s) [(128, 144)] -> 720 ilv excluded, 7512 binned, 7342 binned & kept
+2024-12-05_043AS: nav AIkill_Dynamic_b44d; 17104 lines = 780 spec + 2x8162; TR 17.2 ms; 32 EE, period 4.13 s; RAW k0 B/A median 5.62 (IQR 4.55-5.99); diss/gas sum8 at A 0.139, coh8 0.126; pneumo tidal amplitude trend -4.4 %/min over 3-185 s (47 cycles, pneumo clock)
+== 2024-12-06_051VM 22:04:34
+2024-12-06_051VM: binning=DIAPHRAGM nilv 5676 TR 0.0172 EE 35 | exclude ranges (s) [(85, 101)] -> 734 ilv excluded, 5217 binned, 4805 binned & kept
+2024-12-06_051VM: nav AIkill_Dynamic_b44d; 12133 lines = 780 spec + 2x5676; TR 17.2 ms; 35 EE, period 2.61 s; RAW k0 B/A median 2.36 (IQR 2.02-2.72); diss/gas sum8 at A 0.040, coh8 0.032; pneumo tidal amplitude trend -11.1 %/min over 2-145 s (54 cycles, pneumo clock)
+== 2024-12-09_027JC 22:04:39
+2024-12-09_027JC: binning=DIAPHRAGM nilv 7272 TR 0.0172 EE 28 | exclude ranges (s) [(114, 129)] -> 644 ilv excluded, 6364 binned, 6364 binned & kept
+2024-12-09_027JC: nav AIkill_Dynamic_b44d; 15324 lines = 780 spec + 2x7272; TR 17.2 ms; 28 EE, period 4.06 s; RAW k0 B/A median 3.57 (IQR 3.31-3.81); diss/gas sum8 at A 0.052, coh8 0.040; pneumo tidal amplitude trend -24.8 %/min over 3-201 s (54 cycles, pneumo clock)
+BATCH DONE 22:04:44

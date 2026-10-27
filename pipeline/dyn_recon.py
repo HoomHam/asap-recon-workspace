@@ -62,7 +62,7 @@ TRIES       = 4              # retries per transfer step
 POLL_S       = 30             # run status poll interval
 
 # respiratory binning methods -> output subfolder letter
-BINNING_LETTER = {'SIGNAL': 's', 'PNEUMOTACH': 'p', 'DIAPHRAGM': 'd'}
+BINNING_LETTER = {'SIGNAL': 's', 'PNEUMOTACH': 'p', 'DIAPHRAGM': 'd', 'MIX': 'm'}
 LETTER_BINNING = {v: k for k, v in BINNING_LETTER.items()}
 
 # defaults for the --date/--id resolve mode (HoomHam died; data now on Ext)
@@ -191,7 +191,8 @@ def resolve(args):
         _log(f'exclude    : {args.excluderanges or "(auto only)"}   SIGNAL EE half-window: {args.sigmin_n or 50}')
     return dict(datadir=str(datadir), seqname=seqname, gp=gp, dp=dp,
                 pneumo=pneumo, outbase=outbase, date=date, id=subj_id,
-                merge=merge, ref=args.ref, excluderanges=args.excluderanges, sigmin_n=args.sigmin_n)
+                merge=merge, ref=args.ref, excluderanges=args.excluderanges, sigmin_n=args.sigmin_n,
+                binsigma=args.binsigma, binpou=args.binpou, pneumoclock=args.pneumoclock)
 
 
 # --- stage 2: convert --------------------------------------------------------
@@ -244,6 +245,15 @@ def convert(ds, run_dir, binning):
         cmd += ['--excluderanges', ds['excluderanges']]
     if ds.get('sigmin_n') is not None:
         cmd += ['--sigmin-n', str(ds['sigmin_n'])]
+    if ds.get('binsigma') is not None:
+        cmd += ['--binsigma', str(ds['binsigma'])]
+    if ds.get('binpou') is not None:
+        cmd += ['--binpou', str(ds['binpou'])]
+    if ds.get('pneumoclock'):
+        # XeCS F78: inside 2024-07-29..2024-09-10 the pneumotach record starts ~5.8 s before the first cal FID
+        off = -5.8 if '2024-07-29' <= str(ds.get('date', '')) <= '2024-09-10' else 0.0
+        cmd += ['--pneumoclock', '1', '--pneumo-offset-s', str(off)]
+        _log(f'pneumotach clock: MDH-timestamp mapping ON, record-start offset {off:+.1f} s')
     _log(f'converting ({binning}) -> {input_mrd}')
     if subprocess.run(cmd).returncode != 0:
         _die('conversion failed')
@@ -407,6 +417,9 @@ def main():
     ap.add_argument('--ref', help='breath-hold MID stored as reference_acquisition (with --merge)')
     ap.add_argument('--excluderanges', help="Steve's exclude ranges, integer seconds on the gas-interleave clock "
                                             "iilv*TR, e.g. '0-12, 66-93' (needs ASAP_CONVERTER=convert_mixed_adc.py)")
+    ap.add_argument('--binsigma', type=float, default=None, help='soft-bin kernel width in bins (fork MIX patch; default Steve 1.0)')
+    ap.add_argument('--binpou', type=int, default=None, help='1: partition-of-unity bin weights (fork MIX patch)')
+    ap.add_argument('--pneumoclock', action='store_true', help='map the pneumotach clock onto the gas interleaves from the MDH timestamps (fork 2026-10-27)')
     ap.add_argument('--sigmin-n', type=int, default=None,
                     help='SIGNAL EE-minimum half-window in gas interleaves (Steve: 50; needs convert_mixed_adc.py)')
     ap.add_argument('--codespec', default=str(TYGER_SPEC),
